@@ -480,9 +480,8 @@ def render_top_navigation():
 # ================= 登录弹窗 =================
 def render_login_modal():
     """渲染登录/注册弹窗"""
-    # 使用对话框形式
-    @st.dialog("🔐 用户登录 / 注册", width="large")
-    def login_dialog():
+    # 使用 expander 替代 dialog
+    with st.expander("🔐 用户登录 / 注册", expanded=True):
         tab1, tab2 = st.tabs(["登录", "注册"])
 
         with tab1:
@@ -547,7 +546,7 @@ def render_login_modal():
             st.session_state.show_login_modal = False
             st.rerun()
 
-    login_dialog()
+
 
 
 # ================= 侧边栏导航 =================
