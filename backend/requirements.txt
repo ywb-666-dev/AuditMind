@@ -34,8 +34,9 @@ joblib==1.3.2
 httpx==0.26.0
 openai==1.10.0
 
-# 支付
-alipay-sdk==3.3.1
+# 支付（Vercel部署时如果不需要支付功能可以注释掉）
+# alipay-sdk-python==3.7.0
+# wechatpay==1.0.0
 
 # 可视化
 plotly==5.18.0
