@@ -1,0 +1,79 @@
+# 财务舞弊识别 SaaS 平台 - Git忽略文件
+
+# ==================== 环境变量和敏感信息 ====================
+.env
+*.env
+.streamlit/secrets.toml
+backend/.env
+
+# ==================== Python缓存 ====================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ==================== 虚拟环境 ====================
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# ==================== IDE和编辑器 ====================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ==================== 上传的文件（可能包含敏感数据） ====================
+backend/data/uploads/*
+!backend/data/uploads/.gitkeep
+frontend/data/uploads/*
+!frontend/data/uploads/.gitkeep
+
+# ==================== 生成的报告（可选，如果太大） ====================
+backend/result/reports/*.pdf
+backend/result/reports/*.html
+
+# ==================== 日志文件 ====================
+*.log
+logs/
+
+# ==================== 数据库文件（如果使用SQLite） ====================
+*.db
+*.sqlite
+*.sqlite3
+
+# ==================== 模型文件（如果太大，可从其他渠道获取） ====================
+# 注释掉下面几行如果你想推送模型文件
+# backend/result/models/*.pkl
+# backend/result/models/*.joblib
+
+# ==================== 测试相关 ====================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# ==================== 临时文件 ====================
+tmp/
+temp/
+*.tmp
