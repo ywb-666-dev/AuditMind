@@ -93,23 +93,51 @@ class ProfessionalReportService:
         os.makedirs(self.output_dir, exist_ok=True)
 
     def _register_fonts(self):
-        """注册中文字体"""
+        """注册中文字体 - 支持 Windows 和 Linux"""
+        font_registered = False
         try:
+            # 尝试多种字体路径（Windows + Linux）
             font_paths = [
+                # Windows 字体
                 ('C:/Windows/Fonts/msyh.ttc', 'MicrosoftYaHei'),
                 ('C:/Windows/Fonts/simhei.ttf', 'SimHei'),
                 ('C:/Windows/Fonts/simsun.ttc', 'SimSun'),
+                ('C:/Windows/Fonts/msyhbd.ttc', 'MicrosoftYaHeiBold'),
+                # Linux 中文字体
+                ('/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc', 'WenQuanYiZenHei'),
+                ('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 'WenQuanYiMicroHei'),
+                ('/usr/share/fonts/truetype/noto/NotoSansCJK-Regular.ttc', 'NotoSansCJK'),
+                ('/usr/share/fonts/truetype/noto/NotoSansCJK-Bold.ttc', 'NotoSansCJKBold'),
+                ('/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc', 'NotoSansCJK'),
+                ('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 'DejaVu'),
+                ('/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf', 'Liberation'),
             ]
 
+            chinese_font_path = None
             for path, name in font_paths:
                 if os.path.exists(path):
                     try:
-                        pdfmetrics.registerFont(TTFont('ChineseFont', path))
-                        pdfmetrics.registerFont(TTFont('ChineseFontBold', path))
-                        print(f"[OK] 注册字体: {name}")
-                        break
-                    except:
+                        if 'Bold' in name or 'bd' in path.lower():
+                            pdfmetrics.registerFont(TTFont('ChineseFontBold', path))
+                        else:
+                            pdfmetrics.registerFont(TTFont('ChineseFont', path))
+                            chinese_font_path = path
+                        print(f"[OK] 注册字体: {name} from {path}")
+                        font_registered = True
+                    except Exception as e:
+                        print(f"[WARN] 注册字体失败 {name}: {e}")
                         continue
+
+            # 如果没有粗体字体，用常规字体代替
+            if chinese_font_path:
+                try:
+                    pdfmetrics.registerFont(TTFont('ChineseFontBold', chinese_font_path))
+                except:
+                    pass
+
+            if not font_registered:
+                print("[WARN] 未找到任何中文字体，PDF生成可能显示乱码")
+
         except Exception as e:
             print(f"[WARN] 字体注册失败: {e}")
 
@@ -162,14 +190,33 @@ class ProfessionalReportService:
             "file_size": os.path.getsize(file_path)
         }
 
+    def _get_font_name(self, bold=False) -> str:
+        """获取可用字体名称"""
+        try:
+            # 检查字体是否已注册
+            from reportlab.pdfbase import pdfmetrics
+            if bold:
+                if 'ChineseFontBold' in pdfmetrics._fonts:
+                    return 'ChineseFontBold'
+            if 'ChineseFont' in pdfmetrics._fonts:
+                return 'ChineseFont'
+        except:
+            pass
+        # 回退到 Helvetica（英文）或默认字体
+        return 'Helvetica-Bold' if bold else 'Helvetica'
+
     def _create_styles(self) -> Dict[str, ParagraphStyle]:
         """创建文档样式"""
         styles = {}
 
+        # 获取可用字体
+        font_name = self._get_font_name(bold=False)
+        font_name_bold = self._get_font_name(bold=True)
+
         # 标题样式
         styles['title'] = ParagraphStyle(
-            'Title',
-            fontName='ChineseFont',
+            'CustomTitle',
+            fontName=font_name,
             fontSize=26,
             leading=32,
             alignment=TA_CENTER,
@@ -178,8 +225,8 @@ class ProfessionalReportService:
         )
 
         styles['subtitle'] = ParagraphStyle(
-            'Subtitle',
-            fontName='ChineseFont',
+            'CustomSubtitle',
+            fontName=font_name,
             fontSize=12,
             leading=16,
             alignment=TA_CENTER,
@@ -187,8 +234,8 @@ class ProfessionalReportService:
         )
 
         styles['heading1'] = ParagraphStyle(
-            'Heading1',
-            fontName='ChineseFont',
+            'CustomHeading1',
+            fontName=font_name,
             fontSize=16,
             leading=22,
             spaceBefore=20,
@@ -198,8 +245,8 @@ class ProfessionalReportService:
         )
 
         styles['heading2'] = ParagraphStyle(
-            'Heading2',
-            fontName='ChineseFont',
+            'CustomHeading2',
+            fontName=font_name,
             fontSize=13,
             leading=17,
             spaceBefore=12,
@@ -208,8 +255,8 @@ class ProfessionalReportService:
         )
 
         styles['normal'] = ParagraphStyle(
-            'Normal',
-            fontName='ChineseFont',
+            'CustomNormal',
+            fontName=font_name,
             fontSize=10,
             leading=15,
             alignment=TA_LEFT,
@@ -218,8 +265,8 @@ class ProfessionalReportService:
         )
 
         styles['highlight'] = ParagraphStyle(
-            'Highlight',
-            fontName='ChineseFont',
+            'CustomHighlight',
+            fontName=font_name,
             fontSize=11,
             leading=16,
             textColor=colors.HexColor('#333333'),
@@ -230,8 +277,8 @@ class ProfessionalReportService:
         )
 
         styles['alert'] = ParagraphStyle(
-            'Alert',
-            fontName='ChineseFont',
+            'CustomAlert',
+            fontName=font_name,
             fontSize=11,
             leading=16,
             textColor=colors.HexColor('#721c24'),
@@ -242,8 +289,8 @@ class ProfessionalReportService:
         )
 
         styles['success'] = ParagraphStyle(
-            'Success',
-            fontName='ChineseFont',
+            'CustomSuccess',
+            fontName=font_name,
             fontSize=11,
             leading=16,
             textColor=colors.HexColor('#155724'),
@@ -254,8 +301,8 @@ class ProfessionalReportService:
         )
 
         styles['quote'] = ParagraphStyle(
-            'Quote',
-            fontName='ChineseFont',
+            'CustomQuote',
+            fontName=font_name,
             fontSize=9,
             leading=13,
             textColor=colors.HexColor('#555555'),
@@ -289,10 +336,13 @@ class ProfessionalReportService:
         # 风险等级大图标
         risk_style = self.RISK_STYLES.get(detection.risk_level, self.RISK_STYLES['low'])
 
+        # 获取可用字体
+        font_name = self._get_font_name(bold=False)
+
         # 风险等级框
         risk_box_style = ParagraphStyle(
             'RiskBox',
-            fontName='ChineseFont',
+            fontName=font_name,
             fontSize=20,
             alignment=TA_CENTER,
             textColor=risk_style['color'],
@@ -306,7 +356,7 @@ class ProfessionalReportService:
         # 舞弊概率
         prob_style = ParagraphStyle(
             'ProbStyle',
-            fontName='ChineseFont',
+            fontName=font_name,
             fontSize=14,
             alignment=TA_CENTER,
             textColor=colors.HexColor('#333333')
@@ -317,7 +367,7 @@ class ProfessionalReportService:
         # 简要建议
         advice_style = ParagraphStyle(
             'AdviceStyle',
-            fontName='ChineseFont',
+            fontName=font_name,
             fontSize=11,
             alignment=TA_CENTER,
             textColor=colors.HexColor('#666666'),
@@ -383,7 +433,7 @@ class ProfessionalReportService:
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.HexColor('#333333')),
             ('LINEBELOW', (0, 0), (-1, 0), 1, colors.HexColor('#dddddd')),
             ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONTNAME', (0, 0), (-1, -1), 'ChineseFont'),
+            ('FONTNAME', (0, 0), (-1, -1), self._get_font_name()),
             ('FONTSIZE', (0, 0), (-1, -1), 10),
             ('TOPPADDING', (0, 0), (-1, -1), 8),
             ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
@@ -539,7 +589,7 @@ class ProfessionalReportService:
                 ('LINEBELOW', (0, 0), (-1, 0), 1, colors.HexColor('#dddddd')),
                 ('ALIGN', (0, 0), (0, -1), 'LEFT'),
                 ('ALIGN', (1, 0), (1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, -1), 'ChineseFont'),
+                ('FONTNAME', (0, 0), (-1, -1), self._get_font_name()),
                 ('FONTSIZE', (0, 0), (-1, -1), 9),
                 ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
                 ('TOPPADDING', (0, 0), (-1, -1), 6),
