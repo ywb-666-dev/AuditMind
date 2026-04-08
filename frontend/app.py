@@ -541,10 +541,39 @@ def render_login_modal():
                         else:
                             st.error("注册失败")
 
-        # 关闭按钮
-        if st.button("❌ 关闭", use_container_width=True):
-            st.session_state.show_login_modal = False
-            st.rerun()
+        # 快速登录按钮 - AuditMind 默认账号
+        st.divider()
+        st.markdown("🚀 **快速体验？使用演示账号登录**")
+
+        col_quick, col_close = st.columns([2, 1])
+
+        with col_quick:
+            if st.button("✨ 一键登录演示账号", use_container_width=True, type="primary", key="quick_login_btn"):
+                # 使用默认账号登录
+                result = make_api_request(
+                    "/user/login",
+                    method="POST",
+                    data={"username": "AuditMind", "password": "123"}
+                )
+
+                if result and "access_token" in result:
+                    st.session_state.token = result["access_token"]
+                    st.session_state.user_info = result["user"]
+                    st.session_state.logged_in = True
+                    st.session_state.show_login_modal = False
+
+                    # 持久化登录信息
+                    AuthManager.save_auth(result["access_token"], result["user"])
+
+                    st.success("✅ 演示账号登录成功！已解锁全部功能")
+                    st.rerun()
+                else:
+                    st.error("演示账号登录失败，请尝试手动注册登录")
+
+        with col_close:
+            if st.button("❌ 关闭", use_container_width=True, key="close_login_modal"):
+                st.session_state.show_login_modal = False
+                st.rerun()
 
 
 
@@ -609,6 +638,16 @@ def render_home():
         | 投资者 | 个股风险检测、投资标的筛查 |
         | 上市公司 | 财务舞弊自查、信息披露优化 |
         """)
+
+        # 演示账号提示
+        if not st.session_state.logged_in:
+            st.info("""
+            💡 **快速体验**
+
+            点击右上角 🔐 登录/注册，然后选择「✨ 一键登录演示账号」即可体验全部功能，无需注册！
+
+            📋 演示账号：AuditMind / 123
+            """)
 
     with col2:
         st.image("https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400", caption="AI 驱动的财务分析")

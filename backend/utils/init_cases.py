@@ -7,9 +7,11 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from sqlalchemy.orm import Session
+from datetime import datetime, timedelta
 # 🔥 强制导入 表基类 + 引擎 + 模型
-from backend.models.database import Base, DemoCase
+from backend.models.database import Base, DemoCase, User, UserProfile
 from backend.core.database import engine, SessionLocal
+from backend.core.security import get_password_hash
 
 
 def init_demo_cases(db: Session):
@@ -217,6 +219,63 @@ def init_demo_cases(db: Session):
     print(f"✅ 成功导入 {db.query(DemoCase).count()} 个预设案例")
 
 
+def init_default_user(db: Session):
+    """
+    初始化默认用户账号 - AuditMind（演示账号，拥有全部功能）
+    """
+    # 检查默认账号是否已存在
+    existing = db.query(User).filter(User.username == "AuditMind").first()
+    if existing:
+        print("✅ 默认账号 AuditMind 已存在，跳过创建")
+        # 确保账号有企业版权限
+        if existing.membership_level != "enterprise":
+            existing.membership_level = "enterprise"
+            existing.free_detections_remaining = -1  # 无限次检测
+            db.commit()
+            print("✅ 已更新 AuditMind 为 Enterprise 会员")
+        return
+
+    # 创建默认账号
+    default_user = User(
+        username="AuditMind",
+        email="admin@auditmind.com",
+        phone="13800000000",
+        password_hash=get_password_hash("123"),
+        user_type="enterprise",
+        membership_level="enterprise",  # 企业版，拥有全部功能
+        membership_expire_at=datetime.utcnow() + timedelta(days=3650),  # 10年有效期
+        balance=999999.0,  # 充足余额
+        free_detections_remaining=-1,  # -1 表示无限次检测
+        detection_reset_date=datetime.utcnow().date() + timedelta(days=3650)
+    )
+
+    db.add(default_user)
+    db.commit()
+    db.refresh(default_user)
+
+    # 创建用户资料
+    default_profile = UserProfile(
+        user_id=default_user.id,
+        real_name="审计专家",
+        company_name="AuditMind 智能审计",
+        certified=True,
+        certified_at=datetime.utcnow()
+    )
+
+    db.add(default_profile)
+    db.commit()
+
+    print("✅ 默认账号创建成功！")
+    print("=" * 50)
+    print("📋 账号信息:")
+    print("   用户名: AuditMind")
+    print("   密  码: 123")
+    print("   邮  箱: admin@auditmind.com")
+    print("   手  机: 13800000000")
+    print("   权  限: Enterprise（全部功能）")
+    print("=" * 50)
+
+
 if __name__ == "__main__":
     # 🔥 🔥 🔥 核心修复：直接强制创建所有表（100%生效）
     Base.metadata.create_all(bind=engine)
@@ -226,5 +285,6 @@ if __name__ == "__main__":
     db = SessionLocal()
     try:
         init_demo_cases(db)
+        init_default_user(db)  # 创建默认账号
     finally:
         db.close()
