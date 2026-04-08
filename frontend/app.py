@@ -25,7 +25,7 @@ st.set_page_config(
 )
 
 # ================= API 配置 =================
-API_BASE_URL = "http://localhost:8000/api"
+API_BASE_URL = "http://47.76.180.29:8000/api"
 
 # ================= 持久化登录管理 =================
 class AuthManager:

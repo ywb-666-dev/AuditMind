@@ -8,7 +8,7 @@ import hashlib
 import json
 
 # API基础URL
-API_BASE_URL = "http://localhost:8000/api"
+API_BASE_URL = "http://47.76.180.29:8000/api"
 
 
 class APICache:

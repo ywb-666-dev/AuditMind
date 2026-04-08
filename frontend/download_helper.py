@@ -5,7 +5,7 @@ import streamlit as st
 import requests
 from typing import Optional
 
-API_BASE_URL = "http://localhost:8000/api"
+API_BASE_URL = "http://47.76.180.29:8000/api"
 
 
 def download_file_with_auth(download_url: str, filename: str, token: str):
