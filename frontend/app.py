@@ -1840,10 +1840,18 @@ def render_report_management():
         st.warning("请先登录以查看报告")
         return
 
+    # 刷新按钮
+    col_title, col_refresh = st.columns([6, 1])
+    with col_refresh:
+        if st.button("🔄 刷新", key="refresh_report_management", use_container_width=True):
+            # 清除缓存并重新加载
+            clear_api_cache()
+            st.rerun()
+
     # 获取检测历史和报告列表
     # 构建认证headers
     headers = {"Authorization": f"Bearer {st.session_state.token}"} if st.session_state.token else {}
-    
+
     history = cached_api_request("/detection/history", headers=headers, cache_ttl=300) or []
     reports = cached_api_request("/report/list", headers=headers, cache_ttl=300) or []
     
