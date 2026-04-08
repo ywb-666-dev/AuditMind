@@ -1731,59 +1731,104 @@ def render_membership():
         st.subheader("会员权益")
         if membership == "free":
             st.markdown("""
-            - ✅ 基础检测 3 次/月
-            - ✅ AI 问答 5 次/天
-            - ❌ 报告导出
+            - ✅ 基础财务指标分析
+            - ✅ 标准风险标签
+            - ❌ API 接口
             - ❌ 批量检测
             """)
         elif membership == "pro":
             st.markdown("""
-            - ✅ 无限次检测
-            - ✅ AI 问答 50 次/天
-            - ✅ PDF/HTML 报告导出
-            - ✅ SHAP 特征分析
+            - ✅ 高级AI文本分析
+            - ✅ SHAP可解释性分析
+            - ✅ API 接口对接
+            - ❌ 批量检测
             """)
         else:
             st.markdown("""
-            - ✅ 专业版全部权益
+            - ✅ 全部高级分析功能
             - ✅ 批量检测(100 家/次)
-            - ✅ API 接口调用
-            - ✅ 专属客服
+            - ✅ API 接口对接
+            - ✅ 私有云部署支持
             """)
 
     st.divider()
 
-    # 套餐选择
+    # 套餐选择 - 企业级定价方案
     st.subheader("套餐选择")
+    st.caption("💼 企业级服务方案，助力专业机构高效风控")
 
-    # 获取会员套餐(使用缓存)
-    plans = get_cached_membership_plans(_token=st.session_state.token)
+    # 定义企业级套餐（前端静态展示，不依赖后端）
+    enterprise_plans = [
+        {
+            "name": "基础版",
+            "price": "1.98万",
+            "unit": "元/年",
+            "highlight": False,
+            "features": [
+                "✅ 30个项目/年",
+                "✅ 基础财务指标分析",
+                "✅ 标准风险标签",
+                "✅ 邮件技术支持",
+                "❌ API 接口",
+                "❌ 批量检测",
+                "❌ 私有部署"
+            ]
+        },
+        {
+            "name": "专业版",
+            "price": "3.98万",
+            "unit": "元/年",
+            "highlight": True,
+            "features": [
+                "✅ 无限项目数量",
+                "✅ 高级AI文本分析",
+                "✅ SHAP可解释性分析",
+                "✅ API 接口对接",
+                "✅ 优先技术支持",
+                "❌ 批量检测",
+                "❌ 私有部署"
+            ]
+        },
+        {
+            "name": "旗舰版",
+            "price": "6.98万",
+            "unit": "元/年",
+            "highlight": False,
+            "features": [
+                "✅ 无限项目数量",
+                "✅ 高级AI文本分析",
+                "✅ SHAP可解释性分析",
+                "✅ API 接口对接",
+                "✅ 批量检测(100家/次)",
+                "✅ 私有云部署",
+                "✅ 专属客户经理"
+            ]
+        }
+    ]
 
-    if plans:
-        cols = st.columns(3)
-        for idx, plan in enumerate(plans):
-            with cols[idx]:
-                st.markdown(f"### {plan['name']}")
-                st.markdown(f"## ¥{plan['price']}")
-                st.caption(f"¥{plan['price']/plan['duration_days']*30:.0f}/月")
+    cols = st.columns(3)
+    for idx, plan in enumerate(enterprise_plans):
+        with cols[idx]:
+            # 高亮推荐方案
+            if plan["highlight"]:
+                st.success("⭐ 最受欢迎")
 
-                st.markdown("**权益包括:**")
-                for benefit in plan.get("benefits", []):
-                    st.markdown(f"- {benefit}")
+            st.markdown(f"### {plan['name']}")
+            st.markdown(f"## {plan['price']}")
+            st.caption(plan["unit"])
 
-                if st.button(f"选择{plan['name']}", use_container_width=True, key=f"plan_{plan['plan_type']}"):
-                    # 创建订阅订单
-                    result = make_api_request(
-                        f"/order/subscribe/{plan['plan_type']}",
-                        method="POST"
-                    )
-                    if result:
-                        st.success(f"订单创建成功！订单号：{result['order_no']}")
+            st.markdown("**权益包括：**")
+            for feature in plan["features"]:
+                st.markdown(f"{feature}")
 
-                        # 支付方式选择
-                        payment_method = st.selectbox("选择支付方式", ["支付宝", "微信支付"])
-                        if st.button("立即支付"):
-                            st.info("支付功能开发中...")
+            # 联系咨询按钮（替代直接购买）
+            button_type = "primary" if plan["highlight"] else "secondary"
+            if st.button(f"立即咨询", use_container_width=True, key=f"plan_consult_{idx}", type=button_type):
+                st.info("📞 请联系商务经理：400-888-8888 或发送邮件至 sales@auditmind.com")
+                st.balloons()
+
+    st.divider()
+    st.markdown("📋 **说明：** 以上价格均为企业年度订阅费用，支持对公转账。详情请联系商务团队获取正式报价单。")
 
 
 # ================= 报告管理页面 =================
