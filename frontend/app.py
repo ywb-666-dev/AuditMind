@@ -1969,10 +1969,37 @@ def render_report_management():
                             )
                             if result and result.get("download_url"):
                                 st.success(f"{selected_format}报告已生成！")
-                                # 使用认证下载
-                                download_url = f"{API_BASE_URL}{result['download_url']}"
-                                filename = result.get("filename", f"报告.{format_code}")
-                                download_file_with_auth(download_url, filename, st.session_state.token)
+                                # 使用 Python 下载文件内容
+                                try:
+                                    import requests
+                                    download_url = f"{API_BASE_URL}{result['download_url']}"
+                                    headers = {"Authorization": f"Bearer {st.session_state.token}"}
+                                    response = requests.get(download_url, headers=headers, timeout=30)
+
+                                    if response.status_code == 200:
+                                        filename = result.get("filename", f"报告.{format_code}")
+                                        # 获取文件内容
+                                        file_content = response.content
+
+                                        # 使用 Streamlit 原生下载按钮
+                                        mime_types = {
+                                            "pdf": "application/pdf",
+                                            "word": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                            "excel": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                        }
+                                        mime_type = mime_types.get(format_code, "application/octet-stream")
+
+                                        st.download_button(
+                                            label=f"⬇️ 点击下载 {filename}",
+                                            data=file_content,
+                                            file_name=filename,
+                                            mime=mime_type,
+                                            key=f"download_btn_{report['id']}_{format_code}"
+                                        )
+                                    else:
+                                        st.error(f"下载失败: HTTP {response.status_code}")
+                                except Exception as e:
+                                    st.error(f"下载出错: {str(e)}")
                             else:
                                 st.error("生成失败")
                 with col_del:
