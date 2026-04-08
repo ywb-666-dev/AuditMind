@@ -71,7 +71,7 @@ class ReportService:
             file_path = os.path.join(self.output_dir, report_filename)
 
             # 保存报告文件
-            self._save_report_file(file_path, report_content, report_type)
+            self._save_report_file(file_path, report_content, report_type, detection)
 
             # 创建报告记录
             db_report = Report(
@@ -161,12 +161,28 @@ class ReportService:
         company_name = detection.company_name.replace(" ", "_").replace("/", "_")
         return f"{company_name}_{detection.year}_{report_type}_{timestamp}.pdf"
 
-    def _save_report_file(self, file_path: str, content: str, report_type: str):
+    def _save_report_file(self, file_path: str, content: str, report_type: str, detection: DetectionRecord = None):
         """保存报告文件"""
         if report_type.endswith("pdf"):
-            # 生成 PDF
-            html = HTML(string=content)
-            html.write_pdf(file_path)
+            try:
+                # 尝试使用 weasyprint 生成 PDF
+                html = HTML(string=content)
+                html.write_pdf(file_path)
+            except Exception as e:
+                print(f"[WARN] weasyprint 生成 PDF 失败: {e}，尝试使用 reportlab")
+                # 回退到使用 professional_report_service 生成 PDF
+                if detection:
+                    from backend.services.professional_report_service import generate_professional_report
+                    result = generate_professional_report(detection)
+                    # 复制生成的文件到目标路径
+                    import shutil
+                    shutil.copy(result['file_path'], file_path)
+                else:
+                    # 如果无法使用 reportlab，保存为 HTML
+                    html_path = file_path.replace('.pdf', '.html')
+                    with open(html_path, 'w', encoding='utf-8') as f:
+                        f.write(content)
+                    raise RuntimeError(f"PDF 生成失败，已保存为 HTML: {html_path}")
         else:
             # 保存 HTML
             with open(file_path, 'w', encoding='utf-8') as f:
