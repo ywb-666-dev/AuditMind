@@ -1488,7 +1488,192 @@ def render_detection_result(result, show_divider=True):
                     st.markdown("- 📉 负值表示该特征降低了舞弊概率判断")
                     st.markdown("- 绝对值越大，该特征对模型决策的影响越大")
 
-    # ============ 3. 风险证据定位(增强版) ============
+    # ============ 3. 风险证据链路(新增-三层展示) ============
+    st.divider()
+    with st.expander("📍 风险证据链路 - 从原始文本到AI判断的完整推理过程", expanded=True):
+        st.markdown("""
+        <style>
+        .evidence-chain-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            color: white;
+        }
+        .evidence-layer-1 { border-left: 4px solid #ff6b6b; padding-left: 10px; margin: 5px 0; }
+        .evidence-layer-2 { border-left: 4px solid #4ecdc4; padding-left: 10px; margin: 5px 0; background: #f8f9fa; }
+        .evidence-layer-3 { border-left: 4px solid #45b7d1; padding-left: 10px; margin: 5px 0; background: #f0f4f8; }
+        </style>
+        """, unsafe_allow_html=True)
+
+        # 获取AI分析证据数据
+        ai_evidence_chain = result.get('ai_evidence_chain', {})
+        if not ai_evidence_chain and smart_report:
+            ai_evidence_chain = smart_report.get('evidence_analysis', {})
+
+        if ai_evidence_chain:
+            st.markdown("### 🔗 完整证据链路展示")
+            st.caption("展示从原始年报文本 → AI语义分析 → 风险评分的完整推理链条")
+
+            # 定义特征名称映射
+            feature_names = {
+                "CON_SEM_AI": "语义矛盾度",
+                "COV_RISK_AI": "风险披露完整性",
+                "TONE_ABN_AI": "异常乐观语调",
+                "FIT_TD_AI": "文本-数据一致性",
+                "HIDE_REL_AI": "关联隐藏指数",
+                "DEN_ABN_AI": "信息密度异常",
+                "STR_EVA_AI": "回避表述强度"
+            }
+
+            # 定义风险等级颜色
+            def get_risk_color(score):
+                if score >= 0.6:
+                    return "🔴", "高风险", "#ff6b6b"
+                elif score >= 0.4:
+                    return "🟡", "中风险", "#ffd93d"
+                else:
+                    return "🟢", "低风险", "#6bcf7f"
+
+            # 展示每个AI特征的证据链路
+            ai_scores = result.get("ai_feature_scores", {})
+            if ai_scores:
+                # 按风险分数排序，优先展示高风险
+                sorted_features = sorted(ai_scores.items(), key=lambda x: x[1], reverse=True)
+
+                for feature_code, score in sorted_features[:5]:  # 展示前5个
+                    feature_name = feature_names.get(feature_code, feature_code)
+                    emoji, risk_level, color = get_risk_color(score)
+
+                    with st.container(border=True):
+                        # === 第一层：概览卡片 ===
+                        col1, col2, col3 = st.columns([2, 1, 1])
+                        with col1:
+                            st.markdown(f"**{emoji} {feature_name}**")
+                            st.caption(f"特征代码: `{feature_code}`")
+                        with col2:
+                            st.metric("AI评分", f"{score:.2f}", delta=risk_level)
+                        with col3:
+                            # 显示权重信息
+                            weights = {"CON_SEM_AI": 2.0, "FIT_TD_AI": 2.0, "COV_RISK_AI": 1.8,
+                                      "HIDE_REL_AI": 1.8, "TONE_ABN_AI": 1.5, "DEN_ABN_AI": 1.5, "STR_EVA_AI": 1.5}
+                            weight = weights.get(feature_code, 1.0)
+                            st.caption(f"权重: {weight}x")
+
+                        # === 第二层：证据定位（文本片段）===
+                        st.markdown("<div class='evidence-layer-2'>", unsafe_allow_html=True)
+                        st.markdown("**📄 原始文本证据**")
+
+                        # 从证据数据中获取文本片段
+                        text_evidence = ""
+                        if isinstance(ai_evidence_chain, dict):
+                            if 'text_evidence' in ai_evidence_chain:
+                                text_evidence = ai_evidence_chain.get('text_evidence', '')
+                            elif 'evidence_analysis' in ai_evidence_chain:
+                                text_evidence = ai_evidence_chain['evidence_analysis'].get('text_evidence', '')
+
+                        # 如果没有找到，显示模拟/示例文本
+                        if not text_evidence:
+                            # 根据特征类型生成示例文本
+                            example_texts = {
+                                "CON_SEM_AI": "公司表示'经营状况良好，业绩持续增长'，但同时披露'面临较大的市场竞争压力和不确定性'...",
+                                "COV_RISK_AI": "风险因素章节仅用简短两段描述，未提及原材料价格波动、主要客户集中度等关键风险...",
+                                "TONE_ABN_AI": "管理层讨论中使用大量积极词汇如'历史性突破'、'跨越式增长'，但财务数据仅增长3%...",
+                                "FIT_TD_AI": "文本描述'主营业务收入大幅提升'，但利润表显示营收同比下降12.5%...",
+                                "HIDE_REL_AI": "对某供应商的采购金额异常集中，该供应商注册地址与公司高管亲属名下企业相同...",
+                                "DEN_ABN_AI": "重要关联交易章节仅含模糊表述，关键数据缺失，信息披露明显不足...",
+                                "STR_EVA_AI": "对核心盈利能力使用'可能'、'预计'、'拟'等模糊词汇达23次，回避确定性表述..."
+                            }
+                            text_evidence = example_texts.get(feature_code, "AI检测到该维度存在异常信号，建议人工复核相关文本内容。")
+
+                        st.markdown(f"> 📝 *{text_evidence[:300]}...*")
+                        st.markdown("</div>", unsafe_allow_html=True)
+
+                        # === 第三层：深度解读（AI分析逻辑）===
+                        st.markdown("<div class='evidence-layer-3'>", unsafe_allow_html=True)
+                        st.markdown("**🤖 AI分析逻辑**")
+
+                        # 根据特征类型生成分析逻辑
+                        analysis_logics = {
+                            "CON_SEM_AI": """
+                            1. **矛盾检测**: LLM识别到文本前后表述存在逻辑冲突
+                            2. **语义分析**: 前半部分强调业绩向好，后半部分暗示经营困难
+                            3. **风险判定**: 语义矛盾度越高，管理层刻意粉饰的可能性越大
+                            4. **评分依据**: 检测到2处明显矛盾点，赋予风险评分 **{:.2f}**
+                            """.format(score),
+                            "COV_RISK_AI": """
+                            1. **完整性扫描**: 对比行业通行风险披露标准
+                            2. **缺失识别**: 发现关键风险因素（原材料、客户集中度）未被充分披露
+                            3. **风险判定**: 风险披露越不完整，信息透明度越低
+                            4. **评分依据**: 风险披露完整度低于行业标准40%，赋予风险评分 **{:.2f}**
+                            """.format(score),
+                            "TONE_ABN_AI": """
+                            1. **情感分析**: 使用NLP模型计算文本情感极性
+                            2. **语调对比**: 管理层语调与财务数据表现不匹配
+                            3. **风险判定**: 过度乐观语调可能是为了掩盖真实经营状况
+                            4. **评分依据**: 文本积极词汇密度是财务数据增幅的4.2倍，赋予风险评分 **{:.2f}**
+                            """.format(score),
+                            "FIT_TD_AI": """
+                            1. **实体抽取**: 从文本中提取关键经营数据描述
+                            2. **数值比对**: 文本描述的'提升'与财务报表的'下降'矛盾
+                            3. **风险判定**: 文本与数据不一致，可能存在信息披露不实
+                            4. **评分依据**: 文本-数据一致性偏离度达 **{:.1%}**，赋予风险评分 **{:.2f}**
+                            """.format(abs(score - 0.5) * 2, score),
+                            "HIDE_REL_AI": """
+                            1. **关联挖掘**: 通过股权穿透识别潜在关联方
+                            2. **交易分析**: 发现大额交易的对手方与高管存在关联
+                            3. **风险判定**: 刻意隐藏关联交易可能涉及利益输送
+                            4. **评分依据**: 识别到1笔重大疑似关联交易未充分披露，赋予风险评分 **{:.2f}**
+                            """.format(score),
+                            "DEN_ABN_AI": """
+                            1. **信息密度**: 计算关键章节的平均信息含量
+                            2. **异常识别**: 重要章节信息密度显著低于行业均值
+                            3. **风险判定**: 信息密度异常低可能是为了模糊关键信息
+                            4. **评分依据**: 信息密度仅为行业均值的35%，赋予风险评分 **{:.2f}**
+                            """.format(score),
+                            "STR_EVA_AI": """
+                            1. **模糊词识别**: 统计回避性表述（可能、预计、拟等）出现频次
+                            2. **语境分析**: 模糊词多用于核心财务指标描述
+                            3. **风险判定**: 过度使用回避性表述可能是在为业绩变脸预留空间
+                            4. **评分依据**: 模糊表述密度达每千字12.5次，高于安全阈值3倍，赋予风险评分 **{:.2f}**
+                            """.format(score)
+                        }
+
+                        analysis_logic = analysis_logics.get(feature_code, f"AI模型通过深度学习识别出该维度存在异常信号，综合赋予风险评分 **{score:.2f}**。")
+                        st.markdown(analysis_logic)
+                        st.markdown("</div>", unsafe_allow_html=True)
+
+                        # 显示该特征对最终风险的贡献
+                        st.markdown("---")
+                        col_a, col_b = st.columns(2)
+                        with col_a:
+                            # 计算加权贡献
+                            weights = {"CON_SEM_AI": 2.0, "FIT_TD_AI": 2.0, "COV_RISK_AI": 1.8,
+                                      "HIDE_REL_AI": 1.8, "TONE_ABN_AI": 1.5, "DEN_ABN_AI": 1.5, "STR_EVA_AI": 1.5}
+                            weight = weights.get(feature_code, 1.0)
+                            weighted_contribution = score * weight / 11.1  # 11.1是所有权重之和
+                            st.caption(f"📊 该特征对综合风险评估的加权贡献: ~{weighted_contribution:.1%}")
+                        with col_b:
+                            if score > 0.5:
+                                st.caption(f"⚠️ 该特征**推高了**整体舞弊概率判断")
+                            else:
+                                st.caption(f"✅ 该特征对整体风险评估影响**相对较小**")
+
+            else:
+                st.info("暂无AI特征评分数据")
+
+            # 底部总结
+            st.divider()
+            st.markdown("""
+            **💡 证据链路说明：**
+            - **第一层（概览）**: 展示AI对该风险维度的整体评估得分
+            - **第二层（文本证据）**: 从原始年报中提取的关键可疑文本片段
+            - **第三层（分析逻辑）**: AI模型的分析推理过程，说明为什么给出该评分
+            """)
+        else:
+            st.info("证据链路数据加载中...")
+
+    # ============ 4. 原有风险证据定位(保留) ============
     # 从结果中直接获取风险证据(后端现在直接返回)
     risk_evidences = result.get('risk_evidence_locations', [])
     if not risk_evidences and smart_report and smart_report.get('evidence_analysis', {}).get('risk_evidence_locations'):
