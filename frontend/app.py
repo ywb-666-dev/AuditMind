@@ -719,8 +719,9 @@ def render_home():
                     with col_s3:
                         st.error(scoring.get('high', ''))
 
-                    with st.expander("查看完整提示词模板"):
-                        st.code(prompt_data.get('prompt_template', ''), language='text')
+                    st.markdown("---")
+                    st.markdown("**📄 完整提示词模板：**")
+                    st.code(prompt_data.get('prompt_template', ''), language='text')
                 else:
                     st.error("提示词数据加载失败")
             except Exception as e:
@@ -1150,9 +1151,10 @@ def render_detection():
                         emoji = {"low": "🟢", "medium": "🟡", "high": "🔴"}.get(level, "⚪")
                         st.markdown(f"{emoji} {desc}")
 
-                    # 完整提示词（折叠）
-                    with st.expander("📄 查看完整提示词模板", expanded=False):
-                        st.code(prompt_data.get('prompt_template', ''), language='text')
+                    # 完整提示词
+                    st.markdown("---")
+                    st.markdown("**📄 完整提示词模板：**")
+                    st.code(prompt_data.get('prompt_template', ''), language='text')
                 else:
                     st.info("提示词信息加载失败")
             except Exception as e:
@@ -1360,10 +1362,10 @@ def render_detection_result(result, show_divider=True):
             # 获取当前检测记录的ID用于查询AI提示词
             detection_id = result.get('id', 0)
             if detection_id:
-                prompt_data = make_api_request(f"/detection/{detection_id}/ai-prompt")
+                prompt_data = make_api_request("/detection/ai-prompt")
             else:
                 # 如果没有ID（如内置案例），使用通用提示词接口
-                prompt_data = make_api_request("/detection/ai-prompt-info")
+                prompt_data = make_api_request("/detection/ai-prompt")
                 if not prompt_data:
                     # 如果专用接口不存在，从配置中直接获取
                     from backend.core.config import settings
@@ -1422,8 +1424,10 @@ def render_detection_result(result, show_divider=True):
                     - 动态阈值优化（Youden指数）
                     """)
 
-                with st.expander("查看完整提示词模板"):
-                    st.code(prompt_data.get('prompt_template', ''), language='text')
+                st.markdown("---")
+                st.markdown("**📄 完整提示词模板：**")
+                st.caption("以下提示词用于指导AI进行7维度文本风险分析")
+                st.code(prompt_data.get('prompt_template', ''), language='text')
             else:
                 st.warning("提示词数据加载失败")
         except Exception as e:
