@@ -1357,7 +1357,27 @@ def render_detection_result(result, show_divider=True):
         st.info("本区域展示本次检测使用的AI技术实现细节")
 
         try:
-            prompt_data = make_api_request("/detection/ai-prompt")
+            # 获取当前检测记录的ID用于查询AI提示词
+            detection_id = result.get('id', 0)
+            if detection_id:
+                prompt_data = make_api_request(f"/detection/{detection_id}/ai-prompt")
+            else:
+                # 如果没有ID（如内置案例），使用通用提示词接口
+                prompt_data = make_api_request("/detection/ai-prompt-info")
+                if not prompt_data:
+                    # 如果专用接口不存在，从配置中直接获取
+                    from backend.core.config import settings
+                    prompt_data = {
+                        "title": "AI文本风险分析提示词",
+                        "model": settings.MODEL_QWEN,
+                        "prompt_template": settings.OPTIMIZED_PROMPT_TEMPLATE,
+                        "features": settings.WEIGHTED_FEATURES,
+                        "scoring_criteria": {
+                            "low": "0.00-0.30: 低风险，无明显异常",
+                            "medium": "0.30-0.60: 中等风险，存在可疑信号",
+                            "high": "0.60-1.00: 高风险，存在明显舞弊嫌疑"
+                        }
+                    }
             if prompt_data:
                 col_tech1, col_tech2 = st.columns([1, 1])
 
@@ -1536,8 +1556,16 @@ def render_detection_result(result, show_divider=True):
                     return "🟢", "低风险", "#6bcf7f"
 
             # 展示每个AI特征的证据链路
-            ai_scores = result.get("ai_feature_scores", {})
-            if ai_scores:
+            ai_scores_raw = result.get("ai_feature_scores", {})
+            if ai_scores_raw:
+                # 将分数转换为float类型（防止后端返回字符串）
+                ai_scores = {}
+                for k, v in ai_scores_raw.items():
+                    try:
+                        ai_scores[k] = float(v) if v is not None else 0.0
+                    except (ValueError, TypeError):
+                        ai_scores[k] = 0.0
+
                 # 按风险分数排序，优先展示高风险
                 sorted_features = sorted(ai_scores.items(), key=lambda x: x[1], reverse=True)
 

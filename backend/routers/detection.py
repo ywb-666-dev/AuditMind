@@ -658,6 +658,65 @@ def get_detection_history(
     return detections
 
 
+@router.get("/ai-prompt")
+def get_ai_prompt():
+    """
+    获取AI分析使用的提示词（用于演示展示）
+    """
+    from backend.core.config import settings
+
+    prompt_data = {
+        "title": "AI文本风险分析提示词",
+        "description": "本提示词用于指导大语言模型对MD&A文本进行7维度风险分析",
+        "model": settings.MODEL_QWEN,
+        "prompt_template": settings.OPTIMIZED_PROMPT_TEMPLATE,
+        "features": {
+            "CON_SEM_AI": {
+                "name": "语义矛盾度",
+                "description": "检测文本中前后矛盾的表述",
+                "example": "先说'业绩大幅增长'后又说'面临严峻挑战'"
+            },
+            "COV_RISK_AI": {
+                "name": "风险披露完整性",
+                "description": "评估风险因素披露的充分性",
+                "example": "是否回避了关键风险"
+            },
+            "TONE_ABN_AI": {
+                "name": "异常乐观语调",
+                "description": "检测语调是否过度乐观",
+                "example": "与财务数据是否匹配"
+            },
+            "FIT_TD_AI": {
+                "name": "文本-数据一致性",
+                "description": "验证文本描述与财务数据是否一致",
+                "example": "文本说'销量大增'但营收下降"
+            },
+            "HIDE_REL_AI": {
+                "name": "关联隐藏指数",
+                "description": "识别关联交易披露不充分",
+                "example": "刻意隐藏关联方信息"
+            },
+            "DEN_ABN_AI": {
+                "name": "信息密度异常",
+                "description": "检测关键信息披露过于简略或冗长",
+                "example": "故意冗长模糊"
+            },
+            "STR_EVA_AI": {
+                "name": "回避表述强度",
+                "description": "识别对敏感问题使用模糊表述",
+                "example": "使用'可能''拟''预计'等词汇"
+            }
+        },
+        "scoring_criteria": {
+            "low": "0.00-0.30: 低风险，无明显异常",
+            "medium": "0.30-0.60: 中等风险，存在可疑信号",
+            "high": "0.60-1.00: 高风险，存在明显舞弊嫌疑"
+        }
+    }
+
+    return prompt_data
+
+
 @router.get("/{detection_id}", response_model=DetectionDetailResponse)
 def get_detection_detail(
     detection_id: int,
@@ -777,62 +836,3 @@ def _generate_comparison_summary(ipo_results: list) -> dict:
             for f in case.get("matched_features", [])
         ))[:5]
     }
-
-
-@router.get("/ai-prompt")
-def get_ai_prompt():
-    """
-    获取AI分析使用的提示词（用于演示展示）
-    """
-    from backend.core.config import settings
-
-    prompt_data = {
-        "title": "AI文本风险分析提示词",
-        "description": "本提示词用于指导大语言模型对MD&A文本进行7维度风险分析",
-        "model": settings.MODEL_QWEN,
-        "prompt_template": settings.OPTIMIZED_PROMPT_TEMPLATE,
-        "features": {
-            "CON_SEM_AI": {
-                "name": "语义矛盾度",
-                "description": "检测文本中前后矛盾的表述",
-                "example": "先说'业绩大幅增长'后又说'面临严峻挑战'"
-            },
-            "COV_RISK_AI": {
-                "name": "风险披露完整性",
-                "description": "评估风险因素披露的充分性",
-                "example": "是否回避了关键风险"
-            },
-            "TONE_ABN_AI": {
-                "name": "异常乐观语调",
-                "description": "检测语调是否过度乐观",
-                "example": "与财务数据是否匹配"
-            },
-            "FIT_TD_AI": {
-                "name": "文本-数据一致性",
-                "description": "验证文本描述与财务数据是否一致",
-                "example": "文本说'销量大增'但营收下降"
-            },
-            "HIDE_REL_AI": {
-                "name": "关联隐藏指数",
-                "description": "识别关联交易披露不充分",
-                "example": "刻意隐藏关联方信息"
-            },
-            "DEN_ABN_AI": {
-                "name": "信息密度异常",
-                "description": "检测关键信息披露过于简略或冗长",
-                "example": "故意冗长模糊"
-            },
-            "STR_EVA_AI": {
-                "name": "回避表述强度",
-                "description": "识别对敏感问题使用模糊表述",
-                "example": "使用'可能''拟''预计'等词汇"
-            }
-        },
-        "scoring_criteria": {
-            "low": "0.00-0.30: 低风险，无明显异常",
-            "medium": "0.30-0.60: 中等风险，存在可疑信号",
-            "high": "0.60-1.00: 高风险，存在明显舞弊嫌疑"
-        }
-    }
-
-    return prompt_data
