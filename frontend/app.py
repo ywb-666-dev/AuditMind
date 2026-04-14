@@ -683,6 +683,83 @@ def render_home():
         st.metric("用户满意度", "96%")
         st.caption("来自会计师事务所和投资机构")
 
+    # 技术亮点展示（供评委查看）
+    st.divider()
+    with st.expander("🔬 查看核心技术细节（AI提示词与算法原理）", expanded=False):
+        st.info("本展示专为评委/技术评审设计，展示系统的核心技术实现")
+
+        tab1, tab2, tab3 = st.tabs(["📝 AI提示词", "🧮 算法原理", "📊 特征体系"])
+
+        with tab1:
+            try:
+                prompt_data = make_api_request("/detection/ai-prompt")
+                if prompt_data:
+                    st.markdown(f"### {prompt_data.get('title', 'AI分析提示词')}")
+                    st.caption(f"使用模型: `{prompt_data.get('model', 'Unknown')}`")
+
+                    st.markdown("**七大风险特征维度：**")
+                    features = prompt_data.get('features', {})
+                    for i, (feature_code, feature_info) in enumerate(features.items(), 1):
+                        with st.container(border=True):
+                            col_feat, col_desc = st.columns([1, 2])
+                            with col_feat:
+                                st.markdown(f"**{i}. {feature_info.get('name', feature_code)}**")
+                                st.code(feature_code, language='text')
+                            with col_desc:
+                                st.caption(f"{feature_info.get('description', '')}")
+                                st.markdown(f"💡 *示例: {feature_info.get('example', '')}*")
+
+                    st.markdown("**评分标准：**")
+                    scoring = prompt_data.get('scoring_criteria', {})
+                    col_s1, col_s2, col_s3 = st.columns(3)
+                    with col_s1:
+                        st.success(scoring.get('low', ''))
+                    with col_s2:
+                        st.warning(scoring.get('medium', ''))
+                    with col_s3:
+                        st.error(scoring.get('high', ''))
+
+                    with st.expander("查看完整提示词模板"):
+                        st.code(prompt_data.get('prompt_template', ''), language='text')
+                else:
+                    st.error("提示词数据加载失败")
+            except Exception as e:
+                st.error(f"加载提示词失败: {e}")
+
+        with tab2:
+            st.markdown("### 🧮 GMM-SHAP可解释性算法")
+            st.markdown("""
+            **算法流程：**
+            1. **多模型集成预测**：结合逻辑回归、XGBoost、神经网络预测
+            2. **动态阈值优化**：通过Youden指数确定最优分类阈值
+            3. **GMM聚类解释**：使用高斯混合模型将样本聚为低/中/高风险簇
+            4. **SHAP归因分析**：在每个簇内计算特征贡献度，生成定制化解释
+
+            **技术创新点：**
+            - 解决AI"黑箱"问题，每个预测都有明确依据
+            - 针对不同风险等级提供差异化解释
+            - 结合7维文本特征 + 传统财务指标
+            """)
+
+        with tab3:
+            st.markdown("### 📊 双模特征体系")
+            st.markdown("""
+            **维度1: 结构化财务指标**
+            - 存贷双高检测
+            - 现金流背离分析
+            - 存货异常识别
+            - ROE/资产负债率监控
+
+            **维度2: 非结构化文本特征（AI提取）**
+            - 语义矛盾度（CON_SEM_AI）
+            - 风险披露完整性（COV_RISK_AI）
+            - 异常乐观语调（TONE_ABN_AI）
+            - 文本-数据一致性（FIT_TD_AI）
+            - 关联隐藏指数（HIDE_REL_AI）
+            - 信息密度异常（DEN_ABN_AI）
+            - 回避表述强度（STR_EVA_AI）
+            """)
+
 
 # ================= 舞弊检测页面 =================
 def render_detection():
@@ -1047,6 +1124,40 @@ def render_detection():
 
         # MD&A 文本录入
         st.subheader("📝 MD&A 文本分析")
+
+        # AI提示词展示（供评委/用户查看技术细节）
+        with st.expander("🔍 查看AI分析提示词（技术细节）", expanded=False):
+            try:
+                prompt_data = make_api_request("/detection/ai-prompt")
+                if prompt_data:
+                    st.markdown(f"**{prompt_data.get('title', 'AI提示词')}**")
+                    st.caption(f"使用模型: {prompt_data.get('model', 'Unknown')}")
+                    st.caption(f"说明: {prompt_data.get('description', '')}")
+
+                    # 显示7个特征维度
+                    st.markdown("**📊 七大风险特征维度：**")
+                    features = prompt_data.get('features', {})
+                    for feature_code, feature_info in features.items():
+                        with st.container(border=True):
+                            st.markdown(f"**{feature_info.get('name', feature_code)}** (`{feature_code}`)")
+                            st.caption(f"描述: {feature_info.get('description', '')}")
+                            st.caption(f"示例: {feature_info.get('example', '')}")
+
+                    # 评分标准
+                    st.markdown("**📈 评分标准：**")
+                    scoring = prompt_data.get('scoring_criteria', {})
+                    for level, desc in scoring.items():
+                        emoji = {"low": "🟢", "medium": "🟡", "high": "🔴"}.get(level, "⚪")
+                        st.markdown(f"{emoji} {desc}")
+
+                    # 完整提示词（折叠）
+                    with st.expander("📄 查看完整提示词模板", expanded=False):
+                        st.code(prompt_data.get('prompt_template', ''), language='text')
+                else:
+                    st.info("提示词信息加载失败")
+            except Exception as e:
+                st.error(f"加载提示词失败: {e}")
+
         mdna_text_manual = st.text_area(
             "请输入或粘贴 MD&A 章节内容*",
             value=default_mdna,
@@ -1241,7 +1352,64 @@ def render_detection_result(result, show_divider=True):
             risk_labels = result.get("risk_labels", [])
             st.metric("风险标签", f"{len(risk_labels)}个")
 
-    # ============ 2. AI特征雷达图 ============
+    # ============ 2. 技术细节展示（供评委查看）============
+    with st.expander("🔍 查看本次检测的AI技术细节", expanded=False):
+        st.info("本区域展示本次检测使用的AI技术实现细节")
+
+        try:
+            prompt_data = make_api_request("/detection/ai-prompt")
+            if prompt_data:
+                col_tech1, col_tech2 = st.columns([1, 1])
+
+                with col_tech1:
+                    st.markdown("**📝 AI提示词框架**")
+                    st.caption(f"使用模型: `{prompt_data.get('model', 'Unknown')}`")
+                    st.markdown("""
+                    **分析维度：**
+                    - 语义矛盾度（CON_SEM_AI）
+                    - 风险披露完整性（COV_RISK_AI）
+                    - 异常乐观语调（TONE_ABN_AI）
+                    - 文本-数据一致性（FIT_TD_AI）
+                    - 关联隐藏指数（HIDE_REL_AI）
+                    - 信息密度异常（DEN_ABN_AI）
+                    - 回避表述强度（STR_EVA_AI）
+                    """)
+
+                    # 显示评分标准
+                    st.markdown("**📊 评分标准：**")
+                    scoring = prompt_data.get('scoring_criteria', {})
+                    st.success(f"🟢 {scoring.get('low', '')}")
+                    st.warning(f"🟡 {scoring.get('medium', '')}")
+                    st.error(f"🔴 {scoring.get('high', '')}")
+
+                with col_tech2:
+                    st.markdown("**🧮 特征权重配置**")
+                    st.markdown("""
+                    各维度权重（越高越重要）：
+                    - FIT_TD_AI（文本-数据一致性）: **2.0x**
+                    - CON_SEM_AI（语义矛盾度）: **2.0x**
+                    - HIDE_REL_AI（关联隐藏）: **1.8x**
+                    - COV_RISK_AI（风险披露）: **1.8x**
+                    - TONE_ABN_AI（异常语调）: **1.5x**
+                    - DEN_ABN_AI（信息密度）: **1.5x**
+                    - STR_EVA_AI（回避表述）: **1.5x**
+                    """)
+
+                    st.markdown("**🔍 可解释性方法：**")
+                    st.markdown("""
+                    - SHAP值计算特征贡献度
+                    - GMM聚类划分风险等级
+                    - 动态阈值优化（Youden指数）
+                    """)
+
+                with st.expander("查看完整提示词模板"):
+                    st.code(prompt_data.get('prompt_template', ''), language='text')
+            else:
+                st.warning("提示词数据加载失败")
+        except Exception as e:
+            st.error(f"加载技术细节失败: {e}")
+
+    # ============ 3. AI特征雷达图 ============
     st.divider()
     col_chart1, col_chart2 = st.columns([2, 1])
 
