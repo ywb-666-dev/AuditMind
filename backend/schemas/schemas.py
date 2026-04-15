@@ -147,6 +147,11 @@ class DetectionDetailResponse(DetectionResponse):
     shap_features: Optional[Dict[str, Any]] = None
     ai_feature_scores: Optional[Dict[str, Any]] = None
     financial_data: Optional[Dict[str, Any]] = None
+    risk_evidence_locations: Optional[List[Dict[str, Any]]] = None
+    suspicious_segments: Optional[List[Dict[str, Any]]] = None
+    mdna_text: Optional[str] = None
+    remediation_suggestions: Optional[Dict[str, Any]] = None
+    ipo_comparison_results: Optional[List[Dict[str, Any]]] = None
 
 
 # ================= 报告相关 Schema =================

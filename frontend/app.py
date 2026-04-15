@@ -1530,10 +1530,20 @@ def render_detection_result(result, show_divider=True):
         </style>
         """, unsafe_allow_html=True)
 
-        # 获取AI分析证据数据
+        # 获取AI分析证据数据（支持多种数据格式）
         ai_evidence_chain = result.get('ai_evidence_chain', {})
         if not ai_evidence_chain and smart_report:
             ai_evidence_chain = smart_report.get('evidence_analysis', {})
+        # 如果还没有，尝试从 detection 结果中获取 evidence_locations
+        if not ai_evidence_chain:
+            risk_evidence_locations = result.get('risk_evidence_locations', [])
+            suspicious_segments = result.get('suspicious_segments', [])
+            if risk_evidence_locations or suspicious_segments:
+                ai_evidence_chain = {
+                    'evidence_locations': risk_evidence_locations,
+                    'suspicious_segments': suspicious_segments,
+                    'text_evidence': result.get('mdna_text', '')[:500] if result.get('mdna_text') else ''
+                }
 
         if ai_evidence_chain:
             st.markdown("### 🔗 完整证据链路展示")
