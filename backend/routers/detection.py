@@ -584,7 +584,7 @@ async def analyze_detection(
         print(f"⚠️ IPO对标服务调用失败: {e}")
 
     # ============ 新增：整改建议引擎 ============
-    remediation_suggestions = []
+    remediation_suggestions = {}
     try:
         from backend.services.remediation_engine import get_remediation_engine
 

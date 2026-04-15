@@ -144,13 +144,15 @@ class DetectionResponse(BaseModel):
 
 class DetectionDetailResponse(DetectionResponse):
     """检测详情响应（含完整数据）"""
+    model_config = ConfigDict(from_attributes=True, arbitrary_types_allowed=True)
+
     shap_features: Optional[Dict[str, Any]] = None
     ai_feature_scores: Optional[Dict[str, Any]] = None
     financial_data: Optional[Dict[str, Any]] = None
     risk_evidence_locations: Optional[List[Dict[str, Any]]] = None
     suspicious_segments: Optional[List[Dict[str, Any]]] = None
     mdna_text: Optional[str] = None
-    remediation_suggestions: Optional[Dict[str, Any]] = None
+    remediation_suggestions: Optional[Any] = None  # 可以是Dict或List
     ipo_comparison_results: Optional[List[Dict[str, Any]]] = None
 
 
