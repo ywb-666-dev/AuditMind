@@ -374,6 +374,9 @@ class FinancialStatementResponse(BaseModel):
     notes: Optional[str] = None
     ai_suggestions: Optional[Dict] = None
     validation_results: Optional[Dict] = None
+    source_files: Optional[List[Dict]] = None
+    extraction_metadata: Optional[Dict] = None
+    ai_filled_items: Optional[List[Dict]] = None
     created_at: datetime
     updated_at: datetime
 

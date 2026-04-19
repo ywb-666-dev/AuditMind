@@ -398,6 +398,11 @@ class FinancialStatement(Base):
     ai_suggestions = Column(JSON)     # AI填表建议
     validation_results = Column(JSON) # 数据校验结果
 
+    # 自动提取相关
+    source_files = Column(JSON)         # 来源文件列表 [{filename, file_type, parsed_at}]
+    extraction_metadata = Column(JSON)  # AI提取元数据 {confidence, missing_items, currency_unit}
+    ai_filled_items = Column(JSON)      # AI填充项 [{item_name, statement_type, estimated_value, reasoning, confidence}]
+
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

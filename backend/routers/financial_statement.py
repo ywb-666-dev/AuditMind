@@ -2,10 +2,13 @@
 财务报表助手路由
 帮助企业填写四表一注：资产负债表、利润表、现金流量表、所有者权益变动表、财务报表附注
 """
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from typing import List, Optional, Dict, Any
 import json
+import sys
+import os
+from datetime import datetime
 
 from core.database import get_db
 from core.security import get_current_user
@@ -345,7 +348,9 @@ def validate_financial_statement(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """校验财务报表数据的勾稽关系"""
+    """校验财务报表数据的勾稽关系（增强版）"""
+    from services.validation_service import StatementValidator
+
     statement = db.query(FinancialStatement).filter(
         FinancialStatement.id == statement_id,
         FinancialStatement.user_id == current_user.id,
@@ -357,67 +362,31 @@ def validate_financial_statement(
             detail="财务报表不存在"
         )
 
-    errors = []
-    warnings = []
-    details = {}
-
-    # 校验资产负债表：资产 = 负债 + 所有者权益
-    bs = statement.balance_sheet or {}
-    if bs:
-        total_assets = 0.0
-        total_liabilities = 0.0
-        total_equity = 0.0
-
-        for section, items in bs.items():
-            for item in items:
-                val = item.get("ending_balance") or 0
-                if "资产" in section and "非流动" not in section:
-                    total_assets += val
-                elif "负债" in section:
-                    total_liabilities += val
-                elif "权益" in section or "所有者" in section:
-                    total_equity += val
-
-        if abs(total_assets - (total_liabilities + total_equity)) > 0.01:
-            errors.append(f"资产负债表不平衡：资产({total_assets:.2f}) != 负债({total_liabilities:.2f}) + 所有者权益({total_equity:.2f})")
-        details["total_assets"] = total_assets
-        details["total_liabilities"] = total_liabilities
-        details["total_equity"] = total_equity
-
-    # 校验利润表：营业利润 → 利润总额 → 净利润
-    is_data = statement.income_statement or {}
-    if is_data:
-        # 简化校验：净利润 = 利润总额 - 所得税费用
-        pass
-
-    # 校验现金流量表：期末 = 期初 + 净增加额
-    cf = statement.cash_flow or {}
-    if cf:
-        pass
-
-    is_valid = len(errors) == 0
-    result = ValidationResult(
-        is_valid=is_valid,
-        errors=errors,
-        warnings=warnings,
-        details=details,
-    )
+    validator = StatementValidator()
+    result = validator.validate({
+        "balance_sheet": statement.balance_sheet or {},
+        "income_statement": statement.income_statement or {},
+        "cash_flow": statement.cash_flow or {},
+        "equity_change": statement.equity_change or {},
+    })
 
     # 保存校验结果
-    statement.validation_results = result.model_dump()
+    statement.validation_results = result
     db.commit()
 
-    return result
+    return ValidationResult(**result)
 
 
 @router.post("/{statement_id}/ai-suggestions", response_model=AISuggestionResponse)
-def get_ai_suggestions(
+async def get_ai_suggestions(
     statement_id: int,
     req: AISuggestionRequest,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """获取AI填表建议（基于已有数据智能推荐）"""
+    """获取AI填表建议（基于已有数据智能推荐）- 增强版"""
+    from services.financial_extraction_service import FinancialDataExtractor
+
     statement = db.query(FinancialStatement).filter(
         FinancialStatement.id == statement_id,
         FinancialStatement.user_id == current_user.id,
@@ -429,28 +398,65 @@ def get_ai_suggestions(
             detail="财务报表不存在"
         )
 
-    # 基于已有数据给出简单建议（实际可接入AI模型）
+    # 构建上下文
+    current_data = getattr(statement, req.statement_type, None)
+    other_data = {
+        "balance_sheet": statement.balance_sheet,
+        "income_statement": statement.income_statement,
+        "cash_flow": statement.cash_flow,
+        "equity_change": statement.equity_change,
+    }
+
+    # 调用LLM获取智能建议
+    prompt = f"""你是一位资深财务分析师。请基于以下财务报表数据，给出专业的填表建议和异常提醒。
+
+【企业】{statement.company_name} {statement.report_year}年度
+【当前报表类型】{req.statement_type}
+【当前报表数据】
+{json.dumps(current_data, ensure_ascii=False, indent=2)[:3000] if current_data else "暂无数据"}
+
+【其他报表数据摘要】
+{json.dumps({k: v for k, v in other_data.items() if k != req.statement_type and v}, ensure_ascii=False, indent=2)[:2000]}
+
+请输出：
+1. 建议列表（如何完善当前报表，至少3条具体建议）
+2. 警告列表（发现的异常、不一致或需重点关注的地方）
+3. 估计值（基于其他报表可推导出的缺失值，如无法推导则留空）
+
+输出严格JSON格式：
+{{"suggestions": ["建议1", "建议2"], "warnings": ["警告1"], "estimated_values": {{"项目名": 12345.67}}}}"""
+
+    extractor = FinancialDataExtractor()
+    response_text = await extractor._call_llm(prompt, max_tokens=2000, temperature=0.3)
+
     suggestions = []
     warnings = []
     estimated = {}
 
-    if req.statement_type == "balance_sheet":
-        suggestions.append("请确保货币资金与现金流量表期末余额一致")
-        suggestions.append("应收账款账龄分析需与附注中的坏账准备匹配")
-        warnings.append("如存货金额较大，建议在附注中披露详细的存货明细")
-    elif req.statement_type == "income_statement":
-        suggestions.append("营业收入增长率应与行业平均水平对比")
-        suggestions.append("毛利率异常波动需在附注中说明原因")
-    elif req.statement_type == "cash_flow":
-        suggestions.append("经营活动现金流量净额应与净利润基本匹配")
-        suggestions.append("如投资活动现金流出较大，需说明主要投资项目")
-    elif req.statement_type == "equity_change":
-        suggestions.append("所有者权益变动应与资产负债表对应科目一致")
-    elif req.statement_type == "notes":
-        suggestions.append("重要会计政策需说明选择依据")
-        suggestions.append("关联交易需详细披露交易对手及金额")
+    if response_text:
+        try:
+            cleaned = re.sub(r'^```json\s*|\s*```$', '', response_text.strip(), flags=re.MULTILINE)
+            parsed = json.loads(cleaned)
+            suggestions = parsed.get("suggestions", [])
+            warnings = parsed.get("warnings", [])
+            estimated = parsed.get("estimated_values", {})
+        except Exception:
+            pass
 
-    response = AISuggestionResponse(
+    # 兜底建议
+    if not suggestions:
+        if req.statement_type == "balance_sheet":
+            suggestions = ["请确保货币资金与现金流量表期末余额一致", "检查资产总计是否等于负债加所有者权益"]
+        elif req.statement_type == "income_statement":
+            suggestions = ["验证营业利润→利润总额→净利润的链式计算", "毛利率应与行业平均水平对比"]
+        elif req.statement_type == "cash_flow":
+            suggestions = ["经营活动现金流量净额应与净利润基本匹配", "检查期末现金 = 期初现金 + 净增加额"]
+        elif req.statement_type == "equity_change":
+            suggestions = ["所有者权益变动应与资产负债表对应科目一致"]
+        else:
+            suggestions = ["重要会计政策需说明选择依据", "关联交易需详细披露"]
+
+    ai_response = AISuggestionResponse(
         suggestions=suggestions,
         warnings=warnings if warnings else None,
         estimated_values=estimated if estimated else None,
@@ -458,11 +464,11 @@ def get_ai_suggestions(
 
     # 保存AI建议
     existing = statement.ai_suggestions or {}
-    existing[req.statement_type] = response.model_dump()
+    existing[req.statement_type] = ai_response.model_dump()
     statement.ai_suggestions = existing
     db.commit()
 
-    return response
+    return ai_response
 
 
 @router.post("/{statement_id}/complete", response_model=FinancialStatementResponse)
@@ -486,4 +492,115 @@ def complete_financial_statement(
     statement.status = "completed"
     db.commit()
     db.refresh(statement)
+    return statement
+
+
+@router.post("/auto-generate", response_model=FinancialStatementResponse, status_code=status.HTTP_201_CREATED)
+async def auto_generate_financial_statement(
+    files: List[UploadFile] = File(...),
+    company_name: str = Form(...),
+    stock_code: Optional[str] = Form(None),
+    report_year: int = Form(...),
+    report_period: str = Form(default="annual"),
+    fill_missing: bool = Form(default=True),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    从上传的文件自动生成财务报表（四表一注）
+
+    工作流程：
+    1. 解析上传的文件（PDF/Excel/Word等）
+    2. 调用AI提取结构化四表一注数据
+    3. 可选：AI补全缺失项
+    4. 创建FinancialStatement记录
+    5. 返回草稿供用户审核
+    """
+    import asyncio
+    from services.financial_extraction_service import FinancialDataExtractor
+    from services.file_parser import FileParser
+
+    if not files:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="请至少上传一个文件"
+        )
+
+    # Step 1: 解析所有文件
+    parser = FileParser()
+    parsed_results = []
+    source_files_meta = []
+
+    for file in files:
+        content = await file.read()
+        file_ext = os.path.splitext(file.filename)[1].lower()
+
+        try:
+            result = parser.parse_file(content, file_ext)
+            parsed_results.append(result)
+            source_files_meta.append({
+                "filename": file.filename,
+                "file_type": file_ext.replace(".", ""),
+                "parsed_at": datetime.now().isoformat(),
+            })
+        except Exception as e:
+            print(f"⚠️ 文件解析失败 {file.filename}: {e}")
+            source_files_meta.append({
+                "filename": file.filename,
+                "file_type": file_ext.replace(".", ""),
+                "error": str(e),
+            })
+        finally:
+            await file.close()
+
+    if not parsed_results:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="所有文件解析失败，请检查文件格式"
+        )
+
+    # Step 2: AI提取结构化数据
+    extractor = FinancialDataExtractor()
+    try:
+        extraction_result = await extractor.extract_from_parsed_files(
+            parsed_results=parsed_results,
+            company_name=company_name,
+            report_year=report_year,
+            fill_missing=fill_missing,
+        )
+    except Exception as e:
+        print(f"⚠️ AI提取失败: {e}")
+        # 降级：返回空模板
+        extraction_result = {
+            "balance_sheet": BALANCE_SHEET_TEMPLATE,
+            "income_statement": INCOME_STATEMENT_TEMPLATE,
+            "cash_flow": CASH_FLOW_TEMPLATE,
+            "equity_change": EQUITY_CHANGE_TEMPLATE,
+            "notes": NOTES_TEMPLATE,
+            "extraction_metadata": {"confidence": 0.0, "missing_items": ["AI提取失败，使用默认模板"], "currency_unit": "元"},
+            "ai_filled_items": [],
+        }
+
+    # Step 3: 创建数据库记录
+    statement = FinancialStatement(
+        user_id=current_user.id,
+        company_name=company_name,
+        stock_code=stock_code,
+        report_year=report_year,
+        report_period=report_period,
+        balance_sheet=extraction_result.get("balance_sheet", BALANCE_SHEET_TEMPLATE),
+        income_statement=extraction_result.get("income_statement", INCOME_STATEMENT_TEMPLATE),
+        cash_flow=extraction_result.get("cash_flow", CASH_FLOW_TEMPLATE),
+        equity_change=extraction_result.get("equity_change", EQUITY_CHANGE_TEMPLATE),
+        notes=extraction_result.get("notes", NOTES_TEMPLATE),
+        status="draft",
+        source_files=source_files_meta,
+        extraction_metadata=extraction_result.get("extraction_metadata", {}),
+        ai_filled_items=extraction_result.get("ai_filled_items", []),
+    )
+
+    db.add(statement)
+    db.commit()
+    db.refresh(statement)
+
     return statement
