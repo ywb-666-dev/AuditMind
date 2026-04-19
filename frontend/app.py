@@ -2842,15 +2842,6 @@ def render_membership():
     st.dataframe(comparison_data, use_container_width=True, hide_index=True)
 
     # ========== 底部信息 ==========
-    st.divider()
-    st.markdown("""
-    <div style='text-align:center;padding:20px;background:#f8f9fa;border-radius:8px;'>
-        <h4>💼  ready to transform your audit practice?</h4>
-        <p>以上价格均为企业年度订阅费用，支持对公转账。高级版和企业版请联系商务团队获取正式报价单。</p>
-        <p><b>商务热线：400-888-8888</b> &nbsp;|&nbsp; <b>邮箱：sales@auditmind.com</b></p>
-    </div>
-    """, unsafe_allow_html=True)
-
 
 # ================= 报告管理页面 =================
 def render_report_management():
