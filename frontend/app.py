@@ -2665,131 +2665,191 @@ def render_my_detections():
 
 # ================= 会员中心页面 =================
 def render_membership():
-    """渲染会员中心页面"""
-    st.title("💎 会员中心")
+    """渲染会员中心/价格中心页面 - 四版本企业级定价方案"""
+    st.title("💎 产品定价")
+    st.caption("企业级审计数字化解决方案，助力事务所高效风控")
 
-    if not st.session_state.logged_in:
-        st.warning("请先登录")
-        return
-
-    user = st.session_state.user_info
-    membership = user.get("membership_level", "free")
-
-    # 当前会员状态
-    col1, col2 = st.columns(2)
-    with col1:
-        st.subheader("当前会员状态")
-        membership_emoji = {"free": "🆓", "pro": "⭐", "enterprise": "🏢"}
-        st.metric("会员等级", f"{membership_emoji.get(membership, '🆓')} {membership.upper()}")
-
-        remaining = user.get('free_detections_remaining')
-        if remaining and remaining > 0:
-            st.metric("剩余检测次数", remaining)
-        else:
-            st.metric("检测次数", "无限")
-
-    with col2:
-        st.subheader("会员权益")
-        if membership == "free":
-            st.markdown("""
-            - ✅ 基础财务指标分析
-            - ✅ 标准风险标签
-            - ❌ API 接口
-            - ❌ 批量检测
-            """)
-        elif membership == "pro":
-            st.markdown("""
-            - ✅ 高级AI文本分析
-            - ✅ SHAP可解释性分析
-            - ✅ API 接口对接
-            - ❌ 批量检测
-            """)
-        else:
-            st.markdown("""
-            - ✅ 全部高级分析功能
-            - ✅ 批量检测(100 家/次)
-            - ✅ API 接口对接
-            - ✅ 私有云部署支持
-            """)
-
-    st.divider()
-
-    # 套餐选择 - 企业级定价方案
-    st.subheader("套餐选择")
-    st.caption("💼 企业级服务方案，助力专业机构高效风控")
-
-    # 定义企业级套餐（前端静态展示，不依赖后端）
-    enterprise_plans = [
+    # ========== 四版本定价卡片 ==========
+    plans = [
         {
             "name": "基础版",
+            "target": "初创/小型事务所",
+            "team": "团队 < 10人",
             "price": "1.98万",
-            "unit": "元/年",
+            "unit": "元/年（固定年费）",
             "highlight": False,
+            "value": "入门级效率工具，以极低成本启用数字化审计，规范单个项目流程",
             "features": [
-                "✅ 30个项目/年",
-                "✅ 基础财务指标分析",
-                "✅ 标准风险标签",
+                "✅ 单项目审计管理",
+                "✅ 3年财报分析",
+                "✅ 风险评分底稿高亮",
+                "✅ 基础建议报告",
                 "✅ 邮件技术支持",
-                "❌ API 接口",
-                "❌ 批量检测",
-                "❌ 私有部署"
-            ]
+                "❌ 多项目并行",
+                "❌ 可视化雷达图",
+                "❌ API接口",
+                "❌ 私有部署",
+            ],
+            "cta": "立即订阅",
+            "cta_type": "secondary",
         },
         {
             "name": "专业版",
-            "price": "3.98万",
-            "unit": "元/年",
+            "target": "成长型/标准中型所",
+            "team": "团队 10-50人",
+            "price": "3.98万起",
+            "unit": "元/年（分级年费）",
             "highlight": True,
+            "value": "多项目协同管理平台，实现多个项目并行管理与质量把控，提升团队标准化水平",
             "features": [
-                "✅ 无限项目数量",
-                "✅ 高级AI文本分析",
-                "✅ SHAP可解释性分析",
-                "✅ API 接口对接",
+                "✅ 多项目并行（≤10个/年）",
+                "✅ 可视化雷达图",
+                "✅ 同业案例对标",
+                "✅ 整改跟踪引擎",
+                "✅ 原文溯源功能",
                 "✅ 优先技术支持",
-                "❌ 批量检测",
-                "❌ 私有部署"
-            ]
+                "❌ Open API接口",
+                "❌ 高级数据分析",
+                "❌ 私有部署",
+            ],
+            "cta": "立即订阅",
+            "cta_type": "primary",
         },
         {
-            "name": "旗舰版",
-            "price": "6.98万",
-            "unit": "元/年",
+            "name": "高级版",
+            "target": "成熟型中型所/区域领先所",
+            "team": "团队 50-150人",
+            "price": "8.8万起",
+            "unit": "元/年（平台费+模块费）",
             "highlight": False,
+            "value": "一体化协同与集成平台，支撑跨部门复杂协作，并具备与企业或内部系统集成的能力",
             "features": [
-                "✅ 无限项目数量",
-                "✅ 高级AI文本分析",
-                "✅ SHAP可解释性分析",
-                "✅ API 接口对接",
-                "✅ 批量检测(100家/次)",
-                "✅ 私有云部署",
-                "✅ 专属客户经理"
-            ]
-        }
+                "✅ 含20个基础项目",
+                "✅ 团队与角色权限管理",
+                "✅ Open API接口",
+                "✅ 高级数据分析模块",
+                "✅ 项目增量包扩展",
+                "✅ 高级模块按需选购",
+                "✅ 专属客户经理",
+                "❌ 不限项目数",
+                "❌ 深度定制开发",
+            ],
+            "cta": "联系咨询",
+            "cta_type": "secondary",
+        },
+        {
+            "name": "企业版",
+            "target": "大型/全国性会计师事务所",
+            "team": "团队 > 150人",
+            "price": "25万起",
+            "unit": "元/年（定制化报价）",
+            "highlight": False,
+            "value": "战略级审计数字化解决方案，全面对接客户生态，实现审计流程的深度定制与系统集成",
+            "features": [
+                "✅ 不限项目数量",
+                "✅ 定制化工作流",
+                "✅ 深度API集成与开发支持",
+                "✅ 专属客户成功团队",
+                "✅ 高级安全与合规保障",
+                "✅ 私有化部署",
+                "✅ 全功能开放",
+                "✅ 7×24小时技术支持",
+            ],
+            "cta": "联系咨询",
+            "cta_type": "secondary",
+        },
     ]
 
-    cols = st.columns(3)
-    for idx, plan in enumerate(enterprise_plans):
+    # 四列卡片布局
+    cols = st.columns(4)
+    for idx, plan in enumerate(plans):
         with cols[idx]:
-            # 高亮推荐方案
-            if plan["highlight"]:
-                st.success("⭐ 最受欢迎")
+            with st.container(border=True):
+                # 推荐标签
+                if plan["highlight"]:
+                    st.success("⭐ 最受欢迎")
 
-            st.markdown(f"### {plan['name']}")
-            st.markdown(f"## {plan['price']}")
-            st.caption(plan["unit"])
+                # 版本信息
+                st.markdown(f"### {plan['name']}")
+                st.caption(f"**{plan['target']}**")
+                st.caption(f"*{plan['team']}*")
 
-            st.markdown("**权益包括：**")
-            for feature in plan["features"]:
-                st.markdown(f"{feature}")
+                # 价格
+                st.markdown(f"<h2 style='margin:8px 0;color:#1f77b4;'>{plan['price']}</h2>", unsafe_allow_html=True)
+                st.caption(plan["unit"])
 
-            # 联系咨询按钮（替代直接购买）
-            button_type = "primary" if plan["highlight"] else "secondary"
-            if st.button(f"立即咨询", use_container_width=True, key=f"plan_consult_{idx}", type=button_type):
-                st.info("📞 请联系商务经理：400-888-8888 或发送邮件至 sales@auditmind.com")
-                st.balloons()
+                st.divider()
 
+                # 价值主张
+                st.markdown(f"<p style='font-size:13px;color:#666;min-height:60px;'>{plan['value']}</p>", unsafe_allow_html=True)
+
+                st.divider()
+
+                # 功能列表
+                st.markdown("**功能权益：**")
+                for feat in plan["features"]:
+                    st.markdown(f"<p style='margin:2px 0;font-size:13px;'>{feat}</p>", unsafe_allow_html=True)
+
+                st.divider()
+
+                # CTA按钮
+                btn_type = plan.get("cta_type", "secondary")
+                if st.button(plan["cta"], use_container_width=True, key=f"plan_cta_{idx}", type=btn_type):
+                    if plan["cta"] == "联系咨询":
+                        st.info("""
+                        📞 **商务咨询**
+
+                        电话：400-888-8888
+                        邮箱：sales@auditmind.com
+                        微信：AuditMind_Sales
+
+                        工作时间：周一至周五 9:00-18:00
+                        """)
+                    else:
+                        st.info("""
+                        🛒 **订阅流程**
+
+                        1. 确认套餐版本
+                        2. 签署服务协议
+                        3. 对公转账支付
+                        4. 开通企业账户
+
+                        请联系商务团队完成订阅：sales@auditmind.com
+                        """)
+                        st.balloons()
+
+    # ========== 功能对比表 ==========
     st.divider()
-    st.markdown("📋 **说明：** 以上价格均为企业年度订阅费用，支持对公转账。详情请联系商务团队获取正式报价单。")
+    st.subheader("📊 功能对比详情")
+
+    comparison_data = [
+        {"功能模块": "项目数量", "基础版": "1个", "专业版": "≤10个/年", "高级版": "20个基础+增量", "企业版": "不限"},
+        {"功能模块": "财报分析年限", "基础版": "3年", "专业版": "5年", "高级版": "不限", "企业版": "不限"},
+        {"功能模块": "风险评分底稿", "基础版": "✅", "专业版": "✅", "高级版": "✅", "企业版": "✅"},
+        {"功能模块": "可视化雷达图", "基础版": "❌", "专业版": "✅", "高级版": "✅", "企业版": "✅"},
+        {"功能模块": "同业案例对标", "基础版": "❌", "专业版": "✅", "高级版": "✅", "企业版": "✅"},
+        {"功能模块": "整改跟踪引擎", "基础版": "❌", "专业版": "✅", "高级版": "✅", "企业版": "✅"},
+        {"功能模块": "原文溯源", "基础版": "❌", "专业版": "✅", "高级版": "✅", "企业版": "✅"},
+        {"功能模块": "Open API接口", "基础版": "❌", "专业版": "❌", "高级版": "✅", "企业版": "✅深度集成"},
+        {"功能模块": "高级数据分析", "基础版": "❌", "专业版": "❌", "高级版": "✅", "企业版": "✅"},
+        {"功能模块": "团队权限管理", "基础版": "❌", "专业版": "❌", "高级版": "✅", "企业版": "✅"},
+        {"功能模块": "定制化工作流", "基础版": "❌", "专业版": "❌", "高级版": "❌", "企业版": "✅"},
+        {"功能模块": "私有化部署", "基础版": "❌", "专业版": "❌", "高级版": "❌", "企业版": "✅"},
+        {"功能模块": "专属客户成功团队", "基础版": "❌", "专业版": "❌", "高级版": "✅", "企业版": "✅"},
+        {"功能模块": "7×24小时支持", "基础版": "❌", "专业版": "❌", "高级版": "❌", "企业版": "✅"},
+    ]
+
+    st.dataframe(comparison_data, use_container_width=True, hide_index=True)
+
+    # ========== 底部信息 ==========
+    st.divider()
+    st.markdown("""
+    <div style='text-align:center;padding:20px;background:#f8f9fa;border-radius:8px;'>
+        <h4>💼  ready to transform your audit practice?</h4>
+        <p>以上价格均为企业年度订阅费用，支持对公转账。高级版和企业版请联系商务团队获取正式报价单。</p>
+        <p><b>商务热线：400-888-8888</b> &nbsp;|&nbsp; <b>邮箱：sales@auditmind.com</b></p>
+    </div>
+    """, unsafe_allow_html=True)
 
 
 # ================= 报告管理页面 =================
