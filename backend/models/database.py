@@ -369,6 +369,41 @@ class RemediationSuggestion(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
+# ==================== 财务报表助手相关模型 ====================
+
+class FinancialStatement(Base):
+    """财务报表主表 - 四表一注"""
+    __tablename__ = "financial_statements"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), index=True)
+
+    # 企业信息
+    company_name = Column(String(200), nullable=False, index=True)
+    stock_code = Column(String(20), index=True)
+    report_year = Column(Integer, nullable=False, index=True)
+    report_period = Column(String(20), default="annual")  # annual/quarterly/half_year
+
+    # 四表数据（JSON格式）
+    balance_sheet = Column(JSON)      # 资产负债表
+    income_statement = Column(JSON)   # 利润表
+    cash_flow = Column(JSON)          # 现金流量表
+    equity_change = Column(JSON)      # 所有者权益变动表
+    notes = Column(LONGTEXT)          # 财务报表附注
+
+    # 状态
+    status = Column(String(20), default="draft")  # draft/completed/audited
+
+    # AI 辅助
+    ai_suggestions = Column(JSON)     # AI填表建议
+    validation_results = Column(JSON) # 数据校验结果
+
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = relationship("User")
+
+
 # ==================== 系统配置相关模型 ====================
 
 class SystemConfig(Base):

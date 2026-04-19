@@ -17,7 +17,7 @@ from core.config import settings
 from core.database import init_db
 
 # 导入路由
-from routers import user, detection, qa, payment, report, user_account, payment_system, membership, upload, report_export
+from routers import user, detection, qa, payment, report, user_account, payment_system, membership, upload, report_export, financial_statement
 
 # 创建 FastAPI 应用
 app = FastAPI(
@@ -65,6 +65,7 @@ app.include_router(membership.router, prefix=settings.API_PREFIX)
 app.include_router(report_export.router, prefix=settings.API_PREFIX)
 app.include_router(report.router, prefix=settings.API_PREFIX)
 app.include_router(upload.router, prefix=settings.API_PREFIX)
+app.include_router(financial_statement.router, prefix=settings.API_PREFIX)
 
 
 # 健康检查

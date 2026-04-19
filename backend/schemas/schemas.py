@@ -284,3 +284,129 @@ class PaginatedResponse(BaseModel):
     page: int
     page_size: int
     has_next: bool
+
+
+# ================= 财务报表助手相关 Schema =================
+
+class BalanceSheetItem(BaseModel):
+    """资产负债表项目"""
+    item_name: str                    # 项目名称
+    item_code: Optional[str] = None   # 项目代码
+    ending_balance: Optional[float] = None    # 期末余额
+    beginning_balance: Optional[float] = None  # 期初余额
+    notes: Optional[str] = None       # 备注
+
+
+class IncomeStatementItem(BaseModel):
+    """利润表项目"""
+    item_name: str
+    item_code: Optional[str] = None
+    current_period: Optional[float] = None      # 本期金额
+    previous_period: Optional[float] = None     # 上期金额
+    notes: Optional[str] = None
+
+
+class CashFlowItem(BaseModel):
+    """现金流量表项目"""
+    item_name: str
+    item_code: Optional[str] = None
+    current_period: Optional[float] = None      # 本期金额
+    notes: Optional[str] = None
+
+
+class EquityChangeItem(BaseModel):
+    """所有者权益变动表项目"""
+    item_name: str
+    item_code: Optional[str] = None
+    beginning_balance: Optional[float] = None
+    increase: Optional[float] = None
+    decrease: Optional[float] = None
+    ending_balance: Optional[float] = None
+    notes: Optional[str] = None
+
+
+class FinancialStatementBase(BaseModel):
+    """财务报表基础 Schema"""
+    company_name: str = Field(..., min_length=1, max_length=200)
+    stock_code: Optional[str] = Field(None, max_length=20)
+    report_year: int = Field(..., ge=2000, le=2100)
+    report_period: str = Field(default="annual", pattern="^(annual|quarterly|half_year)$")
+
+
+class FinancialStatementCreate(FinancialStatementBase):
+    """创建财务报表请求"""
+    balance_sheet: Optional[Dict[str, List[BalanceSheetItem]]] = None
+    income_statement: Optional[Dict[str, List[IncomeStatementItem]]] = None
+    cash_flow: Optional[Dict[str, List[CashFlowItem]]] = None
+    equity_change: Optional[Dict[str, List[EquityChangeItem]]] = None
+    notes: Optional[str] = None
+
+
+class FinancialStatementUpdate(BaseModel):
+    """更新财务报表请求"""
+    company_name: Optional[str] = Field(None, min_length=1, max_length=200)
+    stock_code: Optional[str] = Field(None, max_length=20)
+    report_year: Optional[int] = Field(None, ge=2000, le=2100)
+    report_period: Optional[str] = Field(None, pattern="^(annual|quarterly|half_year)$")
+    balance_sheet: Optional[Dict[str, List[BalanceSheetItem]]] = None
+    income_statement: Optional[Dict[str, List[IncomeStatementItem]]] = None
+    cash_flow: Optional[Dict[str, List[CashFlowItem]]] = None
+    equity_change: Optional[Dict[str, List[EquityChangeItem]]] = None
+    notes: Optional[str] = None
+    status: Optional[str] = Field(None, pattern="^(draft|completed|audited)$")
+
+
+class FinancialStatementResponse(BaseModel):
+    """财务报表响应"""
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    user_id: int
+    company_name: str
+    stock_code: Optional[str]
+    report_year: int
+    report_period: str
+    status: str
+    balance_sheet: Optional[Dict] = None
+    income_statement: Optional[Dict] = None
+    cash_flow: Optional[Dict] = None
+    equity_change: Optional[Dict] = None
+    notes: Optional[str] = None
+    ai_suggestions: Optional[Dict] = None
+    validation_results: Optional[Dict] = None
+    created_at: datetime
+    updated_at: datetime
+
+
+class FinancialStatementListItem(BaseModel):
+    """财务报表列表项"""
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    company_name: str
+    stock_code: Optional[str]
+    report_year: int
+    report_period: str
+    status: str
+    created_at: datetime
+
+
+class AISuggestionRequest(BaseModel):
+    """AI 建议请求"""
+    statement_type: str = Field(..., pattern="^(balance_sheet|income_statement|cash_flow|equity_change|notes)$")
+    current_data: Optional[Dict[str, Any]] = None
+
+
+class AISuggestionResponse(BaseModel):
+    """AI 建议响应"""
+    suggestions: List[str]
+    warnings: Optional[List[str]] = None
+    estimated_values: Optional[Dict[str, Any]] = None
+
+
+class ValidationResult(BaseModel):
+    """校验结果"""
+    is_valid: bool
+    errors: List[str] = []
+    warnings: List[str] = []
+    details: Optional[Dict[str, Any]] = None

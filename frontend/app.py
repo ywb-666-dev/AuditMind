@@ -10,6 +10,7 @@ import plotly.express as px
 from datetime import datetime, timedelta
 import json
 import base64
+import time
 import extra_streamlit_components as stx
 from utils import cached_api_request, clear_api_cache, api_cache, batch_load_data
 from download_helper import download_file_with_auth, create_download_button
@@ -589,7 +590,7 @@ def render_sidebar():
         if st.session_state.logged_in:
             menu = st.radio(
                 "导航",
-                ["🏠 首页", "🔍 舞弊检测", "💬 AI 问答", "📊 我的检测", "📁 报告管理", "💎 会员中心", "⚙️ 账号设置"],
+                ["🏠 首页", "📋 财务助手", "🔍 舞弊检测", "💬 AI 问答", "📊 我的检测", "📁 报告管理", "💎 会员中心", "⚙️ 账号设置"],
                 label_visibility="collapsed"
             )
         else:
@@ -763,6 +764,442 @@ def render_home():
 
 
 # ================= 舞弊检测页面 =================
+
+# ================= 财务助手页面 =================
+def render_financial_assistant():
+    """渲染财务助手页面 - 四表一注填写"""
+    st.title("📋 财务助手")
+    st.caption("帮助企业填写四表一注：资产负债表、利润表、现金流量表、所有者权益变动表、财务报表附注")
+
+    if not st.session_state.logged_in:
+        st.warning("请先登录")
+        return
+
+    # 初始化session_state
+    if "fs_selected_id" not in st.session_state:
+        st.session_state.fs_selected_id = None
+    if "fs_view" not in st.session_state:
+        st.session_state.fs_view = "list"  # list | edit
+
+    # 返回列表按钮
+    if st.session_state.fs_view == "edit":
+        if st.button("← 返回列表"):
+            st.session_state.fs_selected_id = None
+            st.session_state.fs_view = "list"
+            st.rerun()
+
+    if st.session_state.fs_view == "list":
+        _render_statement_list()
+    else:
+        _render_statement_editor(st.session_state.fs_selected_id)
+
+
+def _render_statement_list():
+    """渲染报表列表"""
+    col1, col2 = st.columns([4, 1])
+    with col1:
+        st.subheader("我的财务报表")
+    with col2:
+        if st.button("➕ 新建报表", use_container_width=True):
+            st.session_state.fs_show_create = True
+
+    # 新建报表表单
+    if st.session_state.get("fs_show_create"):
+        with st.form("create_statement_form"):
+            st.markdown("**新建财务报表**")
+            c1, c2, c3 = st.columns(3)
+            with c1:
+                company_name = st.text_input("企业名称", placeholder="请输入企业全称")
+            with c2:
+                stock_code = st.text_input("证券代码", placeholder="如：600519")
+            with c3:
+                report_year = st.number_input("报表年度", min_value=2000, max_value=2100, value=2025)
+            report_period = st.selectbox("报表期间", [("annual", "年报"), ("quarterly", "季报"), ("half_year", "半年报")], format_func=lambda x: x[1])
+
+            submitted = st.form_submit_button("创建", use_container_width=True)
+            if submitted:
+                if not company_name:
+                    st.error("企业名称不能为空")
+                else:
+                    resp = make_api_request("/financial-statements", method="POST", data={
+                        "company_name": company_name,
+                        "stock_code": stock_code or None,
+                        "report_year": int(report_year),
+                        "report_period": report_period[0],
+                    })
+                    if resp:
+                        st.success(f"已创建「{company_name}」{report_year}年度报表")
+                        st.session_state.fs_show_create = False
+                        time.sleep(0.5)
+                        st.rerun()
+
+    st.divider()
+
+    # 获取报表列表
+    statements = make_api_request("/financial-statements?limit=100", method="GET")
+    if not statements:
+        st.info("暂无财务报表，点击右上角「新建报表」开始填写")
+        return
+
+    # 列表展示
+    for stmt in statements:
+        with st.container():
+            cols = st.columns([3, 2, 2, 2, 1, 1])
+            with cols[0]:
+                st.markdown(f"**{stmt['company_name']}**")
+            with cols[1]:
+                period_map = {"annual": "年报", "quarterly": "季报", "half_year": "半年报"}
+                st.caption(f"{stmt['report_year']}年 {period_map.get(stmt['report_period'], stmt['report_period'])}")
+            with cols[2]:
+                status_map = {"draft": "📝 草稿", "completed": "✅ 已完成", "audited": "🔒 已审计"}
+                st.caption(status_map.get(stmt['status'], stmt['status']))
+            with cols[3]:
+                st.caption(stmt['created_at'][:10])
+            with cols[4]:
+                if st.button("编辑", key=f"edit_{stmt['id']}", use_container_width=True):
+                    st.session_state.fs_selected_id = stmt['id']
+                    st.session_state.fs_view = "edit"
+                    st.rerun()
+            with cols[5]:
+                if st.button("🗑️", key=f"del_{stmt['id']}", use_container_width=True):
+                    if make_api_request(f"/financial-statements/{stmt['id']}", method="DELETE"):
+                        st.success("已删除")
+                        time.sleep(0.3)
+                        st.rerun()
+        st.divider()
+
+
+def _render_statement_editor(statement_id: int):
+    """渲染报表编辑器"""
+    # 获取详情
+    detail = make_api_request(f"/financial-statements/{statement_id}", method="GET")
+    if not detail:
+        st.error("加载报表失败")
+        return
+
+    st.subheader(f"{detail['company_name']} - {detail['report_year']}年度")
+
+    # 顶部操作栏
+    c1, c2, c3, c4 = st.columns([2, 2, 2, 2])
+    with c1:
+        if st.button("💾 保存全部", use_container_width=True):
+            st.success("数据已自动保存")
+    with c2:
+        if st.button("🔍 校验勾稽", use_container_width=True):
+            result = make_api_request(f"/financial-statements/{statement_id}/validate", method="POST")
+            if result:
+                if result['is_valid']:
+                    st.success("✅ 勾稽关系校验通过")
+                else:
+                    st.error("❌ 发现勾稽关系错误：")
+                    for err in result['errors']:
+                        st.markdown(f"- {err}")
+                if result['warnings']:
+                    st.warning("⚠️ 警告：")
+                    for w in result['warnings']:
+                        st.markdown(f"- {w}")
+    with c3:
+        if st.button("🤖 AI建议", use_container_width=True):
+            st.session_state.fs_show_ai = True
+    with c4:
+        if detail['status'] != 'completed':
+            if st.button("✅ 标记完成", use_container_width=True):
+                resp = make_api_request(f"/financial-statements/{statement_id}/complete", method="POST")
+                if resp:
+                    st.success("已标记为完成")
+                    time.sleep(0.3)
+                    st.rerun()
+
+    # AI建议弹窗
+    if st.session_state.get("fs_show_ai"):
+        with st.expander("🤖 AI 智能建议", expanded=True):
+            stmt_type = st.selectbox("选择报表类型", [
+                ("balance_sheet", "资产负债表"),
+                ("income_statement", "利润表"),
+                ("cash_flow", "现金流量表"),
+                ("equity_change", "所有者权益变动表"),
+                ("notes", "财务报表附注"),
+            ], format_func=lambda x: x[1])
+            if st.button("获取建议"):
+                ai_resp = make_api_request(
+                    f"/financial-statements/{statement_id}/ai-suggestions",
+                    method="POST",
+                    data={"statement_type": stmt_type[0]}
+                )
+                if ai_resp:
+                    st.markdown("**💡 建议：**")
+                    for s in ai_resp.get('suggestions', []):
+                        st.markdown(f"- {s}")
+                    if ai_resp.get('warnings'):
+                        st.markdown("**⚠️ 注意事项：**")
+                        for w in ai_resp['warnings']:
+                            st.markdown(f"- {w}")
+            if st.button("关闭"):
+                st.session_state.fs_show_ai = False
+                st.rerun()
+
+    # 四表一注标签页
+    tabs = st.tabs(["📊 资产负债表", "📈 利润表", "💰 现金流量表", "📋 所有者权益", "📝 报表附注"])
+
+    # 资产负债表
+    with tabs[0]:
+        _render_balance_sheet_editor(statement_id, detail.get('balance_sheet', {}))
+
+    # 利润表
+    with tabs[1]:
+        _render_income_statement_editor(statement_id, detail.get('income_statement', {}))
+
+    # 现金流量表
+    with tabs[2]:
+        _render_cash_flow_editor(statement_id, detail.get('cash_flow', {}))
+
+    # 所有者权益变动表
+    with tabs[3]:
+        _render_equity_change_editor(statement_id, detail.get('equity_change', {}))
+
+    # 财务报表附注
+    with tabs[4]:
+        _render_notes_editor(statement_id, detail.get('notes', ''))
+
+
+def _render_balance_sheet_editor(statement_id: int, data: dict):
+    """资产负债表编辑器"""
+    st.markdown("**资产负债表**")
+    st.caption("资产 = 负债 + 所有者权益")
+
+    updated = {}
+    for section_name, items in data.items():
+        st.markdown(f"##### {section_name}")
+        cols = st.columns([3, 2, 2, 2])
+        with cols[0]:
+            st.markdown("**项目名称**")
+        with cols[1]:
+            st.markdown("**期末余额**")
+        with cols[2]:
+            st.markdown("**期初余额**")
+        with cols[3]:
+            st.markdown("**备注**")
+
+        updated_items = []
+        for i, item in enumerate(items):
+            cols = st.columns([3, 2, 2, 2])
+            with cols[0]:
+                st.text(item.get('item_name', ''))
+            with cols[1]:
+                ending = st.number_input(
+                    f"期末_{section_name}_{i}",
+                    value=item.get('ending_balance') or 0.0,
+                    label_visibility="collapsed",
+                    key=f"bs_end_{statement_id}_{section_name}_{i}"
+                )
+            with cols[2]:
+                beginning = st.number_input(
+                    f"期初_{section_name}_{i}",
+                    value=item.get('beginning_balance') or 0.0,
+                    label_visibility="collapsed",
+                    key=f"bs_beg_{statement_id}_{section_name}_{i}"
+                )
+            with cols[3]:
+                notes = st.text_input(
+                    f"备注_{section_name}_{i}",
+                    value=item.get('notes', ''),
+                    label_visibility="collapsed",
+                    key=f"bs_note_{statement_id}_{section_name}_{i}"
+                )
+            updated_items.append({
+                **item,
+                "ending_balance": ending if ending != 0 else None,
+                "beginning_balance": beginning if beginning != 0 else None,
+                "notes": notes or None,
+            })
+        updated[section_name] = updated_items
+        st.divider()
+
+    if st.button("保存资产负债表", key=f"save_bs_{statement_id}"):
+        _save_statement_field(statement_id, "balance_sheet", updated)
+
+
+def _render_income_statement_editor(statement_id: int, data: dict):
+    """利润表编辑器"""
+    st.markdown("**利润表**")
+
+    updated = {}
+    for section_name, items in data.items():
+        st.markdown(f"##### {section_name}")
+        cols = st.columns([3, 2, 2, 2])
+        with cols[0]:
+            st.markdown("**项目名称**")
+        with cols[1]:
+            st.markdown("**本期金额**")
+        with cols[2]:
+            st.markdown("**上期金额**")
+        with cols[3]:
+            st.markdown("**备注**")
+
+        updated_items = []
+        for i, item in enumerate(items):
+            cols = st.columns([3, 2, 2, 2])
+            with cols[0]:
+                st.text(item.get('item_name', ''))
+            with cols[1]:
+                current = st.number_input(
+                    f"本期_{section_name}_{i}",
+                    value=item.get('current_period') or 0.0,
+                    label_visibility="collapsed",
+                    key=f"is_cur_{statement_id}_{section_name}_{i}"
+                )
+            with cols[2]:
+                previous = st.number_input(
+                    f"上期_{section_name}_{i}",
+                    value=item.get('previous_period') or 0.0,
+                    label_visibility="collapsed",
+                    key=f"is_prev_{statement_id}_{section_name}_{i}"
+                )
+            with cols[3]:
+                notes = st.text_input(
+                    f"备注_{section_name}_{i}",
+                    value=item.get('notes', ''),
+                    label_visibility="collapsed",
+                    key=f"is_note_{statement_id}_{section_name}_{i}"
+                )
+            updated_items.append({
+                **item,
+                "current_period": current if current != 0 else None,
+                "previous_period": previous if previous != 0 else None,
+                "notes": notes or None,
+            })
+        updated[section_name] = updated_items
+        st.divider()
+
+    if st.button("保存利润表", key=f"save_is_{statement_id}"):
+        _save_statement_field(statement_id, "income_statement", updated)
+
+
+def _render_cash_flow_editor(statement_id: int, data: dict):
+    """现金流量表编辑器"""
+    st.markdown("**现金流量表**")
+
+    updated = {}
+    for section_name, items in data.items():
+        st.markdown(f"##### {section_name}")
+        cols = st.columns([4, 2, 2])
+        with cols[0]:
+            st.markdown("**项目名称**")
+        with cols[1]:
+            st.markdown("**本期金额**")
+        with cols[2]:
+            st.markdown("**备注**")
+
+        updated_items = []
+        for i, item in enumerate(items):
+            cols = st.columns([4, 2, 2])
+            with cols[0]:
+                st.text(item.get('item_name', ''))
+            with cols[1]:
+                current = st.number_input(
+                    f"cf_{section_name}_{i}",
+                    value=item.get('current_period') or 0.0,
+                    label_visibility="collapsed",
+                    key=f"cf_cur_{statement_id}_{section_name}_{i}"
+                )
+            with cols[2]:
+                notes = st.text_input(
+                    f"cf_note_{section_name}_{i}",
+                    value=item.get('notes', ''),
+                    label_visibility="collapsed",
+                    key=f"cf_note_{statement_id}_{section_name}_{i}"
+                )
+            updated_items.append({
+                **item,
+                "current_period": current if current != 0 else None,
+                "notes": notes or None,
+            })
+        updated[section_name] = updated_items
+        st.divider()
+
+    if st.button("保存现金流量表", key=f"save_cf_{statement_id}"):
+        _save_statement_field(statement_id, "cash_flow", updated)
+
+
+def _render_equity_change_editor(statement_id: int, data: dict):
+    """所有者权益变动表编辑器"""
+    st.markdown("**所有者权益变动表**")
+
+    updated = {}
+    for section_name, items in data.items():
+        st.markdown(f"##### {section_name}")
+        cols = st.columns([3, 1.5, 1.5, 1.5, 1.5, 1.5])
+        with cols[0]:
+            st.markdown("**项目名称**")
+        with cols[1]:
+            st.markdown("**期初**")
+        with cols[2]:
+            st.markdown("**增加**")
+        with cols[3]:
+            st.markdown("**减少**")
+        with cols[4]:
+            st.markdown("**期末**")
+        with cols[5]:
+            st.markdown("**备注**")
+
+        updated_items = []
+        for i, item in enumerate(items):
+            cols = st.columns([3, 1.5, 1.5, 1.5, 1.5, 1.5])
+            with cols[0]:
+                st.text(item.get('item_name', ''))
+            with cols[1]:
+                beg = st.number_input(f"eq_beg_{i}", value=item.get('beginning_balance') or 0.0, label_visibility="collapsed", key=f"eq_beg_{statement_id}_{i}")
+            with cols[2]:
+                inc = st.number_input(f"eq_inc_{i}", value=item.get('increase') or 0.0, label_visibility="collapsed", key=f"eq_inc_{statement_id}_{i}")
+            with cols[3]:
+                dec = st.number_input(f"eq_dec_{i}", value=item.get('decrease') or 0.0, label_visibility="collapsed", key=f"eq_dec_{statement_id}_{i}")
+            with cols[4]:
+                end = st.number_input(f"eq_end_{i}", value=item.get('ending_balance') or 0.0, label_visibility="collapsed", key=f"eq_end_{statement_id}_{i}")
+            with cols[5]:
+                notes = st.text_input(f"eq_note_{i}", value=item.get('notes', ''), label_visibility="collapsed", key=f"eq_note_{statement_id}_{i}")
+            updated_items.append({
+                **item,
+                "beginning_balance": beg if beg != 0 else None,
+                "increase": inc if inc != 0 else None,
+                "decrease": dec if dec != 0 else None,
+                "ending_balance": end if end != 0 else None,
+                "notes": notes or None,
+            })
+        updated[section_name] = updated_items
+        st.divider()
+
+    if st.button("保存权益变动表", key=f"save_eq_{statement_id}"):
+        _save_statement_field(statement_id, "equity_change", updated)
+
+
+def _render_notes_editor(statement_id: int, notes: str):
+    """财务报表附注编辑器"""
+    st.markdown("**财务报表附注**")
+    st.caption("支持Markdown格式")
+
+    updated_notes = st.text_area(
+        "附注内容",
+        value=notes or "",
+        height=500,
+        key=f"notes_{statement_id}"
+    )
+
+    if st.button("保存附注", key=f"save_notes_{statement_id}"):
+        _save_statement_field(statement_id, "notes", updated_notes)
+
+
+def _save_statement_field(statement_id: int, field: str, value):
+    """保存报表字段"""
+    resp = make_api_request(
+        f"/financial-statements/{statement_id}",
+        method="PUT",
+        data={field: value}
+    )
+    if resp:
+        st.success("保存成功")
+    else:
+        st.error("保存失败")
+
 def render_detection():
     """渲染舞弊检测页面 - 文件上传为主"""
     st.title("🔍 舞弊检测")
@@ -2683,6 +3120,8 @@ def main():
     if st.session_state.logged_in:
         if menu == "🏠 首页":
             render_home()
+        elif menu == "📋 财务助手":
+            render_financial_assistant()
         elif menu == "🔍 舞弊检测":
             render_detection()
         elif menu == "💬 AI 问答":
