@@ -25,6 +25,301 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# ================= 全局样式注入 =================
+st.markdown("""
+<style>
+/* ===== 全局主题变量 ===== */
+:root {
+    --primary: #1e3a5f;
+    --primary-light: #3b82f6;
+    --accent: #f59e0b;
+    --accent-light: #fbbf24;
+    --bg-dark: #0f172a;
+    --bg-card: #1e293b;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --border: #334155;
+    --success: #10b981;
+    --danger: #ef4444;
+}
+
+/* ===== 页面全局背景 ===== */
+.stApp {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+}
+
+/* ===== 侧边栏美化 ===== */
+section[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
+    border-right: 1px solid #334155;
+}
+section[data-testid="stSidebar"] .stRadio label {
+    color: #cbd5e1 !important;
+    font-size: 14px !important;
+    padding: 8px 12px !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease;
+}
+section[data-testid="stSidebar"] .stRadio label:hover {
+    background: rgba(59, 130, 246, 0.15) !important;
+    color: #fbbf24 !important;
+}
+
+/* ===== 主内容区 ===== */
+.main .block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    max-width: 1400px;
+}
+
+/* ===== 标题样式 ===== */
+h1 {
+    color: #f1f5f9 !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.5px;
+}
+h2, h3 {
+    color: #e2e8f0 !important;
+    font-weight: 600 !important;
+}
+h4, h5, h6 {
+    color: #cbd5e1 !important;
+}
+
+/* ===== 文本颜色 ===== */
+p, span, div {
+    color: #cbd5e1;
+}
+.stCaption {
+    color: #94a3b8 !important;
+}
+
+/* ===== 卡片容器 ===== */
+[data-testid="stVerticalBlock"] > [style*="flex-direction: column"] > [data-testid="stVerticalBlock"] {
+    background: rgba(30, 41, 59, 0.6) !important;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(51, 65, 85, 0.5);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+/* ===== 按钮美化 ===== */
+.stButton > button {
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px;
+    padding: 0.6rem 1.5rem !important;
+    transition: all 0.25s ease !important;
+    text-transform: none !important;
+    border: none !important;
+}
+.stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
+}
+.stButton > button[kind="primary"]:hover {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%) !important;
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4) !important;
+    transform: translateY(-2px);
+}
+.stButton > button[kind="secondary"] {
+    background: rgba(51, 65, 85, 0.8) !important;
+    color: #e2e8f0 !important;
+    border: 1px solid #475569 !important;
+}
+.stButton > button[kind="secondary"]:hover {
+    background: rgba(71, 85, 105, 0.9) !important;
+    border-color: #64748b !important;
+    transform: translateY(-2px);
+}
+
+/* ===== 输入框美化 ===== */
+.stTextInput > div > div > input,
+.stNumberInput > div > div > input,
+.stTextArea > div > div > textarea {
+    background: rgba(15, 23, 42, 0.8) !important;
+    border: 1px solid #334155 !important;
+    border-radius: 10px !important;
+    color: #e2e8f0 !important;
+    padding: 0.75rem 1rem !important;
+}
+.stTextInput > div > div > input:focus,
+.stNumberInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+}
+
+/* ===== 数据表格 ===== */
+[data-testid="stDataFrame"] {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #334155;
+}
+[data-testid="stDataFrame"] th {
+    background: #1e293b !important;
+    color: #f1f5f9 !important;
+    font-weight: 600;
+}
+[data-testid="stDataFrame"] td {
+    background: #0f172a !important;
+    color: #cbd5e1 !important;
+}
+[data-testid="stDataFrame"] tr:hover td {
+    background: #1e293b !important;
+}
+
+/* ===== Tab美化 ===== */
+.stTabs [data-baseweb="tab-list"] {
+    background: rgba(30, 41, 59, 0.5);
+    border-radius: 12px;
+    padding: 4px;
+    gap: 4px;
+}
+.stTabs [data-baseweb="tab"] {
+    color: #94a3b8 !important;
+    border-radius: 8px;
+    padding: 10px 20px !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+.stTabs [data-baseweb="tab"][aria-selected="true"] {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+    color: #ffffff !important;
+}
+.stTabs [data-baseweb="tab-panel"] {
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 8px;
+}
+
+/* ===== Expander美化 ===== */
+.streamlit-expanderHeader {
+    background: rgba(30, 41, 59, 0.6) !important;
+    border-radius: 10px !important;
+    border: 1px solid #334155 !important;
+    color: #e2e8f0 !important;
+    font-weight: 500;
+}
+.streamlit-expanderContent {
+    background: rgba(15, 23, 42, 0.4) !important;
+    border-radius: 0 0 10px 10px;
+    border: 1px solid #334155;
+    border-top: none;
+}
+
+/* ===== Selectbox / Multiselect ===== */
+.stSelectbox > div > div,
+.stMultiSelect > div > div {
+    background: rgba(15, 23, 42, 0.8) !important;
+    border: 1px solid #334155 !important;
+    border-radius: 10px !important;
+}
+.stSelectbox > div > div:focus-within,
+.stMultiSelect > div > div:focus-within {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+}
+
+/* ===== Metric美化 ===== */
+[data-testid="stMetric"] {
+    background: rgba(30, 41, 59, 0.5);
+    border-radius: 12px;
+    padding: 1rem;
+    border: 1px solid rgba(51, 65, 85, 0.3);
+}
+[data-testid="stMetric"] label {
+    color: #94a3b8 !important;
+    font-size: 0.85rem;
+}
+[data-testid="stMetric"] .css-1xarl3l {
+    color: #f1f5f9 !important;
+    font-weight: 700;
+}
+
+/* ===== Divider ===== */
+hr {
+    border-color: #334155 !important;
+    opacity: 0.5;
+}
+
+/* ===== 滚动条 ===== */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+/* ===== 文件上传器 ===== */
+[data-testid="stFileUploader"] > section {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border: 2px dashed #334155 !important;
+    border-radius: 16px !important;
+}
+[data-testid="stFileUploader"] > section:hover {
+    border-color: #3b82f6 !important;
+    background: rgba(59, 130, 246, 0.05) !important;
+}
+
+/* ===== 成功/警告/信息框 ===== */
+[data-testid="stToast"] {
+    border-radius: 12px !important;
+}
+.stSuccess {
+    background: rgba(16, 185, 129, 0.1) !important;
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+    border-radius: 12px !important;
+}
+.stInfo {
+    background: rgba(59, 130, 246, 0.1) !important;
+    border: 1px solid rgba(59, 130, 246, 0.3) !important;
+    border-radius: 12px !important;
+}
+.stWarning {
+    background: rgba(245, 158, 11, 0.1) !important;
+    border: 1px solid rgba(245, 158, 11, 0.3) !important;
+    border-radius: 12px !important;
+}
+.stError {
+    background: rgba(239, 68, 68, 0.1) !important;
+    border: 1px solid rgba(239, 68, 68, 0.3) !important;
+    border-radius: 12px !important;
+}
+
+/* ===== Pricing Card Hover Effect ===== */
+.pricing-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.pricing-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== Spinner ===== */
+[data-testid="stSpinner"] > div {
+    border-top-color: #3b82f6 !important;
+}
+
+/* ===== 隐藏Streamlit默认水印和菜单 ===== */
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
+
+</style>
+""", unsafe_allow_html=True)
+
+
 # ================= API 配置 =================
 API_BASE_URL = "http://47.76.180.29:8000/api"
 
@@ -2665,94 +2960,78 @@ def render_my_detections():
 
 # ================= 会员中心页面 =================
 def render_membership():
-    """渲染会员中心/价格中心页面 - 四版本企业级定价方案"""
-    st.title("💎 产品定价")
-    st.caption("企业级审计数字化解决方案，助力事务所高效风控")
+    """渲染会员中心/价格中心页面 - 三版本定价方案"""
+    st.markdown("""
+    <div style="text-align:center; padding: 40px 0 20px 0;">
+        <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 8px;">
+            <span style="background: linear-gradient(135deg, #3b82f6, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                选择适合您的方案
+            </span>
+        </h1>
+        <p style="color: #94a3b8; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
+            灵活的定价，专业的服务，助力每一位财务工作者高效识别风险
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
-    # ========== 四版本定价卡片 ==========
     plans = [
         {
-            "name": "基础版",
-            "target": "初创/小型事务所",
-            "team": "团队 < 10人",
-            "price": "1.98万",
-            "unit": "元/年（固定年费）",
+            "name": "个人/个体版",
+            "price": "99",
+            "unit": "元/年",
+            "target": "独立审计师 · 个人投资者 · 财务分析师",
             "highlight": False,
-            "value": "入门级效率工具，以极低成本启用数字化审计，规范单个项目流程",
+            "value": "个人效率工具，快速识别企业财务风险，支持单项目深度分析",
             "features": [
-                "✅ 单项目审计管理",
-                "✅ 3年财报分析",
-                "✅ 风险评分底稿高亮",
-                "✅ 基础建议报告",
-                "✅ 邮件技术支持",
-                "❌ 多项目并行",
+                "✅ 单项目审计分析",
+                "✅ 3年财报数据对比",
+                "✅ 风险评分与底稿高亮",
+                "✅ 基础AI风险建议报告",
+                "✅ 标准案例库查询",
+                "❌ 多项目并行管理",
                 "❌ 可视化雷达图",
+                "❌ 团队协作功能",
                 "❌ API接口",
-                "❌ 私有部署",
             ],
-            "cta": "立即订阅",
+            "cta": "立即开通",
             "cta_type": "secondary",
         },
         {
-            "name": "专业版",
-            "target": "成长型/标准中型所",
-            "team": "团队 10-50人",
-            "price": "3.98万起",
-            "unit": "元/年（分级年费）",
+            "name": "小微企业版",
+            "price": "298",
+            "unit": "元/年",
+            "target": "小型企业 · 创业团队 · 工作室",
             "highlight": True,
-            "value": "多项目协同管理平台，实现多个项目并行管理与质量把控，提升团队标准化水平",
+            "value": "团队级分析平台，支持多项目并行管理与质量把控，提升协作效率",
             "features": [
-                "✅ 多项目并行（≤10个/年）",
-                "✅ 可视化雷达图",
-                "✅ 同业案例对标",
+                "✅ 多项目并行（≤5个）",
+                "✅ 可视化风险雷达图",
+                "✅ 同业案例对标分析",
                 "✅ 整改跟踪引擎",
-                "✅ 原文溯源功能",
+                "✅ 原文溯源定位",
                 "✅ 优先技术支持",
+                "❌ 团队权限管理",
                 "❌ Open API接口",
-                "❌ 高级数据分析",
-                "❌ 私有部署",
+                "❌ 私有化部署",
             ],
-            "cta": "立即订阅",
+            "cta": "立即开通",
             "cta_type": "primary",
         },
         {
-            "name": "高级版",
-            "target": "成熟型中型所/区域领先所",
-            "team": "团队 50-150人",
-            "price": "8.8万起",
-            "unit": "元/年（平台费+模块费）",
+            "name": "企业分析版",
+            "price": "698",
+            "unit": "元/年",
+            "target": "中型企业 · 投资机构 · 咨询公司",
             "highlight": False,
-            "value": "一体化协同与集成平台，支撑跨部门复杂协作，并具备与企业或内部系统集成的能力",
+            "value": "全功能开放，深度数据分析与系统集成，满足企业级审计数字化需求",
             "features": [
-                "✅ 含20个基础项目",
+                "✅ 不限项目数量",
                 "✅ 团队与角色权限管理",
                 "✅ Open API接口",
                 "✅ 高级数据分析模块",
-                "✅ 项目增量包扩展",
-                "✅ 高级模块按需选购",
+                "✅ 批量检测（100家/次）",
+                "✅ 私有云部署支持",
                 "✅ 专属客户经理",
-                "❌ 不限项目数",
-                "❌ 深度定制开发",
-            ],
-            "cta": "联系咨询",
-            "cta_type": "secondary",
-        },
-        {
-            "name": "企业版",
-            "target": "大型/全国性会计师事务所",
-            "team": "团队 > 150人",
-            "price": "25万起",
-            "unit": "元/年（定制化报价）",
-            "highlight": False,
-            "value": "战略级审计数字化解决方案，全面对接客户生态，实现审计流程的深度定制与系统集成",
-            "features": [
-                "✅ 不限项目数量",
-                "✅ 定制化工作流",
-                "✅ 深度API集成与开发支持",
-                "✅ 专属客户成功团队",
-                "✅ 高级安全与合规保障",
-                "✅ 私有化部署",
-                "✅ 全功能开放",
                 "✅ 7×24小时技术支持",
             ],
             "cta": "联系咨询",
@@ -2760,90 +3039,81 @@ def render_membership():
         },
     ]
 
-    # 四列卡片布局
-    cols = st.columns(4)
+    # 三列卡片布局
+    cols = st.columns(3)
     for idx, plan in enumerate(plans):
         with cols[idx]:
-            with st.container(border=True):
-                # 推荐标签
-                if plan["highlight"]:
-                    st.success("⭐ 最受欢迎")
+            highlight_border = "border: 2px solid #f59e0b;" if plan["highlight"] else "border: 1px solid #334155;"
+            highlight_bg = "background: linear-gradient(180deg, rgba(245,158,11,0.08) 0%, rgba(30,41,59,0.9) 100%);" if plan["highlight"] else "background: rgba(30,41,59,0.7);"
+            badge = '<div style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #0f172a; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 12px;">⭐ 最受欢迎</div>' if plan["highlight"] else '<div style="height: 32px;"></div>'
 
-                # 版本信息
-                st.markdown(f"### {plan['name']}")
-                st.caption(f"**{plan['target']}**")
-                st.caption(f"*{plan['team']}*")
+            st.markdown(f"""
+            <div style="{highlight_bg} {highlight_border} border-radius: 20px; padding: 28px; height: 100%; transition: all 0.3s ease;" class="pricing-card">
+                {badge}
+                <h3 style="color: #f1f5f9; font-size: 1.4rem; margin-bottom: 4px;">{plan['name']}</h3>
+                <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 16px;">{plan['target']}</p>
+                <div style="margin: 20px 0;">
+                    <span style="font-size: 2.8rem; font-weight: 800; background: linear-gradient(135deg, #f1f5f9, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">¥{plan['price']}</span>
+                    <span style="color: #64748b; font-size: 0.9rem;">/{plan['unit']}</span>
+                </div>
+                <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6; min-height: 48px; margin-bottom: 20px;">{plan['value']}</p>
+                <div style="border-top: 1px solid #334155; padding-top: 16px;">
+            """, unsafe_allow_html=True)
 
-                # 价格
-                st.markdown(f"<h2 style='margin:8px 0;color:#1f77b4;'>{plan['price']}</h2>", unsafe_allow_html=True)
-                st.caption(plan["unit"])
+            for feat in plan["features"]:
+                color = "#10b981" if feat.startswith("✅") else "#64748b"
+                st.markdown(f"<p style='margin: 6px 0; font-size: 0.85rem; color: {color};'>{feat}</p>", unsafe_allow_html=True)
 
-                st.divider()
+            st.markdown("</div></div>", unsafe_allow_html=True)
 
-                # 价值主张
-                st.markdown(f"<p style='font-size:13px;color:#666;min-height:60px;'>{plan['value']}</p>", unsafe_allow_html=True)
+            # CTA按钮
+            btn_type = plan.get("cta_type", "secondary")
+            if st.button(plan["cta"], use_container_width=True, key=f"v3_plan_cta_{idx}", type=btn_type):
+                if plan["cta"] == "联系咨询":
+                    st.info("""
+                    📞 **商务咨询**
 
-                st.divider()
+                    电话：400-888-8888
+                    邮箱：sales@auditmind.com
+                    微信：AuditMind_Sales
 
-                # 功能列表
-                st.markdown("**功能权益：**")
-                for feat in plan["features"]:
-                    st.markdown(f"<p style='margin:2px 0;font-size:13px;'>{feat}</p>", unsafe_allow_html=True)
+                    工作时间：周一至周五 9:00-18:00
+                    """)
+                else:
+                    st.info("""
+                    🛒 **开通流程**
 
-                st.divider()
+                    1. 确认套餐版本
+                    2. 在线支付或联系商务
+                    3. 即刻开通账户
 
-                # CTA按钮
-                btn_type = plan.get("cta_type", "secondary")
-                if st.button(plan["cta"], use_container_width=True, key=f"plan_cta_{idx}", type=btn_type):
-                    if plan["cta"] == "联系咨询":
-                        st.info("""
-                        📞 **商务咨询**
-
-                        电话：400-888-8888
-                        邮箱：sales@auditmind.com
-                        微信：AuditMind_Sales
-
-                        工作时间：周一至周五 9:00-18:00
-                        """)
-                    else:
-                        st.info("""
-                        🛒 **订阅流程**
-
-                        1. 确认套餐版本
-                        2. 签署服务协议
-                        3. 对公转账支付
-                        4. 开通企业账户
-
-                        请联系商务团队完成订阅：sales@auditmind.com
-                        """)
-                        st.balloons()
+                    如有疑问请联系：sales@auditmind.com
+                    """)
+                    st.balloons()
 
     # ========== 功能对比表 ==========
     st.divider()
-    st.subheader("📊 功能对比详情")
+    st.markdown("<h3 style='text-align:center; margin-bottom: 24px;'>📊 功能对比详情</h3>", unsafe_allow_html=True)
 
     comparison_data = [
-        {"功能模块": "项目数量", "基础版": "1个", "专业版": "≤10个/年", "高级版": "20个基础+增量", "企业版": "不限"},
-        {"功能模块": "财报分析年限", "基础版": "3年", "专业版": "5年", "高级版": "不限", "企业版": "不限"},
-        {"功能模块": "风险评分底稿", "基础版": "✅", "专业版": "✅", "高级版": "✅", "企业版": "✅"},
-        {"功能模块": "可视化雷达图", "基础版": "❌", "专业版": "✅", "高级版": "✅", "企业版": "✅"},
-        {"功能模块": "同业案例对标", "基础版": "❌", "专业版": "✅", "高级版": "✅", "企业版": "✅"},
-        {"功能模块": "整改跟踪引擎", "基础版": "❌", "专业版": "✅", "高级版": "✅", "企业版": "✅"},
-        {"功能模块": "原文溯源", "基础版": "❌", "专业版": "✅", "高级版": "✅", "企业版": "✅"},
-        {"功能模块": "Open API接口", "基础版": "❌", "专业版": "❌", "高级版": "✅", "企业版": "✅深度集成"},
-        {"功能模块": "高级数据分析", "基础版": "❌", "专业版": "❌", "高级版": "✅", "企业版": "✅"},
-        {"功能模块": "团队权限管理", "基础版": "❌", "专业版": "❌", "高级版": "✅", "企业版": "✅"},
-        {"功能模块": "定制化工作流", "基础版": "❌", "专业版": "❌", "高级版": "❌", "企业版": "✅"},
-        {"功能模块": "私有化部署", "基础版": "❌", "专业版": "❌", "高级版": "❌", "企业版": "✅"},
-        {"功能模块": "专属客户成功团队", "基础版": "❌", "专业版": "❌", "高级版": "✅", "企业版": "✅"},
-        {"功能模块": "7×24小时支持", "基础版": "❌", "专业版": "❌", "高级版": "❌", "企业版": "✅"},
+        {"功能模块": "项目数量", "个人/个体版": "1个", "小微企业版": "≤5个", "企业分析版": "不限"},
+        {"功能模块": "财报分析年限", "个人/个体版": "3年", "小微企业版": "5年", "企业分析版": "不限"},
+        {"功能模块": "风险评分底稿", "个人/个体版": "✅", "小微企业版": "✅", "企业分析版": "✅"},
+        {"功能模块": "可视化雷达图", "个人/个体版": "❌", "小微企业版": "✅", "企业分析版": "✅"},
+        {"功能模块": "同业案例对标", "个人/个体版": "❌", "小微企业版": "✅", "企业分析版": "✅"},
+        {"功能模块": "整改跟踪引擎", "个人/个体版": "❌", "小微企业版": "✅", "企业分析版": "✅"},
+        {"功能模块": "原文溯源", "个人/个体版": "❌", "小微企业版": "✅", "企业分析版": "✅"},
+        {"功能模块": "Open API接口", "个人/个体版": "❌", "小微企业版": "❌", "企业分析版": "✅"},
+        {"功能模块": "团队权限管理", "个人/个体版": "❌", "小微企业版": "❌", "企业分析版": "✅"},
+        {"功能模块": "批量检测", "个人/个体版": "❌", "小微企业版": "❌", "企业分析版": "✅100家/次"},
+        {"功能模块": "私有化部署", "个人/个体版": "❌", "小微企业版": "❌", "企业分析版": "✅"},
+        {"功能模块": "专属客户经理", "个人/个体版": "❌", "小微企业版": "❌", "企业分析版": "✅"},
+        {"功能模块": "7×24小时支持", "个人/个体版": "❌", "小微企业版": "❌", "企业分析版": "✅"},
     ]
 
     st.dataframe(comparison_data, use_container_width=True, hide_index=True)
 
-    # ========== 底部信息 ==========
 
-# ================= 报告管理页面 =================
 def render_report_management():
     """渲染报告管理页面"""
     st.title("📁 报告管理")
