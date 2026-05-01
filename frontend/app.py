@@ -1,5 +1,5 @@
 """
-财务舞弊识别 SaaS 平台
+Audit Mind - Financial Fraud Detection SaaS
 """
 import streamlit as st
 import requests
@@ -19,303 +19,137 @@ from download_helper import download_file_with_auth, create_download_button
 
 # ================= 页面配置 =================
 st.set_page_config(
-    page_title="财务舞弊识别 SaaS 平台",
+    page_title="Audit Mind",
     page_icon="🔍",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # ================= 全局样式注入 =================
+# 仅注入轻量增强样式，不强制主题色，跟随浏览器/系统 light/dark 偏好
 st.markdown("""
 <style>
-/* ===== 全局主题变量 ===== */
-:root {
-    --primary: #1e3a5f;
-    --primary-light: #3b82f6;
-    --accent: #f59e0b;
-    --accent-light: #fbbf24;
-    --bg-dark: #0f172a;
-    --bg-card: #1e293b;
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --border: #334155;
-    --success: #10b981;
-    --danger: #ef4444;
-}
-
-/* ===== 页面全局背景 ===== */
-.stApp {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-}
-
-/* ===== 侧边栏美化 ===== */
-section[data-testid="stSidebar"] {
-    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
-    border-right: 1px solid #334155;
-}
-section[data-testid="stSidebar"] .stRadio label {
-    color: #cbd5e1 !important;
-    font-size: 14px !important;
-    padding: 8px 12px !important;
-    border-radius: 8px !important;
-    transition: all 0.2s ease;
-}
-section[data-testid="stSidebar"] .stRadio label:hover {
-    background: rgba(59, 130, 246, 0.15) !important;
-    color: #fbbf24 !important;
-}
-
-/* ===== 主内容区 ===== */
+/* ===== 通用增强 ===== */
 .main .block-container {
     padding-top: 2rem;
     padding-bottom: 2rem;
     max-width: 1400px;
 }
 
-/* ===== 标题样式 ===== */
-h1 {
-    color: #f1f5f9 !important;
-    font-weight: 700 !important;
-    letter-spacing: -0.5px;
-}
-h2, h3 {
-    color: #e2e8f0 !important;
-    font-weight: 600 !important;
-}
-h4, h5, h6 {
-    color: #cbd5e1 !important;
-}
-
-/* ===== 文本颜色 ===== */
-p, span, div {
-    color: #cbd5e1;
-}
-.stCaption {
-    color: #94a3b8 !important;
-}
-
-/* ===== 卡片容器 ===== */
-[data-testid="stVerticalBlock"] > [style*="flex-direction: column"] > [data-testid="stVerticalBlock"] {
-    background: rgba(30, 41, 59, 0.6) !important;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(51, 65, 85, 0.5);
-    border-radius: 16px;
-    padding: 1.5rem;
-    transition: all 0.3s ease;
-}
-
-/* ===== 按钮美化 ===== */
+/* ===== 按钮圆角与过渡 ===== */
 .stButton > button {
     border-radius: 10px !important;
     font-weight: 600 !important;
-    letter-spacing: 0.5px;
     padding: 0.6rem 1.5rem !important;
     transition: all 0.25s ease !important;
-    text-transform: none !important;
-    border: none !important;
 }
-.stButton > button[kind="primary"] {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
-}
-.stButton > button[kind="primary"]:hover {
-    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%) !important;
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4) !important;
-    transform: translateY(-2px);
-}
-.stButton > button[kind="secondary"] {
-    background: rgba(51, 65, 85, 0.8) !important;
-    color: #e2e8f0 !important;
-    border: 1px solid #475569 !important;
-}
-.stButton > button[kind="secondary"]:hover {
-    background: rgba(71, 85, 105, 0.9) !important;
-    border-color: #64748b !important;
+.stButton > button:hover {
     transform: translateY(-2px);
 }
 
-/* ===== 输入框美化 ===== */
-.stTextInput > div > div > input,
-.stNumberInput > div > div > input,
-.stTextArea > div > div > textarea {
-    background: rgba(15, 23, 42, 0.8) !important;
-    border: 1px solid #334155 !important;
-    border-radius: 10px !important;
-    color: #e2e8f0 !important;
-    padding: 0.75rem 1rem !important;
-}
+/* ===== 输入框聚焦效果 ===== */
 .stTextInput > div > div > input:focus,
 .stNumberInput > div > div > input:focus,
 .stTextArea > div > div > textarea:focus {
-    border-color: #3b82f6 !important;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
 }
 
-/* ===== 数据表格 ===== */
+/* ===== 数据表格圆角 ===== */
 [data-testid="stDataFrame"] {
     border-radius: 12px;
     overflow: hidden;
-    border: 1px solid #334155;
-}
-[data-testid="stDataFrame"] th {
-    background: #1e293b !important;
-    color: #f1f5f9 !important;
-    font-weight: 600;
-}
-[data-testid="stDataFrame"] td {
-    background: #0f172a !important;
-    color: #cbd5e1 !important;
-}
-[data-testid="stDataFrame"] tr:hover td {
-    background: #1e293b !important;
 }
 
-/* ===== Tab美化 ===== */
+/* ===== Tab 圆角 ===== */
 .stTabs [data-baseweb="tab-list"] {
-    background: rgba(30, 41, 59, 0.5);
     border-radius: 12px;
     padding: 4px;
     gap: 4px;
 }
 .stTabs [data-baseweb="tab"] {
-    color: #94a3b8 !important;
     border-radius: 8px;
     padding: 10px 20px !important;
     font-weight: 500;
     transition: all 0.2s ease;
 }
-.stTabs [data-baseweb="tab"][aria-selected="true"] {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
-    color: #ffffff !important;
-}
-.stTabs [data-baseweb="tab-panel"] {
-    background: rgba(15, 23, 42, 0.4);
-    border-radius: 12px;
-    padding: 1rem;
-    margin-top: 8px;
-}
 
-/* ===== Expander美化 ===== */
-.streamlit-expanderHeader {
-    background: rgba(30, 41, 59, 0.6) !important;
-    border-radius: 10px !important;
-    border: 1px solid #334155 !important;
-    color: #e2e8f0 !important;
-    font-weight: 500;
-}
-.streamlit-expanderContent {
-    background: rgba(15, 23, 42, 0.4) !important;
-    border-radius: 0 0 10px 10px;
-    border: 1px solid #334155;
-    border-top: none;
-}
-
-/* ===== Selectbox / Multiselect ===== */
-.stSelectbox > div > div,
-.stMultiSelect > div > div {
-    background: rgba(15, 23, 42, 0.8) !important;
-    border: 1px solid #334155 !important;
-    border-radius: 10px !important;
-}
-.stSelectbox > div > div:focus-within,
-.stMultiSelect > div > div:focus-within {
-    border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
-}
-
-/* ===== Metric美化 ===== */
-[data-testid="stMetric"] {
-    background: rgba(30, 41, 59, 0.5);
-    border-radius: 12px;
-    padding: 1rem;
-    border: 1px solid rgba(51, 65, 85, 0.3);
-}
-[data-testid="stMetric"] label {
-    color: #94a3b8 !important;
-    font-size: 0.85rem;
-}
-[data-testid="stMetric"] .css-1xarl3l {
-    color: #f1f5f9 !important;
-    font-weight: 700;
-}
-
-/* ===== Divider ===== */
-hr {
-    border-color: #334155 !important;
-    opacity: 0.5;
-}
-
-/* ===== 滚动条 ===== */
-::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-}
-::-webkit-scrollbar-track {
-    background: #0f172a;
-}
-::-webkit-scrollbar-thumb {
-    background: #334155;
-    border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #475569;
-}
-
-/* ===== 文件上传器 ===== */
+/* ===== 文件上传器圆角 ===== */
 [data-testid="stFileUploader"] > section {
-    background: rgba(15, 23, 42, 0.6) !important;
-    border: 2px dashed #334155 !important;
     border-radius: 16px !important;
 }
-[data-testid="stFileUploader"] > section:hover {
-    border-color: #3b82f6 !important;
-    background: rgba(59, 130, 246, 0.05) !important;
-}
 
-/* ===== 成功/警告/信息框 ===== */
-[data-testid="stToast"] {
-    border-radius: 12px !important;
-}
-.stSuccess {
-    background: rgba(16, 185, 129, 0.1) !important;
-    border: 1px solid rgba(16, 185, 129, 0.3) !important;
-    border-radius: 12px !important;
-}
-.stInfo {
-    background: rgba(59, 130, 246, 0.1) !important;
-    border: 1px solid rgba(59, 130, 246, 0.3) !important;
-    border-radius: 12px !important;
-}
-.stWarning {
-    background: rgba(245, 158, 11, 0.1) !important;
-    border: 1px solid rgba(245, 158, 11, 0.3) !important;
-    border-radius: 12px !important;
-}
-.stError {
-    background: rgba(239, 68, 68, 0.1) !important;
-    border: 1px solid rgba(239, 68, 68, 0.3) !important;
-    border-radius: 12px !important;
-}
-
-/* ===== Pricing Card Hover Effect ===== */
+/* ===== Pricing Card 动效 ===== */
 .pricing-card {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .pricing-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    transform: translateY(-6px);
 }
 
-/* ===== Spinner ===== */
-[data-testid="stSpinner"] > div {
-    border-top-color: #3b82f6 !important;
-}
-
-/* ===== 隐藏Streamlit默认水印和菜单 ===== */
+/* ===== 隐藏默认水印和菜单 ===== */
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 header {visibility: hidden;}
 
+/* ===== Light Mode Pricing Cards ===== */
+@media (prefers-color-scheme: light) {
+    .pricing-card {
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+    }
+    .pricing-card:hover {
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12) !important;
+    }
+    .pricing-card h3 {
+        color: #0f172a !important;
+    }
+    .pricing-card .price-text {
+        background: linear-gradient(135deg, #1e3a5f, #3b82f6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .pricing-card .feature-yes {
+        color: #047857 !important;
+    }
+    .pricing-card .feature-no {
+        color: #9ca3af !important;
+    }
+    .pricing-highlight {
+        background: linear-gradient(180deg, rgba(245,158,11,0.06) 0%, #ffffff 100%) !important;
+        border: 2px solid #f59e0b !important;
+    }
+}
+
+/* ===== Dark Mode Pricing Cards ===== */
+@media (prefers-color-scheme: dark) {
+    .pricing-card {
+        background: rgba(30, 41, 59, 0.7) !important;
+        border: 1px solid #334155 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+    }
+    .pricing-card:hover {
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35) !important;
+    }
+    .pricing-card h3 {
+        color: #f1f5f9 !important;
+    }
+    .pricing-card .price-text {
+        background: linear-gradient(135deg, #f1f5f9, #cbd5e1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .pricing-card .feature-yes {
+        color: #34d399 !important;
+    }
+    .pricing-card .feature-no {
+        color: #64748b !important;
+    }
+    .pricing-highlight {
+        background: linear-gradient(180deg, rgba(245,158,11,0.08) 0%, rgba(30,41,59,0.9) 100%) !important;
+        border: 2px solid #f59e0b !important;
+    }
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -735,7 +569,7 @@ def render_top_navigation():
     col1, col2, col3, col4 = st.columns([5, 2, 1.5, 1.5])
 
     with col1:
-        st.markdown("### 🔍 慧审 - 财务舞弊识别 SaaS 平台")
+        st.markdown("### 🔍 Audit Mind")
 
     with col2:
         if st.session_state.logged_in:
@@ -911,7 +745,7 @@ def render_sidebar():
 # ================= 首页 =================
 def render_home():
     """渲染首页"""
-    st.title("🔍 财务舞弊识别 SaaS 平台")
+    st.title("🔍 Audit Mind")
     st.subheader("基于生成式 AI 的上市公司财务舞弊智能识别系统")
 
     # Hero Section
@@ -3043,26 +2877,25 @@ def render_membership():
     cols = st.columns(3)
     for idx, plan in enumerate(plans):
         with cols[idx]:
-            highlight_border = "border: 2px solid #f59e0b;" if plan["highlight"] else "border: 1px solid #334155;"
-            highlight_bg = "background: linear-gradient(180deg, rgba(245,158,11,0.08) 0%, rgba(30,41,59,0.9) 100%);" if plan["highlight"] else "background: rgba(30,41,59,0.7);"
+            card_cls = "pricing-card pricing-highlight" if plan["highlight"] else "pricing-card"
             badge = '<div style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #0f172a; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 12px;">⭐ 最受欢迎</div>' if plan["highlight"] else '<div style="height: 32px;"></div>'
 
             st.markdown(f"""
-            <div style="{highlight_bg} {highlight_border} border-radius: 20px; padding: 28px; height: 100%; transition: all 0.3s ease;" class="pricing-card">
+            <div style="border-radius: 20px; padding: 28px; height: 100%;" class="{card_cls}">
                 {badge}
-                <h3 style="color: #f1f5f9; font-size: 1.4rem; margin-bottom: 4px;">{plan['name']}</h3>
-                <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 16px;">{plan['target']}</p>
+                <h3 style="font-size: 1.4rem; margin-bottom: 4px;">{plan['name']}</h3>
+                <p style="opacity: 0.7; font-size: 0.85rem; margin-bottom: 16px;">{plan['target']}</p>
                 <div style="margin: 20px 0;">
-                    <span style="font-size: 2.8rem; font-weight: 800; background: linear-gradient(135deg, #f1f5f9, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">¥{plan['price']}</span>
-                    <span style="color: #64748b; font-size: 0.9rem;">/{plan['unit']}</span>
+                    <span class="price-text" style="font-size: 2.8rem; font-weight: 800;">¥{plan['price']}</span>
+                    <span style="opacity: 0.6; font-size: 0.9rem;">/{plan['unit']}</span>
                 </div>
-                <p style="color: #94a3b8; font-size: 0.9rem; line-height: 1.6; min-height: 48px; margin-bottom: 20px;">{plan['value']}</p>
-                <div style="border-top: 1px solid #334155; padding-top: 16px;">
+                <p style="opacity: 0.75; font-size: 0.9rem; line-height: 1.6; min-height: 48px; margin-bottom: 20px;">{plan['value']}</p>
+                <div style="border-top: 1px solid currentColor; opacity: 0.15; padding-top: 16px;">
             """, unsafe_allow_html=True)
 
             for feat in plan["features"]:
-                color = "#10b981" if feat.startswith("✅") else "#64748b"
-                st.markdown(f"<p style='margin: 6px 0; font-size: 0.85rem; color: {color};'>{feat}</p>", unsafe_allow_html=True)
+                cls = "feature-yes" if feat.startswith("✅") else "feature-no"
+                st.markdown(f"<p class='{cls}' style='margin: 6px 0; font-size: 0.85rem;'>{feat}</p>", unsafe_allow_html=True)
 
             st.markdown("</div></div>", unsafe_allow_html=True)
 
