@@ -20,7 +20,7 @@ from download_helper import download_file_with_auth, create_download_button
 # ================= 页面配置 =================
 st.set_page_config(
     page_title="Audit Mind",
-    page_icon="🔍",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -979,20 +979,20 @@ def run_detection_with_progress(detection_data, timeout=120):
 
     # 定义检测步骤
     steps = [
-        ("📊 数据验证", "验证财务数据完整性和一致性..."),
-        ("🔍 AI文本分析", "使用大模型提取7维风险特征..."),
-        ("📈 财务指标计算", "计算传统财务舞弊指标..."),
-        ("🤖 模型推理", "执行XGBoost模型预测..."),
-        ("📊 SHAP可解释性", "计算特征重要性分析..."),
-        ("⚖️ IPO对标分析", "对比历史IPO被否案例..."),
-        ("💡 生成整改建议", "基于风险标签生成建议..."),
+        (" 数据验证", "验证财务数据完整性和一致性..."),
+        (" AI文本分析", "使用大模型提取7维风险特征..."),
+        (" 财务指标计算", "计算传统财务舞弊指标..."),
+        (" 模型推理", "执行XGBoost模型预测..."),
+        (" SHAP可解释性", "计算特征重要性分析..."),
+        (" IPO对标分析", "对比历史IPO被否案例..."),
+        (" 生成整改建议", "基于风险标签生成建议..."),
     ]
 
     result = None
     error_msg = None
 
     # 使用 st.status 创建进度容器
-    with st.status("🔍 正在执行AI舞弊检测分析...", expanded=True) as status:
+    with st.status("正在执行AI舞弊检测分析...", expanded=True) as status:
         progress_bar = st.progress(0)
         step_text = st.empty()
 
@@ -1024,14 +1024,14 @@ def run_detection_with_progress(detection_data, timeout=120):
                     step_text.markdown(f"**{step_name}**\n{step_desc}")
                     time.sleep(0.2)
 
-                status.update(label="✅ 检测完成！", state="complete", expanded=False)
+                status.update(label=" 检测完成！", state="complete", expanded=False)
             else:
                 error_msg = "检测请求失败"
-                status.update(label=f"❌ {error_msg}", state="error")
+                status.update(label=f" {error_msg}", state="error")
 
         except Exception as e:
             error_msg = str(e)
-            status.update(label=f"❌ 检测失败: {error_msg}", state="error")
+            status.update(label=f" 检测失败: {error_msg}", state="error")
 
         progress_bar.empty()
         step_text.empty()
@@ -1107,11 +1107,11 @@ def get_chart_config():
 def show_risk_level_badge(risk_level):
     """显示风险等级徽章"""
     if risk_level == "high":
-        return "🔴 高风险"
+        return "高风险"
     elif risk_level == "medium":
-        return "🟡 中风险"
+        return "中风险"
     else:
-        return "🟢 低风险"
+        return "低风险"
 
 
 def create_fraud_probability_gauge(fraud_prob):
@@ -1202,29 +1202,29 @@ def render_top_navigation():
     col1, col2, col3, col4 = st.columns([5, 2, 1.5, 1.5])
 
     with col1:
-        st.markdown("### 🔍 Audit Mind")
+        st.markdown("###  Audit Mind")
 
     with col2:
         if st.session_state.logged_in:
             username = st.session_state.user_info.get('username', '用户')
             membership = st.session_state.user_info.get('membership_level', 'free')
-            membership_emoji = {"free": "🆓", "pro": "⭐", "enterprise": "🏢"}
-            st.caption(f"👤 {username} | {membership_emoji.get(membership, '🆓')} {membership.upper()}")
+            membership_label = {"free": "免费版", "pro": "专业版", "enterprise": "企业版"}
+            st.caption(f"{username} | {membership_label.get(membership, '免费版')}")
         else:
-            st.caption("👤 未登录")
+            st.caption("未登录")
 
     with col3:
         if st.session_state.logged_in:
             # 显示剩余检测次数
             remaining = st.session_state.user_info.get('free_detections_remaining')
             if remaining and remaining > 0:
-                st.caption(f"🔢 剩余 {remaining} 次检测")
+                st.caption(f"剩余 {remaining} 次检测")
             elif remaining == -1 or remaining is None:
-                st.caption("🔢 无限次检测")
+                st.caption("无限次检测")
 
     with col4:
         if st.session_state.logged_in:
-            if st.button("🚪 退出", use_container_width=True, key="top_logout"):
+            if st.button("退出", use_container_width=True, key="top_logout"):
                 # 清除持久化登录信息
                 AuthManager.clear_auth()
 
@@ -1233,7 +1233,7 @@ def render_top_navigation():
                 st.session_state.user_info = None
                 st.rerun()
         else:
-            if st.button("🔐 登录 / 注册", use_container_width=True, type="primary", key="top_login"):
+            if st.button("登录 / 注册", use_container_width=True, type="primary", key="top_login"):
                 st.session_state.show_login_modal = True
                 st.rerun()
 
@@ -1244,7 +1244,7 @@ def render_top_navigation():
 def render_login_modal():
     """渲染登录/注册弹窗"""
     # 使用 expander 替代 dialog
-    with st.expander("🔐 用户登录 / 注册", expanded=True):
+    with st.expander("用户登录 / 注册", expanded=True):
         tab1, tab2 = st.tabs(["登录", "注册"])
 
         with tab1:
@@ -1271,7 +1271,7 @@ def render_login_modal():
                             # 持久化登录信息
                             AuthManager.save_auth(result["access_token"], result["user"])
 
-                            st.success("✅ 登录成功！")
+                            st.success("登录成功！")
                             st.rerun()
                         else:
                             st.error("登录失败，请检查用户名和密码")
@@ -1300,18 +1300,18 @@ def render_login_modal():
                         )
 
                         if result:
-                            st.success("✅ 注册成功！请切换到「登录」标签登录")
+                            st.success("注册成功！请切换到「登录」标签登录")
                         else:
                             st.error("注册失败")
 
         # 快速登录按钮 - AuditMind 默认账号
         st.divider()
-        st.markdown("🚀 **快速体验？使用演示账号登录**")
+        st.markdown("**快速体验？使用演示账号登录**")
 
         col_quick, col_close = st.columns([2, 1])
 
         with col_quick:
-            if st.button("✨ 一键登录演示账号", use_container_width=True, type="primary", key="quick_login_btn"):
+            if st.button("一键登录演示账号", use_container_width=True, type="primary", key="quick_login_btn"):
                 # 使用默认账号登录
                 result = make_api_request(
                     "/user/login",
@@ -1328,13 +1328,13 @@ def render_login_modal():
                     # 持久化登录信息
                     AuthManager.save_auth(result["access_token"], result["user"])
 
-                    st.success("✅ 演示账号登录成功！已解锁全部功能")
+                    st.success("演示账号登录成功！已解锁全部功能")
                     st.rerun()
                 else:
                     st.error("演示账号登录失败，请尝试手动注册登录")
 
         with col_close:
-            if st.button("❌ 关闭", use_container_width=True, key="close_login_modal"):
+            if st.button("关闭", use_container_width=True, key="close_login_modal"):
                 st.session_state.show_login_modal = False
                 st.rerun()
 
@@ -1348,7 +1348,7 @@ def render_sidebar():
         # 品牌区域
         st.markdown("""
         <div style="text-align: center; padding: 1rem 0 0.5rem;">
-            <div style="font-size: 2rem; margin-bottom: 0.25rem;">🔍</div>
+            <div style="font-size: 2rem; margin-bottom: 0.25rem;"></div>
             <div style="font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, #3b82f6, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Audit Mind</div>
             <div style="font-size: 0.75rem; opacity: 0.6; margin-top: 2px;">AI 财务舞弊识别</div>
         </div>
@@ -1362,21 +1362,21 @@ def render_sidebar():
         # 主导航 - 根据登录状态显示不同选项
         if st.session_state.logged_in:
             pages = [
-                ("🏠 首页", "home"),
-                ("📋 财务助手", "fs"),
-                ("🔍 舞弊检测", "detect"),
-                ("💬 AI 问答", "qa"),
-                ("📊 我的检测", "history"),
-                ("📁 报告管理", "reports"),
-                ("💎 会员中心", "membership"),
-                ("⚙️ 账号设置", "settings"),
+                ("首页", "home"),
+                ("财务助手", "fs"),
+                ("舞弊检测", "detect"),
+                ("AI 问答", "qa"),
+                ("我的检测", "history"),
+                ("报告管理", "reports"),
+                ("会员中心", "membership"),
+                ("账号设置", "settings"),
             ]
         else:
             pages = [
-                ("🏠 首页", "home"),
-                ("💬 AI 问答(预览)", "qa"),
-                ("📋 价格中心", "pricing"),
-                ("📖 案例中心", "cases"),
+                ("首页", "home"),
+                ("AI 问答(预览)", "qa"),
+                ("价格中心", "pricing"),
+                ("案例中心", "cases"),
             ]
 
         current = st.session_state.current_page
@@ -1390,7 +1390,7 @@ def render_sidebar():
         st.divider()
 
         # 快捷帮助
-        with st.expander("❓ 帮助中心"):
+        with st.expander("帮助中心"):
             st.markdown("""
             - [如何使用](#)
             - [常见问题](#)
@@ -1416,7 +1416,7 @@ def render_home():
         <div style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); width: 700px; height: 700px; background: rgba(139,92,246,0.04); border-radius: 50%; filter: blur(140px);"></div>
         <div style="position: relative; z-index: 2; max-width: 900px; margin: 0 auto;">
             <div style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border-radius: 100px; font-size: 0.9rem; font-weight: 600; background: rgba(255,255,255,0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.12); color: #bfdbfe; margin-bottom: 1.5rem; animation: fadeIn 1s ease-out 0.3s both;">
-                <span style="font-size: 1.1rem;">🚀</span> AI-Powered Financial Audit Intelligence
+                <span style="font-size: 1.1rem;"></span> AI-Powered Financial Audit Intelligence
             </div>
             <h1 style="font-size: 4rem; font-weight: 800; letter-spacing: -2px; line-height: 1.05; margin-bottom: 1rem; background: linear-gradient(135deg, #ffffff 0%, #bfdbfe 40%, #60a5fa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: fadeInUp 0.8s ease-out;">
                 Audit Mind
@@ -1433,7 +1433,7 @@ def render_home():
     # CTA Buttons row
     c1, c2, c3, c4 = st.columns([1, 1, 1, 3])
     with c1:
-        if st.button("🔍 开始检测", type="primary", use_container_width=True, key="hero_cta_detect"):
+        if st.button("开始检测", type="primary", use_container_width=True, key="hero_cta_detect"):
             if st.session_state.logged_in:
                 st.session_state.current_page = "detect"
                 st.rerun()
@@ -1441,7 +1441,7 @@ def render_home():
                 st.session_state.show_login_modal = True
                 st.rerun()
     with c2:
-        if st.button("📋 财务助手", use_container_width=True, key="hero_cta_fs"):
+        if st.button("财务助手", use_container_width=True, key="hero_cta_fs"):
             if st.session_state.logged_in:
                 st.session_state.current_page = "fs"
                 st.rerun()
@@ -1449,13 +1449,13 @@ def render_home():
                 st.session_state.show_login_modal = True
                 st.rerun()
     with c3:
-        if st.button("💬 AI 问答", use_container_width=True, key="hero_cta_qa"):
+        if st.button("AI 问答", use_container_width=True, key="hero_cta_qa"):
             st.session_state.current_page = "qa"
             st.rerun()
 
     # Demo hint
     if not st.session_state.logged_in:
-        st.info("💡 **快速体验** — 点击右上角 🔐 登录/注册，选择「✨ 一键登录演示账号」即可体验全部功能（AuditMind / 123）")
+        st.info("**快速体验** — 点击右上角  登录/注册，选择「 一键登录演示账号」即可体验全部功能（AuditMind / 123）")
 
     # ========== Stats Bar ==========
     st.markdown("<div style='margin: 2.5rem 0 1.5rem;'></div>", unsafe_allow_html=True)
@@ -1478,13 +1478,13 @@ def render_home():
     st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
 
     # ========== Features Grid ==========
-    st.markdown("<h2 style='font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px;'>⚡ 核心能力</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px;'> 核心能力</h2>", unsafe_allow_html=True)
 
     features = [
-        ("📊", "双模输入分析", "结构化财务数据 + MD&A 非结构化文本，全方位透视企业风险"),
-        ("🤖", "AI 可解释性", "SHAP 特征重要性分析，每个预测都有明确依据，告别黑箱"),
-        ("🏷️", "风险标签可视化", "自动生成「存贷双高」等可读性强的风险标签，一目了然"),
-        ("💬", "AI 智能问答", "财务舞弊理论、案例解析、实操指导，7×24 随时解答"),
+        ("", "双模输入分析", "结构化财务数据 + MD&A 非结构化文本，全方位透视企业风险"),
+        ("", "AI 可解释性", "SHAP 特征重要性分析，每个预测都有明确依据，告别黑箱"),
+        ("", "风险标签可视化", "自动生成「存贷双高」等可读性强的风险标签，一目了然"),
+        ("", "AI 智能问答", "财务舞弊理论、案例解析、实操指导，7×24 随时解答"),
     ]
 
     feat_cols = st.columns(2)
@@ -1509,13 +1509,13 @@ def render_home():
     </style>
     <div style="margin: 3rem 0; padding: 3rem 1.5rem; position: relative; overflow: hidden;">
         <div style="text-align: center; margin-bottom: 3rem;">
-            <h2 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem;">🚀 三步完成智能检测</h2>
+            <h2 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem;"> 三步完成智能检测</h2>
             <p style="opacity: 0.7; font-size: 1rem;">上传财务报告 → AI深度解析 → 获取风险报告</p>
         </div>
         <div style="display: flex; align-items: flex-start; justify-content: center; gap: 0; max-width: 1000px; margin: 0 auto; position: relative;">
             <!-- Step 1 -->
             <div style="flex: 1; text-align: center; position: relative; z-index: 2; animation: fadeInUp 0.6s ease-out 0s both;">
-                <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #2563eb); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem; animation: pulse-dot 2s infinite; box-shadow: 0 4px 20px rgba(59,130,246,0.3);">📤</div>
+                <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #2563eb); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem; animation: pulse-dot 2s infinite; box-shadow: 0 4px 20px rgba(59,130,246,0.3);"></div>
                 <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">上传报告</h4>
                 <p style="font-size: 0.85rem; opacity: 0.7; line-height: 1.6; padding: 0 0.5rem;">支持 PDF 年报、Excel 财务表、Word 文档等多格式上传</p>
             </div>
@@ -1523,7 +1523,7 @@ def render_home():
             <div style="flex: 0.5; height: 2px; background: linear-gradient(90deg, #3b82f6, #10b981); margin-top: 32px; position: relative; z-index: 1; animation: connect-grow 0.8s ease-out 0.3s both;"></div>
             <!-- Step 2 -->
             <div style="flex: 1; text-align: center; position: relative; z-index: 2; animation: fadeInUp 0.6s ease-out 0.2s both;">
-                <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #7c3aed); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem; animation: pulse-dot 2s infinite 0.5s; box-shadow: 0 4px 20px rgba(139,92,246,0.3);">🤖</div>
+                <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #7c3aed); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem; animation: pulse-dot 2s infinite 0.5s; box-shadow: 0 4px 20px rgba(139,92,246,0.3);"></div>
                 <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">AI 深度解析</h4>
                 <p style="font-size: 0.85rem; opacity: 0.7; line-height: 1.6; padding: 0 0.5rem;">7 维风险特征提取 + SHAP 可解释性分析 + IPO 对标</p>
             </div>
@@ -1531,7 +1531,7 @@ def render_home():
             <div style="flex: 0.5; height: 2px; background: linear-gradient(90deg, #10b981, #f59e0b); margin-top: 32px; position: relative; z-index: 1; animation: connect-grow 0.8s ease-out 0.6s both;"></div>
             <!-- Step 3 -->
             <div style="flex: 1; text-align: center; position: relative; z-index: 2; animation: fadeInUp 0.6s ease-out 0.4s both;">
-                <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem; animation: pulse-dot 2s infinite 1s; box-shadow: 0 4px 20px rgba(245,158,11,0.3);">📊</div>
+                <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem; animation: pulse-dot 2s infinite 1s; box-shadow: 0 4px 20px rgba(245,158,11,0.3);"></div>
                 <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">获取报告</h4>
                 <p style="font-size: 0.85rem; opacity: 0.7; line-height: 1.6; padding: 0 0.5rem;">可视化风险标签、整改建议、完整证据链下载</p>
             </div>
@@ -1543,13 +1543,13 @@ def render_home():
     st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
 
     # ========== Use Cases ==========
-    st.markdown("<h2 style='font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px;'>🎯 适用场景</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px;'> 适用场景</h2>", unsafe_allow_html=True)
     uc_cols = st.columns(4)
     use_cases = [
-        ("🏛️", "监管机构", "非现场监管、风险预警"),
-        ("🏢", "会计师事务所", "审计辅助分析、底稿复核"),
-        ("📈", "投资者", "个股风险检测、标的筛查"),
-        ("🏭", "上市公司", "财务舞弊自查、信披优化"),
+        ("", "监管机构", "非现场监管、风险预警"),
+        ("", "会计师事务所", "审计辅助分析、底稿复核"),
+        ("", "投资者", "个股风险检测、标的筛查"),
+        ("", "上市公司", "财务舞弊自查、信披优化"),
     ]
     for i, (icon, title, desc) in enumerate(use_cases):
         with uc_cols[i]:
@@ -1564,7 +1564,7 @@ def render_home():
     st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
 
     # ========== Cases Showcase ==========
-    st.markdown("<h2 style='font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px;'>📚 经典案例库</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px;'> 经典案例库</h2>", unsafe_allow_html=True)
 
     cases = get_cached_demo_cases(featured_only=True, _token=st.session_state.token)
     if cases:
@@ -1592,27 +1592,27 @@ def render_home():
     </style>
     <div style="margin: 3rem 0; padding: 3rem 1.5rem; position: relative; overflow: hidden;">
         <div style="text-align: center; margin-bottom: 2.5rem;">
-            <h2 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem;">🛡️ 技术信任背书</h2>
+            <h2 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem;"> 技术信任背书</h2>
             <p style="opacity: 0.7; font-size: 1rem;">源自顶尖学术成果，服务专业审计场景</p>
         </div>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; max-width: 1100px; margin: 0 auto;">
             <div style="text-align: center; padding: 1.5rem; animation: fadeInUp 0.5s ease-out 0s both;">
-                <div style="font-size: 2.5rem; margin-bottom: 0.75rem; animation: float 4s ease-in-out infinite;">🏆</div>
+                <div style="font-size: 2.5rem; margin-bottom: 0.75rem; animation: float 4s ease-in-out infinite;"></div>
                 <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem;">学术认可</h4>
                 <p style="font-size: 0.8rem; opacity: 0.65; line-height: 1.5;">基于前沿财务舞弊识别研究成果</p>
             </div>
             <div style="text-align: center; padding: 1.5rem; animation: fadeInUp 0.5s ease-out 0.1s both;">
-                <div style="font-size: 2.5rem; margin-bottom: 0.75rem; animation: float 4s ease-in-out infinite 1s;">🔒</div>
+                <div style="font-size: 2.5rem; margin-bottom: 0.75rem; animation: float 4s ease-in-out infinite 1s;"></div>
                 <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem;">数据安全</h4>
                 <p style="font-size: 0.8rem; opacity: 0.65; line-height: 1.5;">企业级加密存储，报告阅后即焚</p>
             </div>
             <div style="text-align: center; padding: 1.5rem; animation: fadeInUp 0.5s ease-out 0.2s both;">
-                <div style="font-size: 2.5rem; margin-bottom: 0.75rem; animation: float 4s ease-in-out infinite 2s;">⚡</div>
+                <div style="font-size: 2.5rem; margin-bottom: 0.75rem; animation: float 4s ease-in-out infinite 2s;"></div>
                 <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem;">高效处理</h4>
                 <p style="font-size: 0.8rem; opacity: 0.65; line-height: 1.5;">单次检测仅需 30-60 秒</p>
             </div>
             <div style="text-align: center; padding: 1.5rem; animation: fadeInUp 0.5s ease-out 0.3s both;">
-                <div style="font-size: 2.5rem; margin-bottom: 0.75rem; animation: float 4s ease-in-out infinite 3s;">🎯</div>
+                <div style="font-size: 2.5rem; margin-bottom: 0.75rem; animation: float 4s ease-in-out infinite 3s;"></div>
                 <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem;">精准识别</h4>
                 <p style="font-size: 0.8rem; opacity: 0.65; line-height: 1.5;">92%+ AI 识别准确率，可解释</p>
             </div>
@@ -1636,10 +1636,10 @@ def render_home():
     st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
 
     # ========== Tech Details ==========
-    with st.expander("🔬 查看核心技术细节（AI提示词与算法原理）"):
+    with st.expander("查看核心技术细节（AI提示词与算法原理）"):
         st.info("本展示专为评委/技术评审设计，展示系统的核心技术实现")
 
-        tab1, tab2, tab3 = st.tabs(["📝 AI 提示词", "🧮 算法原理", "📊 特征体系"])
+        tab1, tab2, tab3 = st.tabs([" AI 提示词", " 算法原理", "特征体系"])
 
         with tab1:
             try:
@@ -1658,7 +1658,7 @@ def render_home():
                                 st.code(feature_code, language='text')
                             with col_desc:
                                 st.caption(f"{feature_info.get('description', '')}")
-                                st.markdown(f"💡 *示例: {feature_info.get('example', '')}*")
+                                st.markdown(f"*示例: {feature_info.get('example', '')}*")
 
                     st.markdown("**评分标准：**")
                     scoring = prompt_data.get('scoring_criteria', {})
@@ -1671,7 +1671,7 @@ def render_home():
                         st.error(scoring.get('high', ''))
 
                     st.markdown("---")
-                    st.markdown("**📄 完整提示词模板：**")
+                    st.markdown("** 完整提示词模板：**")
                     st.code(prompt_data.get('prompt_template', ''), language='text')
                 else:
                     st.error("提示词数据加载失败")
@@ -1679,7 +1679,7 @@ def render_home():
                 st.error(f"加载提示词失败: {e}")
 
         with tab2:
-            st.markdown("### 🧮 GMM-SHAP 可解释性算法")
+            st.markdown("###  GMM-SHAP 可解释性算法")
             st.markdown("""
             **算法流程：**
             1. **多模型集成预测**：结合逻辑回归、XGBoost、神经网络预测
@@ -1694,7 +1694,7 @@ def render_home():
             """)
 
         with tab3:
-            st.markdown("### 📊 双模特征体系")
+            st.markdown("###  双模特征体系")
             st.markdown("""
             **维度1: 结构化财务指标**
             - 存贷双高检测
@@ -1730,7 +1730,7 @@ def render_home():
                style="display:inline-block;padding:14px 40px;border-radius:14px;font-size:1.1rem;font-weight:700;color:#1e3a5f;background:linear-gradient(135deg,#ffffff 0%,#e0e7ff 100%);text-decoration:none;box-shadow:0 8px 30px rgba(255,255,255,0.2);transition:all 0.3s ease;animation:pulse-glow 3s infinite;"
                onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 12px 40px rgba(255,255,255,0.3)';"
                onmouseout="this.style.transform='';this.style.boxShadow='0 8px 30px rgba(255,255,255,0.2)';">
-                🔍 立即开始检测
+                 立即开始检测
             </a>
             <p style="font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 1.5rem;">新用户免费体验 3 次完整检测 · 无需信用卡</p>
         </div>
@@ -1749,7 +1749,7 @@ def render_financial_assistant():
     <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
         <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(59,130,246,0.15); border-radius: 50%; filter: blur(60px);"></div>
         <div style="position: relative; z-index: 1;">
-            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">📋 财务助手</h2>
+            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 财务助手</h2>
             <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">智能提取四表一注：上传文件 → AI解析 → 审核编辑 → 完成</p>
         </div>
     </div>
@@ -1785,11 +1785,11 @@ def _render_statement_list_v2():
     with col1:
         st.subheader("我的财务报表")
     with col2:
-        if st.button("🚀 AI自动生成", type="primary", use_container_width=True):
+        if st.button("AI自动生成", type="primary", use_container_width=True):
             st.session_state.fs_state = "upload"
             st.rerun()
     with col3:
-        if st.button("➕ 手动创建", use_container_width=True):
+        if st.button("手动创建", use_container_width=True):
             st.session_state.fs_show_create = True
 
     # 手动创建表单
@@ -1840,7 +1840,7 @@ def _render_statement_list_v2():
                 period_map = {"annual": "年报", "quarterly": "季报", "half_year": "半年报"}
                 st.caption(f"{stmt['report_year']}年 {period_map.get(stmt['report_period'], stmt['report_period'])}")
             with cols[2]:
-                status_map = {"draft": "📝 草稿", "completed": "✅ 已完成", "audited": "🔒 已审计"}
+                status_map = {"draft": " 草稿", "completed": " 已完成", "audited": " 已审计"}
                 st.caption(status_map.get(stmt['status'], stmt['status']))
             with cols[3]:
                 st.caption(stmt['created_at'][:10])
@@ -1850,7 +1850,7 @@ def _render_statement_list_v2():
                     st.session_state.fs_state = "edit"
                     st.rerun()
             with cols[5]:
-                if st.button("🗑️", key=f"del_{stmt['id']}", use_container_width=True):
+                if st.button("", key=f"del_{stmt['id']}", use_container_width=True):
                     if make_api_request(f"/financial-statements/{stmt['id']}", method="DELETE"):
                         st.success("已删除")
                         time.sleep(0.3)
@@ -1860,7 +1860,7 @@ def _render_statement_list_v2():
 
 def _render_upload_and_parse():
     """文件上传和AI解析页面"""
-    st.subheader("📤 上传财务报告文件")
+    st.subheader("上传财务报告文件")
     st.caption("支持PDF年报、Excel财务表、Word文档。AI将自动提取四表一注数据。")
 
     if st.button("← 返回列表"):
@@ -1888,7 +1888,7 @@ def _render_upload_and_parse():
         help="当某些财务数据无法从文件中直接提取时，AI会根据上下文和行业常识进行合理估计")
 
     if uploaded_files and company_name:
-        if st.button("🚀 开始AI解析", type="primary", use_container_width=True):
+        if st.button("开始AI解析", type="primary", use_container_width=True):
             with st.spinner("正在解析文件并提取财务数据，请耐心等待..."):
                 # 构建multipart请求
                 import requests
@@ -1943,7 +1943,7 @@ def _render_ai_review():
         st.error("加载报表失败")
         return
 
-    st.subheader(f"🔍 AI提取结果审核 - {detail['company_name']}")
+    st.subheader(f"AI提取结果审核 - {detail['company_name']}")
 
     if st.button("← 返回列表"):
         st.session_state.fs_state = "list"
@@ -1970,10 +1970,10 @@ def _render_ai_review():
 
     # AI填充项高亮
     if ai_filled:
-        with st.expander("⚠️ AI估计项（请重点核实）", expanded=True):
+        with st.expander("AI估计项（请重点核实）", expanded=True):
             for item in ai_filled:
                 conf = item.get("confidence", 0)
-                emoji = "🟢" if conf > 0.8 else "🟡" if conf > 0.5 else "🔴"
+                emoji = "低" if conf > 0.8 else "中" if conf > 0.5 else "高"
                 st.markdown(f"""
                 **{emoji} {item['item_name']}** ({item.get('statement_type', '')})
                 - 估计值: {item.get('estimated_value', 'N/A'):,.2f}
@@ -1983,7 +1983,7 @@ def _render_ai_review():
 
     # 四表快速预览
     st.markdown("**四表一注预览**")
-    tabs = st.tabs(["📊 资产负债表", "📈 利润表", "💰 现金流量表", "📋 所有者权益", "📝 附注"])
+    tabs = st.tabs([" 资产负债表", " 利润表", " 现金流量表", " 所有者权益", "附注"])
 
     with tabs[0]:
         bs = detail.get("balance_sheet", {})
@@ -2005,11 +2005,11 @@ def _render_ai_review():
     st.divider()
     c1, c2 = st.columns(2)
     with c1:
-        if st.button("✏️ 进入详细编辑", type="primary", use_container_width=True):
+        if st.button("进入详细编辑", type="primary", use_container_width=True):
             st.session_state.fs_state = "edit"
             st.rerun()
     with c2:
-        if st.button("🔄 重新上传"):
+        if st.button("重新上传"):
             st.session_state.fs_state = "upload"
             st.session_state.fs_review_data = None
             st.rerun()
@@ -2054,30 +2054,30 @@ def _render_statement_editor_v2(statement_id: int):
     # 顶部操作栏
     c1, c2, c3, c4 = st.columns([2, 2, 2, 2])
     with c1:
-        if st.button("💾 保存全部", use_container_width=True):
+        if st.button("保存全部", use_container_width=True):
             st.success("数据已自动保存")
     with c2:
-        if st.button("🔍 校验勾稽", use_container_width=True):
+        if st.button("校验勾稽", use_container_width=True):
             result = make_api_request(f"/financial-statements/{statement_id}/validate", method="POST")
             if result:
                 if result['is_valid']:
-                    st.success("✅ 勾稽关系校验通过")
+                    st.success("勾稽关系校验通过")
                 else:
-                    st.error("❌ 发现勾稽关系错误：")
+                    st.error("发现勾稽关系错误：")
                     for err in result['errors']:
                         st.markdown(f"- {err}")
                 if result.get('warnings'):
-                    st.warning("⚠️ 警告：")
+                    st.warning("警告：")
                     for w in result['warnings']:
                         st.markdown(f"- {w}")
                 score = result.get('validation_score', 0)
                 st.metric("校验得分", f"{score:.0f}/100")
     with c3:
-        if st.button("🤖 AI建议", use_container_width=True):
+        if st.button("AI建议", use_container_width=True):
             st.session_state.fs_show_ai = True
     with c4:
         if detail['status'] != 'completed':
-            if st.button("✅ 标记完成", use_container_width=True):
+            if st.button("标记完成", use_container_width=True):
                 resp = make_api_request(f"/financial-statements/{statement_id}/complete", method="POST")
                 if resp:
                     st.success("已标记为完成")
@@ -2086,7 +2086,7 @@ def _render_statement_editor_v2(statement_id: int):
 
     # AI建议弹窗
     if st.session_state.get("fs_show_ai"):
-        with st.expander("🤖 AI 智能建议", expanded=True):
+        with st.expander("AI 智能建议", expanded=True):
             stmt_type = st.selectbox("选择报表类型", [
                 ("balance_sheet", "资产负债表"),
                 ("income_statement", "利润表"),
@@ -2101,15 +2101,15 @@ def _render_statement_editor_v2(statement_id: int):
                     data={"statement_type": stmt_type[0]}
                 )
                 if ai_resp:
-                    st.markdown("**💡 建议：**")
+                    st.markdown("** 建议：**")
                     for s in ai_resp.get('suggestions', []):
                         st.markdown(f"- {s}")
                     if ai_resp.get('warnings'):
-                        st.markdown("**⚠️ 注意事项：**")
+                        st.markdown("** 注意事项：**")
                         for w in ai_resp['warnings']:
                             st.markdown(f"- {w}")
                     if ai_resp.get('estimated_values'):
-                        st.markdown("**📊 估计值：**")
+                        st.markdown("** 估计值：**")
                         for k, v in ai_resp['estimated_values'].items():
                             st.markdown(f"- {k}: {v:,.2f}")
             if st.button("关闭"):
@@ -2126,7 +2126,7 @@ def _render_statement_editor_v2(statement_id: int):
         ai_filled_names[stmt_type].add(item_name)
 
     # 四表一注标签页
-    tabs = st.tabs(["📊 资产负债表", "📈 利润表", "💰 现金流量表", "📋 所有者权益", "📝 报表附注"])
+    tabs = st.tabs([" 资产负债表", " 利润表", " 现金流量表", " 所有者权益", "报表附注"])
 
     with tabs[0]:
         _render_bs_editor(statement_id, detail.get('balance_sheet', {}), ai_filled_names.get('balance_sheet', set()))
@@ -2159,7 +2159,7 @@ def _render_bs_editor(statement_id: int, data: dict, ai_filled: set):
             with cols[0]:
                 label = item.get('item_name', '')
                 if is_ai:
-                    label += " 🤖"
+                    label += " "
                     st.markdown(f"<span style='background-color:#FFF3CD;padding:2px 6px;border-radius:4px;'>{label}</span>", unsafe_allow_html=True)
                 else:
                     st.text(label)
@@ -2171,7 +2171,7 @@ def _render_bs_editor(statement_id: int, data: dict, ai_filled: set):
                 notes = st.text_input(f"bs_note_{statement_id}_{section_name}_{i}", value=item.get('notes', ''), label_visibility="collapsed", key=f"bs2_note_{statement_id}_{section_name}_{i}")
             updated_items.append({**item, "ending_balance": ending if ending != 0 else None, "beginning_balance": beginning if beginning != 0 else None, "notes": notes or None})
             if is_ai:
-                st.caption("🤖 此项由AI估计生成，请核实")
+                st.caption("此项由AI估计生成，请核实")
         updated[section_name] = updated_items
         st.divider()
 
@@ -2198,7 +2198,7 @@ def _render_is_editor(statement_id: int, data: dict, ai_filled: set):
             with cols[0]:
                 label = item.get('item_name', '')
                 if is_ai:
-                    st.markdown(f"<span style='background-color:#FFF3CD;padding:2px 6px;border-radius:4px;'>{label} 🤖</span>", unsafe_allow_html=True)
+                    st.markdown(f"<span style='background-color:#FFF3CD;padding:2px 6px;border-radius:4px;'>{label} </span>", unsafe_allow_html=True)
                 else:
                     st.text(label)
             with cols[1]:
@@ -2209,7 +2209,7 @@ def _render_is_editor(statement_id: int, data: dict, ai_filled: set):
                 notes = st.text_input(f"is_note_{statement_id}_{section_name}_{i}", value=item.get('notes', ''), label_visibility="collapsed", key=f"is2_note_{statement_id}_{section_name}_{i}")
             updated_items.append({**item, "current_period": current if current != 0 else None, "previous_period": previous if previous != 0 else None, "notes": notes or None})
             if is_ai:
-                st.caption("🤖 此项由AI估计生成，请核实")
+                st.caption("此项由AI估计生成，请核实")
         updated[section_name] = updated_items
         st.divider()
 
@@ -2235,7 +2235,7 @@ def _render_cf_editor(statement_id: int, data: dict, ai_filled: set):
             with cols[0]:
                 label = item.get('item_name', '')
                 if is_ai:
-                    st.markdown(f"<span style='background-color:#FFF3CD;padding:2px 6px;border-radius:4px;'>{label} 🤖</span>", unsafe_allow_html=True)
+                    st.markdown(f"<span style='background-color:#FFF3CD;padding:2px 6px;border-radius:4px;'>{label} </span>", unsafe_allow_html=True)
                 else:
                     st.text(label)
             with cols[1]:
@@ -2244,7 +2244,7 @@ def _render_cf_editor(statement_id: int, data: dict, ai_filled: set):
                 notes = st.text_input(f"cf_note_{statement_id}_{section_name}_{i}", value=item.get('notes', ''), label_visibility="collapsed", key=f"cf2_note_{statement_id}_{section_name}_{i}")
             updated_items.append({**item, "current_period": current if current != 0 else None, "notes": notes or None})
             if is_ai:
-                st.caption("🤖 此项由AI估计生成，请核实")
+                st.caption("此项由AI估计生成，请核实")
         updated[section_name] = updated_items
         st.divider()
 
@@ -2273,7 +2273,7 @@ def _render_eq_editor(statement_id: int, data: dict, ai_filled: set):
             with cols[0]:
                 label = item.get('item_name', '')
                 if is_ai:
-                    st.markdown(f"<span style='background-color:#FFF3CD;padding:2px 6px;border-radius:4px;'>{label} 🤖</span>", unsafe_allow_html=True)
+                    st.markdown(f"<span style='background-color:#FFF3CD;padding:2px 6px;border-radius:4px;'>{label} </span>", unsafe_allow_html=True)
                 else:
                     st.text(label)
             with cols[1]:
@@ -2288,7 +2288,7 @@ def _render_eq_editor(statement_id: int, data: dict, ai_filled: set):
                 notes = st.text_input(f"eq_note_{statement_id}_{i}", value=item.get('notes', ''), label_visibility="collapsed", key=f"eq2_note_{statement_id}_{i}")
             updated_items.append({**item, "beginning_balance": beg if beg != 0 else None, "increase": inc if inc != 0 else None, "decrease": dec if dec != 0 else None, "ending_balance": end if end != 0 else None, "notes": notes or None})
             if is_ai:
-                st.caption("🤖 此项由AI估计生成，请核实")
+                st.caption("此项由AI估计生成，请核实")
         updated[section_name] = updated_items
         st.divider()
 
@@ -2319,7 +2319,7 @@ def render_detection():
     <div style="margin: -1rem -1rem 2rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
         <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(59,130,246,0.15); border-radius: 50%; filter: blur(60px);"></div>
         <div style="position: relative; z-index: 1;">
-            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">🔍 舞弊检测</h2>
+            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 舞弊检测</h2>
             <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">上传财务数据，AI 智能识别潜在舞弊风险</p>
         </div>
     </div>
@@ -2339,12 +2339,12 @@ def render_detection():
         st.session_state.parsed_results = None
 
     # 选项卡：文件上传 / 预设案例 / 手动录入
-    tab1, tab2, tab3 = st.tabs(["📁 文件上传", "📚 内置案例库", "📝 手动录入"])
+    tab1, tab2, tab3 = st.tabs([" 文件上传", " 内置案例库", "手动录入"])
 
     # ============ 文件上传标签页(默认)============
     with tab1:
         st.subheader("上传财务文件进行检测")
-        st.info("💡 **上传说明**：您可以将多年度财务数据整理在一个Excel/CSV文件中上传（每行一个年度），系统会自动识别各年度数据。也可以只上传结构化财务数据，MD&A文本可在后续补充。")
+        st.info("**上传说明**：您可以将多年度财务数据整理在一个Excel/CSV文件中上传（每行一个年度），系统会自动识别各年度数据。也可以只上传结构化财务数据，MD&A文本可在后续补充。")
 
         # 企业基本信息
         col1, col2 = st.columns(2)
@@ -2358,7 +2358,7 @@ def render_detection():
         st.divider()
 
         # 年份区间设置
-        st.subheader("📅 设置数据年份区间")
+        st.subheader("设置数据年份区间")
         col_start, col_end = st.columns(2)
         with col_start:
             start_year = st.number_input("起始年份", min_value=2000, max_value=2025, value=2020, key="start_year")
@@ -2371,22 +2371,22 @@ def render_detection():
         st.divider()
 
         # 文件上传 - 支持包含多年度数据的单个文件
-        st.subheader("📂 上传财务数据文件")
+        st.subheader("上传财务数据文件")
         st.caption("支持上传包含多年度数据的Excel或CSV文件，系统将自动按年份解析")
 
         uploaded_file = st.file_uploader(
-            "📂 上传财务数据文件（可包含多年度数据）",
+            " 上传财务数据文件（可包含多年度数据）",
             type=['xlsx', 'xls', 'csv', 'txt'],
             key="financial_file_uploader",
             accept_multiple_files=False
         )
 
         # 可选：补充上传MD&A文本
-        st.subheader("📝 补充上传MD&A文本（可选）")
+        st.subheader("补充上传MD&A文本（可选）")
         st.caption("如有MD&A管理层讨论文本，可在此上传多个文件以进行文本风险分析")
 
         mdna_files = st.file_uploader(
-            "📂 上传MD&A文本文件（可选，可多选）",
+            " 上传MD&A文本文件（可选，可多选）",
             type=['txt', 'docx', 'doc', 'pdf'],
             key="mdna_file_uploader",
             accept_multiple_files=True
@@ -2394,13 +2394,13 @@ def render_detection():
 
         # 文件预览与解析
         if uploaded_file:
-            st.subheader("📋 文件预览与数据确认")
+            st.subheader("文件预览与数据确认")
 
             # 显示上传的文件信息
-            st.info(f"📊 上传文件: {uploaded_file.name} | 年份区间: {start_year}-{end_year}")
+            st.info(f"上传文件: {uploaded_file.name} | 年份区间: {start_year}-{end_year}")
 
             # 解析按钮
-            if st.button("🔍 解析文件内容", type="secondary", use_container_width=True):
+            if st.button("解析文件内容", type="secondary", use_container_width=True):
                 with st.spinner("正在解析文件，请稍候..."):
                     try:
                         # 读取上传的文件
@@ -2421,7 +2421,7 @@ def render_detection():
                                 "mdna_text": mdna_content,
                                 "year_range": f"{start_year}-{end_year}"
                             }
-                            st.success("✅ 文本文件解析成功")
+                            st.success("文本文件解析成功")
                             st.stop()
 
                         # 检查是否包含年份列
@@ -2486,7 +2486,7 @@ def render_detection():
                             "mdna_text": mdna_text
                         }
 
-                        st.success(f"✅ 成功解析 {len(results)} 个年份的数据")
+                        st.success(f"成功解析 {len(results)} 个年份的数据")
                         st.rerun()
 
                     except Exception as e:
@@ -2496,7 +2496,7 @@ def render_detection():
             if st.session_state.parsed_results:
                 parsed = st.session_state.parsed_results
 
-                with st.expander("📊 查看解析结果预览", expanded=True):
+                with st.expander("查看解析结果预览", expanded=True):
                     for r in parsed.get('results', []):
                         year = r.get('year', '-')
                         success = r.get('parsed_success', False)
@@ -2506,7 +2506,7 @@ def render_detection():
                                 col_info, col_data = st.columns([1, 2])
 
                                 with col_info:
-                                    st.success(f"✅ {year}年")
+                                    st.success(f"{year}年")
 
                                 with col_data:
                                     # 显示提取的财务数据
@@ -2521,16 +2521,16 @@ def render_detection():
                                     # 显示MD&A文本预览
                                     mdna_text = parsed.get('mdna_text', '')
                                     if mdna_text:
-                                        st.caption(f"📝 MD&A文本: {len(mdna_text)}字符")
+                                        st.caption(f"MD&A文本: {len(mdna_text)}字符")
                         else:
-                            st.error(f"❌ {year}年 解析失败")
+                            st.error(f"{year}年 解析失败")
 
         # 批量检测按钮
         st.divider()
         col_detect, col_clear = st.columns([3, 1])
 
         with col_detect:
-            if st.button("🚀 开始批量检测", type="primary", use_container_width=True,
+            if st.button("开始批量检测", type="primary", use_container_width=True,
                         disabled=not st.session_state.parsed_results):
                 if not company_name:
                     st.error("请输入企业名称")
@@ -2552,7 +2552,7 @@ def render_detection():
                             continue
 
                         year = result.get('year')
-                        progress_text.markdown(f"📅 **正在分析 {year} 年度数据** ({idx+1}/{total_years})")
+                        progress_text.markdown(f" **正在分析 {year} 年度数据** ({idx+1}/{total_years})")
 
                         financial_data = result.get('financial_data', {})
 
@@ -2592,11 +2592,11 @@ def render_detection():
                             "stock_code": stock_code,
                             "yearly_results": all_yearly_results
                         }
-                        st.success(f"✅ 完成 {len(all_yearly_results)} 个年度的检测！")
+                        st.success(f"完成 {len(all_yearly_results)} 个年度的检测！")
                         render_multi_year_results(st.session_state.multi_year_results)
 
         with col_clear:
-            if st.button("🔄 清空数据", use_container_width=True):
+            if st.button("清空数据", use_container_width=True):
                 st.session_state.parsed_results = None
                 st.session_state.multi_year_results = None
                 st.rerun()
@@ -2613,7 +2613,7 @@ def render_detection():
             cols = st.columns(min(len(cases), 3))
             for idx, case in enumerate(cases):
                 with cols[idx % 3]:
-                    case_type_emoji = "🔴" if case["case_type"] == "fraud" else "🟢"
+                    case_type_emoji = "高" if case["case_type"] == "fraud" else "低"
                     with st.container(border=True):
                         st.markdown(f"### {case_type_emoji} {case['case_name']}")
                         st.caption(case.get('description', ''))
@@ -2656,7 +2656,7 @@ def render_detection():
         st.divider()
 
         # 财务数据录入
-        st.subheader("📊 财务数据 (单位：亿元)")
+        st.subheader("财务数据 (单位：亿元)")
 
         financial_cols = st.columns(4)
         financial_data_manual = {}
@@ -2682,10 +2682,10 @@ def render_detection():
         st.divider()
 
         # MD&A 文本录入
-        st.subheader("📝 MD&A 文本分析")
+        st.subheader("MD&A 文本分析")
 
         # AI提示词展示（供评委/用户查看技术细节）
-        with st.expander("🔍 查看AI分析提示词（技术细节）", expanded=False):
+        with st.expander("查看AI分析提示词（技术细节）", expanded=False):
             try:
                 prompt_data = make_api_request("/detection/ai-prompt")
                 if prompt_data:
@@ -2694,7 +2694,7 @@ def render_detection():
                     st.caption(f"说明: {prompt_data.get('description', '')}")
 
                     # 显示7个特征维度
-                    st.markdown("**📊 七大风险特征维度：**")
+                    st.markdown("** 七大风险特征维度：**")
                     features = prompt_data.get('features', {})
                     for feature_code, feature_info in features.items():
                         with st.container(border=True):
@@ -2703,15 +2703,15 @@ def render_detection():
                             st.caption(f"示例: {feature_info.get('example', '')}")
 
                     # 评分标准
-                    st.markdown("**📈 评分标准：**")
+                    st.markdown("** 评分标准：**")
                     scoring = prompt_data.get('scoring_criteria', {})
                     for level, desc in scoring.items():
-                        emoji = {"low": "🟢", "medium": "🟡", "high": "🔴"}.get(level, "⚪")
+                        emoji = {"low": "低", "medium": "中", "high": "高"}.get(level, "")
                         st.markdown(f"{emoji} {desc}")
 
                     # 完整提示词
                     st.markdown("---")
-                    st.markdown("**📄 完整提示词模板：**")
+                    st.markdown("** 完整提示词模板：**")
                     st.code(prompt_data.get('prompt_template', ''), language='text')
                 else:
                     st.info("提示词信息加载失败")
@@ -2728,7 +2728,7 @@ def render_detection():
 
         # 检测按钮
         st.divider()
-        if st.button("🚀 开始检测", type="primary", use_container_width=True, key="manual_detect"):
+        if st.button("开始检测", type="primary", use_container_width=True, key="manual_detect"):
             if not company_name_manual:
                 st.error("请输入企业名称")
             elif not mdna_text_manual:
@@ -2758,7 +2758,7 @@ def render_detection():
 def render_multi_year_results(multi_year_data):
     """渲染多年份检测结果"""
     st.divider()
-    st.subheader("📊 多年份检测综合报告")
+    st.subheader("多年份检测综合报告")
 
     company_name = multi_year_data.get("company_name", "未命名企业")
     yearly_results = multi_year_data.get("yearly_results", [])
@@ -2782,7 +2782,7 @@ def render_multi_year_results(multi_year_data):
         st.metric("最高风险年份", f"{max_prob:.2%}")
 
     # 趋势分析图表
-    st.subheader("📈 风险趋势分析")
+    st.subheader("风险趋势分析")
 
     trend_df = pd.DataFrame([
         {
@@ -2805,7 +2805,7 @@ def render_multi_year_results(multi_year_data):
     st.plotly_chart(fig, use_container_width=True)
 
     # 各年度对比表格
-    st.subheader("📋 各年度风险对比")
+    st.subheader("各年度风险对比")
 
     comparison_data = []
     for r in yearly_results:
@@ -2820,7 +2820,7 @@ def render_multi_year_results(multi_year_data):
     st.dataframe(comparison_data, use_container_width=True)
 
     # 年度详情选择
-    st.subheader("🔍 年度详情查看")
+    st.subheader("年度详情查看")
 
     year_options = [r.get("year") for r in yearly_results]
     selected_year = st.selectbox("选择年份查看详细结果", year_options)
@@ -2832,14 +2832,14 @@ def render_multi_year_results(multi_year_data):
 
     # 批量生成报告
     st.divider()
-    st.subheader("📄 批量报告生成")
+    st.subheader("批量报告生成")
 
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("📦 生成综合报告", use_container_width=True):
+        if st.button("生成综合报告", use_container_width=True):
             st.info("综合报告生成功能开发中...")
     with col2:
-        if st.button("📥 导出所有年份数据", use_container_width=True):
+        if st.button("导出所有年份数据", use_container_width=True):
             # 导出为CSV
             export_df = pd.DataFrame([
                 {
@@ -2920,7 +2920,7 @@ def render_detection_result(result, show_divider=True):
             st.metric("需整改风险", f"{total_tasks}项")
             high_priority = smart_report['remediation_plan']['summary'].get('high_priority', 0)
             if high_priority > 0:
-                st.caption(f"⚠️ 高优先级: {high_priority}项")
+                st.caption(f"高优先级: {high_priority}项")
         else:
             st.metric("风险标签数", f"{len(result.get('risk_labels', []))}个")
         # IPO对标信息
@@ -2932,7 +2932,7 @@ def render_detection_result(result, show_divider=True):
             st.caption("无显著相似被否案例")
 
     # ============ 2. 技术细节展示（供评委查看）============
-    with st.expander("🔍 查看本次检测的AI技术细节", expanded=False):
+    with st.expander("查看本次检测的AI技术细节", expanded=False):
         st.info("本区域展示本次检测使用的AI技术实现细节")
 
         try:
@@ -2961,7 +2961,7 @@ def render_detection_result(result, show_divider=True):
                 col_tech1, col_tech2 = st.columns([1, 1])
 
                 with col_tech1:
-                    st.markdown("**📝 AI提示词框架**")
+                    st.markdown("** AI提示词框架**")
                     st.caption(f"使用模型: `{prompt_data.get('model', 'Unknown')}`")
                     st.markdown("""
                     **分析维度：**
@@ -2975,14 +2975,14 @@ def render_detection_result(result, show_divider=True):
                     """)
 
                     # 显示评分标准
-                    st.markdown("**📊 评分标准：**")
+                    st.markdown("** 评分标准：**")
                     scoring = prompt_data.get('scoring_criteria', {})
-                    st.success(f"🟢 {scoring.get('low', '')}")
-                    st.warning(f"🟡 {scoring.get('medium', '')}")
-                    st.error(f"🔴 {scoring.get('high', '')}")
+                    st.success(f"低风险: {scoring.get('low', '')}")
+                    st.warning(f"中风险: {scoring.get('medium', '')}")
+                    st.error(f"高风险: {scoring.get('high', '')}")
 
                 with col_tech2:
-                    st.markdown("**🧮 特征权重配置**")
+                    st.markdown("** 特征权重配置**")
                     st.markdown("""
                     各维度权重（越高越重要）：
                     - FIT_TD_AI（文本-数据一致性）: **2.0x**
@@ -2994,7 +2994,7 @@ def render_detection_result(result, show_divider=True):
                     - STR_EVA_AI（回避表述）: **1.5x**
                     """)
 
-                    st.markdown("**🔍 可解释性方法：**")
+                    st.markdown("** 可解释性方法：**")
                     st.markdown("""
                     - SHAP值计算特征贡献度
                     - GMM聚类划分风险等级
@@ -3002,7 +3002,7 @@ def render_detection_result(result, show_divider=True):
                     """)
 
                 st.markdown("---")
-                st.markdown("**📄 完整提示词模板：**")
+                st.markdown("** 完整提示词模板：**")
                 st.caption("以下提示词用于指导AI进行7维度文本风险分析")
                 st.code(prompt_data.get('prompt_template', ''), language='text')
             else:
@@ -3015,7 +3015,7 @@ def render_detection_result(result, show_divider=True):
     col_chart1, col_chart2 = st.columns([2, 1])
 
     with col_chart1:
-        st.subheader("🤖 AI风险特征雷达图")
+        st.subheader("AI风险特征雷达图")
         ai_scores = result.get("ai_feature_scores", {})
 
         if ai_scores:
@@ -3026,7 +3026,7 @@ def render_detection_result(result, show_divider=True):
             # 显示雷达图自动分析解读
             radar_analysis = result.get("radar_analysis")
             if radar_analysis:
-                with st.expander("📊 雷达图智能分析解读", expanded=True):
+                with st.expander("雷达图智能分析解读", expanded=True):
                     st.markdown(radar_analysis.get("summary", ""))
                     if radar_analysis.get("details"):
                         st.markdown(radar_analysis["details"])
@@ -3034,7 +3034,7 @@ def render_detection_result(result, show_divider=True):
                         st.info(radar_analysis["recommendations"])
 
     with col_chart2:
-        st.subheader("🔬 SHAP特征重要性")
+        st.subheader("SHAP特征重要性")
         shap_features = result.get("shap_features", {})
 
         if shap_features:
@@ -3044,7 +3044,7 @@ def render_detection_result(result, show_divider=True):
                 # 使用绝对值作为进度条显示，但文本显示正负号
                 abs_importance = abs(importance)
                 display_value = min(abs_importance * 2, 1.0)  # 放大2倍以便显示，最大1.0
-                direction = "📈" if importance > 0 else "📉"
+                direction = "" if importance > 0 else ""
                 feature_names = {
                     "CON_SEM_AI": "语义矛盾度",
                     "COV_RISK_AI": "风险披露完整性",
@@ -3060,7 +3060,7 @@ def render_detection_result(result, show_divider=True):
             # 显示SHAP分析解读
             shap_analysis = result.get("shap_analysis")
             if shap_analysis:
-                with st.expander("🔍 SHAP分析解读", expanded=True):
+                with st.expander("SHAP分析解读", expanded=True):
                     summary = shap_analysis.get("summary", "")
                     if summary:
                         st.markdown(summary)
@@ -3083,15 +3083,15 @@ def render_detection_result(result, show_divider=True):
                         st.caption(f"**净效应值**: {net_effect:+.4f} (正值表示整体风险偏高)")
             else:
                 # 简单的默认解读
-                with st.expander("🔍 SHAP分析解读", expanded=False):
+                with st.expander("SHAP分析解读", expanded=False):
                     st.markdown("**SHAP分析说明：**")
-                    st.markdown("- 📈 正值表示该特征推高了舞弊概率判断")
-                    st.markdown("- 📉 负值表示该特征降低了舞弊概率判断")
+                    st.markdown("-  正值表示该特征推高了舞弊概率判断")
+                    st.markdown("-  负值表示该特征降低了舞弊概率判断")
                     st.markdown("- 绝对值越大，该特征对模型决策的影响越大")
 
     # ============ 3. 风险证据链路(新增-三层展示) ============
     st.divider()
-    with st.expander("📍 风险证据链路 - 从原始文本到AI判断的完整推理过程", expanded=True):
+    with st.expander("风险证据链路 - 从原始文本到AI判断的完整推理过程", expanded=True):
         st.markdown("""
         <style>
         .evidence-chain-card {
@@ -3123,7 +3123,7 @@ def render_detection_result(result, show_divider=True):
                 }
 
         if ai_evidence_chain:
-            st.markdown("### 🔗 完整证据链路展示")
+            st.markdown("###  完整证据链路展示")
             st.caption("展示从原始年报文本 → AI语义分析 → 风险评分的完整推理链条")
 
             # 定义特征名称映射
@@ -3140,11 +3140,11 @@ def render_detection_result(result, show_divider=True):
             # 定义风险等级颜色
             def get_risk_color(score):
                 if score >= 0.6:
-                    return "🔴", "高风险", "#ff6b6b"
+                    return "高", "高风险", "#ff6b6b"
                 elif score >= 0.4:
-                    return "🟡", "中风险", "#ffd93d"
+                    return "中", "中风险", "#ffd93d"
                 else:
-                    return "🟢", "低风险", "#6bcf7f"
+                    return "低", "低风险", "#6bcf7f"
 
             # 展示每个AI特征的证据链路
             ai_scores_raw = result.get("ai_feature_scores", {})
@@ -3181,7 +3181,7 @@ def render_detection_result(result, show_divider=True):
 
                         # === 第二层：证据定位（文本片段）===
                         st.markdown("<div class='evidence-layer-2'>", unsafe_allow_html=True)
-                        st.markdown("**📄 原始文本证据**")
+                        st.markdown("** 原始文本证据**")
 
                         # 从证据数据中获取文本片段
                         text_evidence = ""
@@ -3205,12 +3205,12 @@ def render_detection_result(result, show_divider=True):
                             }
                             text_evidence = example_texts.get(feature_code, "AI检测到该维度存在异常信号，建议人工复核相关文本内容。")
 
-                        st.markdown(f"> 📝 *{text_evidence[:300]}...*")
+                        st.markdown(f">  *{text_evidence[:300]}...*")
                         st.markdown("</div>", unsafe_allow_html=True)
 
                         # === 第三层：深度解读（AI分析逻辑）===
                         st.markdown("<div class='evidence-layer-3'>", unsafe_allow_html=True)
-                        st.markdown("**🤖 AI分析逻辑**")
+                        st.markdown("** AI分析逻辑**")
 
                         # 根据特征类型生成分析逻辑
                         analysis_logics = {
@@ -3271,12 +3271,12 @@ def render_detection_result(result, show_divider=True):
                                       "HIDE_REL_AI": 1.8, "TONE_ABN_AI": 1.5, "DEN_ABN_AI": 1.5, "STR_EVA_AI": 1.5}
                             weight = weights.get(feature_code, 1.0)
                             weighted_contribution = score * weight / 11.1  # 11.1是所有权重之和
-                            st.caption(f"📊 该特征对综合风险评估的加权贡献: ~{weighted_contribution:.1%}")
+                            st.caption(f"该特征对综合风险评估的加权贡献: ~{weighted_contribution:.1%}")
                         with col_b:
                             if score > 0.5:
-                                st.caption(f"⚠️ 该特征**推高了**整体舞弊概率判断")
+                                st.caption(f"该特征**推高了**整体舞弊概率判断")
                             else:
-                                st.caption(f"✅ 该特征对整体风险评估影响**相对较小**")
+                                st.caption(f"该特征对整体风险评估影响**相对较小**")
 
             else:
                 st.info("暂无AI特征评分数据")
@@ -3284,7 +3284,7 @@ def render_detection_result(result, show_divider=True):
             # 底部总结
             st.divider()
             st.markdown("""
-            **💡 证据链路说明：**
+            ** 证据链路说明：**
             - **第一层（概览）**: 展示AI对该风险维度的整体评估得分
             - **第二层（文本证据）**: 从原始年报中提取的关键可疑文本片段
             - **第三层（分析逻辑）**: AI模型的分析推理过程，说明为什么给出该评分
@@ -3300,7 +3300,7 @@ def render_detection_result(result, show_divider=True):
 
     if risk_evidences:
         st.divider()
-        st.subheader("📍 风险证据定位 - 从几百页材料中找出的可疑之处")
+        st.subheader("风险证据定位 - 从几百页材料中找出的可疑之处")
         st.caption(f"共发现 **{len(risk_evidences)}** 处风险证据")
 
         for i, evidence in enumerate(risk_evidences[:6]):  # 显示前6个证据
@@ -3308,22 +3308,22 @@ def render_detection_result(result, show_divider=True):
             category_name = evidence.get('category_name', '风险证据')
             location = evidence.get('location', '未知位置')
 
-            with st.expander(f"🔍 {category_name} - {feature_name}"):
+            with st.expander(f"{category_name} - {feature_name}"):
                 col_e1, col_e2 = st.columns([3, 1])
                 with col_e1:
                     # 显示"为什么选择这一项"
-                    st.markdown("**🎯 为什么选择这一项？**")
+                    st.markdown("** 为什么选择这一项？**")
                     why_selected = evidence.get('why_selected', 'AI模型检测到该特征存在异常信号')
                     st.markdown(f"> {why_selected}")
 
                     # 显示"风险在哪里"
-                    st.markdown("**📍 风险在哪里？**")
+                    st.markdown("** 风险在哪里？**")
                     where_risk = evidence.get('where_is_risk', '需进一步核查')
                     st.markdown(f"> {where_risk}")
 
                     # 显示文本片段
                     if evidence.get('text_snippet'):
-                        st.markdown("**📝 相关文本片段：**")
+                        st.markdown("** 相关文本片段：**")
                         st.markdown(f"> {evidence.get('text_snippet', '')[:400]}...")
 
                 with col_e2:
@@ -3332,49 +3332,49 @@ def render_detection_result(result, show_divider=True):
 
                     # 显示影响方向（根据AI评分）
                     if score > 0.6:
-                        st.caption('📈 推高风险')
+                        st.caption('推高风险')
                     elif score > 0.4:
-                        st.caption('⚡ 风险中等')
+                        st.caption('风险中等')
                     else:
-                        st.caption('➖ 影响中性')
+                        st.caption('影响中性')
 
                     if score >= 0.7:
-                        st.error("⚠️ 高风险")
+                        st.error("高风险")
                     elif score >= 0.5:
-                        st.warning("⚡ 中风险")
+                        st.warning("中风险")
                     else:
-                        st.info("ℹ️ 低风险")
+                        st.info("ℹ 低风险")
 
                 # 显示详细分析(如果有)
                 detailed = evidence.get('detailed_analysis', {})
                 if detailed:
-                    st.markdown("**🔎 深度分析：**")
+                    st.markdown("** 深度分析：**")
                     st.markdown(detailed.get('detailed_explanation', ''))
 
                     # 显示相关特征分析
                     related = detailed.get('related_features_analysis', [])
                     if related:
-                        st.markdown("**📊 相关特征：**")
+                        st.markdown("** 相关特征：**")
                         for rf in related[:3]:
-                            level_emoji = "🔴" if rf.get('risk_level') == '高风险' else "🟡" if rf.get('risk_level') == '中等风险' else "🟢"
+                            level_emoji = "高" if rf.get('risk_level') == '高风险' else "中" if rf.get('risk_level') == '中等风险' else "低"
                             st.markdown(f"{level_emoji} {rf.get('feature', '')}: {rf.get('score', 0):.2f} ({rf.get('risk_level', '')})")
 
     # ============ 4. 可疑文本片段高亮(新增) ============
     if smart_report and smart_report.get('evidence_analysis', {}).get('suspicious_segments'):
         st.divider()
-        st.subheader("🚨 可疑文本片段 - 高亮显示")
+        st.subheader("可疑文本片段 - 高亮显示")
 
         segments = smart_report['evidence_analysis']['suspicious_segments']
 
         for i, seg in enumerate(segments[:3]):  # 显示前3个
             confidence = seg.get('confidence', 0)
-            confidence_color = "🔴" if confidence > 0.7 else "🟡" if confidence > 0.5 else "🟢"
+            confidence_color = "高" if confidence > 0.7 else "中" if confidence > 0.5 else "低"
 
             with st.container(border=True):
                 col_s1, col_s2 = st.columns([4, 1])
                 with col_s1:
                     st.markdown(f"{confidence_color} **{seg.get('risk_type', '未知风险')}**")
-                    st.caption(f"📍 位置: {seg.get('location', '未知')}")
+                    st.caption(f"位置: {seg.get('location', '未知')}")
                 with col_s2:
                     st.metric("置信度", f"{confidence:.1%}")
 
@@ -3386,14 +3386,14 @@ def render_detection_result(result, show_divider=True):
     # ============ 5. 过会风险对标(新增) ============
     if smart_report and smart_report.get('ipo_comparison', {}).get('similar_cases'):
         st.divider()
-        st.subheader("⚖️ 过会风险对标 - 与近三年被否IPO案例比对")
+        st.subheader("过会风险对标 - 与近三年被否IPO案例比对")
 
         comparison = smart_report['ipo_comparison']
         summary = comparison.get('comparison_summary', {})
 
         # 对标摘要
         if summary.get('has_similar_cases'):
-            st.warning(f"⚠️ 发现与 **{summary.get('most_similar_case')}** 存在相似风险特征，相似度 **{summary.get('highest_similarity', 0):.1%}**")
+            st.warning(f"发现与 **{summary.get('most_similar_case')}** 存在相似风险特征，相似度 **{summary.get('highest_similarity', 0):.1%}**")
 
             if summary.get('common_risk_features'):
                 st.caption(f"共性风险: {', '.join(summary['common_risk_features'])}")
@@ -3405,7 +3405,7 @@ def render_detection_result(result, show_divider=True):
 
             for case in similar_cases[:3]:  # 显示前3个
                 similarity = case.get('similarity', 0)
-                similarity_color = "🔴" if similarity > 0.7 else "🟡" if similarity > 0.5 else "🟢"
+                similarity_color = "高" if similarity > 0.7 else "中" if similarity > 0.5 else "低"
 
                 with st.container(border=True):
                     col_c1, col_c2, col_c3 = st.columns([2, 2, 1])
@@ -3421,12 +3421,12 @@ def render_detection_result(result, show_divider=True):
 
                     # 被否原因
                     if case.get('rejection_reason'):
-                        st.markdown(f"📋 **被否原因:** {case.get('rejection_reason')[:200]}...")
+                        st.markdown(f"**被否原因:** {case.get('rejection_reason')[:200]}...")
 
     # ============ 6. 整改建议引擎(新增) ============
     if smart_report and smart_report.get('remediation_plan', {}).get('remediation_plans'):
         st.divider()
-        st.subheader("✅ 整改建议引擎 - 可执行的操作指引")
+        st.subheader("整改建议引擎 - 可执行的操作指引")
 
         remediation = smart_report['remediation_plan']
         summary = remediation.get('summary', {})
@@ -3443,20 +3443,20 @@ def render_detection_result(result, show_divider=True):
         # 优先行动清单
         prioritized = remediation.get('prioritized_actions', [])
         if prioritized:
-            st.markdown("**📋 优先行动清单：**")
+            st.markdown("** 优先行动清单：**")
             for i, action in enumerate(prioritized[:5]):
-                priority_icon = "🔴" if action.get('priority') == 'high' else "🟡" if action.get('priority') == 'medium' else "🟢"
+                priority_icon = "高" if action.get('priority') == 'high' else "中" if action.get('priority') == 'medium' else "低"
                 with st.container():
                     st.markdown(f"{i+1}. {priority_icon} **{action.get('action', '')}**")
                     st.caption(f"责任部门: {action.get('responsible', '未知')} | 时限: {action.get('timeline', '待定')}")
 
         # 详细整改方案
-        st.markdown("**📑 详细整改方案：**")
+        st.markdown("** 详细整改方案：**")
         plans = remediation.get('remediation_plans', [])
 
         for plan in plans:
             risk_level = plan.get('risk_level', 'low')
-            risk_icon = "🔴" if risk_level == 'high' else "🟡" if risk_level == 'medium' else "🟢"
+            risk_icon = "高" if risk_level == 'high' else "中" if risk_level == 'medium' else "低"
 
             with st.expander(f"{risk_icon} {plan.get('title', '未知整改方案')}"):
                 st.markdown(f"**问题描述:** {plan.get('description', '')}")
@@ -3466,37 +3466,37 @@ def render_detection_result(result, show_divider=True):
                 if actions:
                     st.markdown("**行动步骤：**")
                     for action in actions:
-                        step_icon = "✅" if action.get('priority') == 'high' else "⬜"
+                        step_icon = "包含" if action.get('priority') == 'high' else "—"
                         st.markdown(f"{step_icon} **第{action.get('step')}步** - {action.get('action')}")
                         st.caption(f"责任人: {action.get('responsible')} | 交付物: {action.get('deliverable')} | 时限: {action.get('timeline')}")
 
                 # 参考法规
                 regulations = plan.get('regulations', [])
                 if regulations:
-                    st.markdown("**📚 参考法规：**")
+                    st.markdown("** 参考法规：**")
                     for reg in regulations:
                         st.caption(f"• {reg.get('name')} - {reg.get('article')}")
 
     # ============ 7. 报告生成按钮 ============
     st.divider()
-    st.subheader("📄 报告导出")
+    st.subheader("报告导出")
     col1, col2, col3 = st.columns(3)
     with col1:
-        if st.button("📄 生成基础报告", use_container_width=True, key=f"basic_report_{result.get('id', 0)}"):
-            with st.spinner("🔄 正在生成报告，请稍候..."):
+        if st.button("生成基础报告", use_container_width=True, key=f"basic_report_{result.get('id', 0)}"):
+            with st.spinner("正在生成报告，请稍候..."):
                 report_result = make_api_request(f"/report/{result['id']}/generate", method="POST")
             if report_result:
-                st.success("✅ 报告生成成功！")
+                st.success("报告生成成功！")
                 st.balloons()
     with col2:
-        if st.button("📄 生成专业报告", use_container_width=True, key=f"pro_report_{result.get('id', 0)}"):
-            with st.spinner("🔄 正在生成专业报告，请稍候..."):
+        if st.button("生成专业报告", use_container_width=True, key=f"pro_report_{result.get('id', 0)}"):
+            with st.spinner("正在生成专业报告，请稍候..."):
                 report_result = make_api_request(f"/report/{result['id']}/generate", method="POST", data={"report_type": "professional"})
             if report_result:
-                st.success("✅ 专业报告生成成功！")
+                st.success("专业报告生成成功！")
                 st.balloons()
     with col3:
-        if st.button("📄 生成完整智能报告", use_container_width=True, type="primary", key=f"smart_report_{result.get('id', 0)}"):
+        if st.button("生成完整智能报告", use_container_width=True, type="primary", key=f"smart_report_{result.get('id', 0)}"):
             # 导出包含所有智能分析的报告
             st.info("完整智能报告功能开发中...")
 
@@ -3508,7 +3508,7 @@ def render_qa():
     <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
         <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(139,92,246,0.15); border-radius: 50%; filter: blur(60px);"></div>
         <div style="position: relative; z-index: 1;">
-            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">💬 AI 智能问答</h2>
+            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> AI 智能问答</h2>
             <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">财务舞弊领域专业问答助手，7×24 随时解答</p>
         </div>
     </div>
@@ -3516,7 +3516,7 @@ def render_qa():
 
     # 检查登录状态
     if not st.session_state.logged_in:
-        st.info("💡 AI 问答功能仅对登录用户开放")
+        st.info("AI 问答功能仅对登录用户开放")
         st.divider()
         render_login_register()
         return
@@ -3525,7 +3525,7 @@ def render_qa():
     if not st.session_state.chat_history:
         st.markdown('''
         <div class="glass-card" style="text-align: center; padding: 3rem 2rem; margin-bottom: 1.5rem;">
-            <div style="font-size: 3rem; margin-bottom: 1rem;">🤖</div>
+            <div style="font-size: 3rem; margin-bottom: 1rem;"></div>
             <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">财务舞弊智能问答助手</h3>
             <p style="font-size: 0.95rem; opacity: 0.7; line-height: 1.6; max-width: 500px; margin: 0 auto;">
                 我可以帮您解答财务舞弊识别、审计方法、案例分析等专业问题。
@@ -3545,7 +3545,7 @@ def render_qa():
 
     # 侧边栏显示推荐问题
     with st.sidebar:
-        st.subheader("💡 推荐问题")
+        st.subheader("推荐问题")
         if suggestions:
             for cat in suggestions:
                 with st.expander(cat["category"]):
@@ -3604,7 +3604,7 @@ def render_qa():
                                     content = event_data["content"]
                                     full_answer += content
                                     # 实时更新显示
-                                    answer_placeholder.markdown(full_answer + "▌")
+                                    answer_placeholder.markdown(full_answer + "|")
 
                                 # 处理完成标记
                                 elif event_data.get("done"):
@@ -3652,7 +3652,7 @@ def render_my_detections():
     <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
         <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(16,185,129,0.15); border-radius: 50%; filter: blur(60px);"></div>
         <div style="position: relative; z-index: 1;">
-            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">📊 我的检测</h2>
+            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 我的检测</h2>
             <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">历史检测记录与报告管理</p>
         </div>
     </div>
@@ -3669,7 +3669,7 @@ def render_my_detections():
     # 刷新按钮
     col1, col2 = st.columns([6, 1])
     with col2:
-        if st.button("🔄 刷新", key="refresh_history"):
+        if st.button("刷新", key="refresh_history"):
             # 清除缓存并重新加载
             get_cached_detection_history.clear()
             st.rerun()
@@ -3702,7 +3702,7 @@ def render_my_detections():
         st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
 
         # 卡片化检测记录
-        st.markdown("<h3 style='font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;'>📋 检测记录</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;'> 检测记录</h3>", unsafe_allow_html=True)
 
         for idx, row in df.iterrows():
             risk = row.get('risk_level', 'low')
@@ -3736,7 +3736,7 @@ def render_my_detections():
 
             # 详情展开按钮（放在每个卡片下方）
             detail_key = f"detail_{row.get('id', idx)}"
-            if st.button("🔍 查看详情", key=detail_key, use_container_width=True):
+            if st.button("查看详情", key=detail_key, use_container_width=True):
                 render_detection_result(row.to_dict())
 
     else:
@@ -3768,15 +3768,15 @@ def render_membership():
             "highlight": False,
             "value": "个人效率工具，快速识别企业财务风险，支持单项目深度分析",
             "features": [
-                "✅ 单项目审计分析",
-                "✅ 3年财报数据对比",
-                "✅ 风险评分与底稿高亮",
-                "✅ 基础AI风险建议报告",
-                "✅ 标准案例库查询",
-                "❌ 多项目并行管理",
-                "❌ 可视化雷达图",
-                "❌ 团队协作功能",
-                "❌ API接口",
+                " 单项目审计分析",
+                " 3年财报数据对比",
+                " 风险评分与底稿高亮",
+                " 基础AI风险建议报告",
+                " 标准案例库查询",
+                " 多项目并行管理",
+                " 可视化雷达图",
+                " 团队协作功能",
+                " API接口",
             ],
             "cta": "立即开通",
             "cta_type": "secondary",
@@ -3789,15 +3789,15 @@ def render_membership():
             "highlight": True,
             "value": "团队级分析平台，支持多项目并行管理与质量把控，提升协作效率",
             "features": [
-                "✅ 多项目并行（≤5个）",
-                "✅ 可视化风险雷达图",
-                "✅ 同业案例对标分析",
-                "✅ 整改跟踪引擎",
-                "✅ 原文溯源定位",
-                "✅ 优先技术支持",
-                "❌ 团队权限管理",
-                "❌ Open API接口",
-                "❌ 私有化部署",
+                " 多项目并行（≤5个）",
+                " 可视化风险雷达图",
+                " 同业案例对标分析",
+                " 整改跟踪引擎",
+                " 原文溯源定位",
+                " 优先技术支持",
+                " 团队权限管理",
+                " Open API接口",
+                " 私有化部署",
             ],
             "cta": "立即开通",
             "cta_type": "primary",
@@ -3810,14 +3810,14 @@ def render_membership():
             "highlight": False,
             "value": "全功能开放，深度数据分析与系统集成，满足企业级审计数字化需求",
             "features": [
-                "✅ 不限项目数量",
-                "✅ 团队与角色权限管理",
-                "✅ Open API接口",
-                "✅ 高级数据分析模块",
-                "✅ 批量检测（100家/次）",
-                "✅ 私有云部署支持",
-                "✅ 专属客户经理",
-                "✅ 7×24小时技术支持",
+                " 不限项目数量",
+                " 团队与角色权限管理",
+                " Open API接口",
+                " 高级数据分析模块",
+                " 批量检测（100家/次）",
+                " 私有云部署支持",
+                " 专属客户经理",
+                " 7×24小时技术支持",
             ],
             "cta": "联系咨询",
             "cta_type": "secondary",
@@ -3829,7 +3829,7 @@ def render_membership():
     for idx, plan in enumerate(plans):
         with cols[idx]:
             card_cls = "pricing-card pricing-highlight" if plan["highlight"] else "pricing-card"
-            badge = '<div style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #0f172a; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 12px;">⭐ 最受欢迎</div>' if plan["highlight"] else '<div style="height: 32px;"></div>'
+            badge = '<div style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #0f172a; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 12px;">最受欢迎</div>' if plan["highlight"] else '<div style="height: 32px;"></div>'
 
             st.markdown(f"""
             <div style="border-radius: 20px; padding: 28px; height: 100%;" class="{card_cls}">
@@ -3845,8 +3845,8 @@ def render_membership():
             """, unsafe_allow_html=True)
 
             for feat in plan["features"]:
-                cls = "feature-yes" if feat.startswith("✅") else "feature-no"
-                st.markdown(f"<p class='{cls}' style='margin: 6px 0; font-size: 0.85rem;'>{feat}</p>", unsafe_allow_html=True)
+                cls = "feature-yes" if feat.startswith("包含") else "feature-no"
+                st.markdown(f"<p class='{cls}'style='margin: 6px 0; font-size: 0.85rem;'>{feat}</p>", unsafe_allow_html=True)
 
             st.markdown("</div></div>", unsafe_allow_html=True)
 
@@ -3855,7 +3855,7 @@ def render_membership():
             if st.button(plan["cta"], use_container_width=True, key=f"v3_plan_cta_{idx}", type=btn_type):
                 if plan["cta"] == "联系咨询":
                     st.info("""
-                    📞 **商务咨询**
+                     **商务咨询**
 
                     电话：400-888-8888
                     邮箱：sales@auditmind.com
@@ -3865,7 +3865,7 @@ def render_membership():
                     """)
                 else:
                     st.info("""
-                    🛒 **开通流程**
+                     **开通流程**
 
                     1. 确认套餐版本
                     2. 在线支付或联系商务
@@ -3877,22 +3877,22 @@ def render_membership():
 
     # ========== 功能对比表 ==========
     st.divider()
-    st.markdown("<h3 style='text-align:center; margin-bottom: 24px;'>📊 功能对比详情</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align:center; margin-bottom: 24px;'> 功能对比详情</h3>", unsafe_allow_html=True)
 
     comparison_data = [
         {"功能模块": "项目数量", "个人/个体版": "1个", "小微企业版": "≤5个", "企业分析版": "不限"},
         {"功能模块": "财报分析年限", "个人/个体版": "3年", "小微企业版": "5年", "企业分析版": "不限"},
-        {"功能模块": "风险评分底稿", "个人/个体版": "✅", "小微企业版": "✅", "企业分析版": "✅"},
-        {"功能模块": "可视化雷达图", "个人/个体版": "❌", "小微企业版": "✅", "企业分析版": "✅"},
-        {"功能模块": "同业案例对标", "个人/个体版": "❌", "小微企业版": "✅", "企业分析版": "✅"},
-        {"功能模块": "整改跟踪引擎", "个人/个体版": "❌", "小微企业版": "✅", "企业分析版": "✅"},
-        {"功能模块": "原文溯源", "个人/个体版": "❌", "小微企业版": "✅", "企业分析版": "✅"},
-        {"功能模块": "Open API接口", "个人/个体版": "❌", "小微企业版": "❌", "企业分析版": "✅"},
-        {"功能模块": "团队权限管理", "个人/个体版": "❌", "小微企业版": "❌", "企业分析版": "✅"},
-        {"功能模块": "批量检测", "个人/个体版": "❌", "小微企业版": "❌", "企业分析版": "✅100家/次"},
-        {"功能模块": "私有化部署", "个人/个体版": "❌", "小微企业版": "❌", "企业分析版": "✅"},
-        {"功能模块": "专属客户经理", "个人/个体版": "❌", "小微企业版": "❌", "企业分析版": "✅"},
-        {"功能模块": "7×24小时支持", "个人/个体版": "❌", "小微企业版": "❌", "企业分析版": "✅"},
+        {"功能模块": "风险评分底稿", "个人/个体版": "包含", "小微企业版": "包含", "企业分析版": "包含"},
+        {"功能模块": "可视化雷达图", "个人/个体版": "—", "小微企业版": "包含", "企业分析版": "包含"},
+        {"功能模块": "同业案例对标", "个人/个体版": "—", "小微企业版": "包含", "企业分析版": "包含"},
+        {"功能模块": "整改跟踪引擎", "个人/个体版": "—", "小微企业版": "包含", "企业分析版": "包含"},
+        {"功能模块": "原文溯源", "个人/个体版": "—", "小微企业版": "包含", "企业分析版": "包含"},
+        {"功能模块": "Open API接口", "个人/个体版": "—", "小微企业版": "—", "企业分析版": "包含"},
+        {"功能模块": "团队权限管理", "个人/个体版": "—", "小微企业版": "—", "企业分析版": "包含"},
+        {"功能模块": "批量检测", "个人/个体版": "—", "小微企业版": "—", "企业分析版": "100家/次"},
+        {"功能模块": "私有化部署", "个人/个体版": "—", "小微企业版": "—", "企业分析版": "包含"},
+        {"功能模块": "专属客户经理", "个人/个体版": "—", "小微企业版": "—", "企业分析版": "包含"},
+        {"功能模块": "7×24小时支持", "个人/个体版": "—", "小微企业版": "—", "企业分析版": "包含"},
     ]
 
     st.dataframe(comparison_data, use_container_width=True, hide_index=True)
@@ -3904,7 +3904,7 @@ def render_report_management():
     <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
         <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(245,158,11,0.15); border-radius: 50%; filter: blur(60px);"></div>
         <div style="position: relative; z-index: 1;">
-            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">📁 报告管理</h2>
+            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 报告管理</h2>
             <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">检测报告归档与导出下载</p>
         </div>
     </div>
@@ -3917,7 +3917,7 @@ def render_report_management():
     # 刷新按钮
     col_title, col_refresh = st.columns([6, 1])
     with col_refresh:
-        if st.button("🔄 刷新", key="refresh_report_management", use_container_width=True):
+        if st.button("刷新", key="refresh_report_management", use_container_width=True):
             # 清除缓存并重新加载
             clear_api_cache()
             st.rerun()
@@ -3943,7 +3943,7 @@ def render_report_management():
         return
 
     # 报告筛选
-    st.subheader("📋 报告筛选")
+    st.subheader("报告筛选")
     col1, col2, col3 = st.columns(3)
 
     with col1:
@@ -3976,7 +3976,7 @@ def render_report_management():
     st.divider()
 
     # 批量操作
-    st.subheader("📊 报告列表")
+    st.subheader("报告列表")
 
     if st.session_state.get("selected_reports") is None:
         st.session_state.selected_reports = set()
@@ -3984,7 +3984,7 @@ def render_report_management():
     # 报告列表
     for report in filtered_history[:20]:  # 限制显示前20条
         risk_level = report.get("risk_level", "low")
-        risk_emoji = {"high": "🔴", "medium": "🟡", "low": "🟢"}.get(risk_level, "🟢")
+        risk_emoji = {"high": "高", "medium": "中", "low": "低"}.get(risk_level, "低")
 
         with st.container(border=True):
             cols = st.columns([0.5, 3, 1.5, 1.5, 1.5])
@@ -4033,7 +4033,7 @@ def render_report_management():
                     )
                     format_map = {"PDF": "pdf", "Word": "word", "Excel": "excel"}
 
-                    if st.button("📥", key=f"dl_report_{report['id']}", help=f"下载{selected_format}报告"):
+                    if st.button("", key=f"dl_report_{report['id']}", help=f"下载{selected_format}报告"):
                         with st.spinner(f"生成{selected_format}报告中..."):
                             format_code = format_map[selected_format]
                             # 调用新的导出API
@@ -4064,7 +4064,7 @@ def render_report_management():
                                         mime_type = mime_types.get(format_code, "application/octet-stream")
 
                                         st.download_button(
-                                            label=f"⬇️ 点击下载 {filename}",
+                                            label=f"下载 {filename}",
                                             data=file_content,
                                             file_name=filename,
                                             mime=mime_type,
@@ -4077,7 +4077,7 @@ def render_report_management():
                             else:
                                 st.error("生成失败")
                 with col_del:
-                    if st.button("🗑️", key=f"del_report_{report['id']}", help="删除"):
+                    if st.button("", key=f"del_report_{report['id']}", help="删除"):
                         if make_api_request(f"/detection/{report['id']}", method="DELETE"):
                             st.success("已删除")
                             st.rerun()
@@ -4085,7 +4085,7 @@ def render_report_management():
     # 批量操作栏
     if st.session_state.selected_reports:
         st.divider()
-        st.subheader(f"📦 批量操作 (已选择 {len(st.session_state.selected_reports)} 项)")
+        st.subheader(f"批量操作 (已选择 {len(st.session_state.selected_reports)} 项)")
 
         col1, col2, col3 = st.columns(3)
         with col1:
@@ -4094,7 +4094,7 @@ def render_report_management():
                 ["PDF", "Excel(汇总)"],
                 key="batch_export_format"
             )
-            if st.button("📥 批量导出", use_container_width=True):
+            if st.button("批量导出", use_container_width=True):
                 if not st.session_state.selected_reports:
                     st.warning("请先选择要导出的报告")
                 else:
@@ -4124,16 +4124,16 @@ def render_report_management():
                                 # Excel汇总导出
                                 csv = df.to_csv(index=False)
                                 st.download_button(
-                                    label="📥 下载汇总Excel",
+                                    label=" 下载汇总Excel",
                                     data=csv,
                                     file_name=f"报告汇总_{datetime.now().strftime('%Y%m%d')}.csv",
                                     mime="text/csv"
                                 )
         with col2:
-            if st.button("📧 发送邮件", use_container_width=True):
+            if st.button("发送邮件", use_container_width=True):
                 st.info("邮件发送功能开发中...")
         with col3:
-            if st.button("🗑️ 批量删除", use_container_width=True):
+            if st.button("批量删除", use_container_width=True):
                 st.warning("确认删除选中的报告？")
                 if st.button("确认删除"):
                     for rid in list(st.session_state.selected_reports):
@@ -4149,7 +4149,7 @@ def render_account_settings():
     <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
         <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(99,102,241,0.15); border-radius: 50%; filter: blur(60px);"></div>
         <div style="position: relative; z-index: 1;">
-            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">⚙️ 账号设置</h2>
+            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 账号设置</h2>
             <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">管理账户信息、会员状态与安全设置</p>
         </div>
     </div>
@@ -4162,7 +4162,7 @@ def render_account_settings():
     user = st.session_state.user_info
 
     # 个人信息
-    st.subheader("👤 个人信息")
+    st.subheader("个人信息")
     with st.container(border=True):
         col1, col2 = st.columns(2)
         with col1:
@@ -4173,18 +4173,18 @@ def render_account_settings():
             st.text_input("用户类型", value=user.get("user_type", "individual"))
             st.text_input("注册时间", value=user.get("created_at", "")[:10] if user.get("created_at") else "-")
 
-        if st.button("💾 保存修改", type="primary"):
+        if st.button("保存修改", type="primary"):
             st.info("修改功能开发中...")
 
     # 修改密码
     st.divider()
-    st.subheader("🔒 修改密码")
+    st.subheader("修改密码")
     with st.container(border=True):
         old_password = st.text_input("当前密码", type="password")
         new_password = st.text_input("新密码", type="password")
         confirm_password = st.text_input("确认新密码", type="password")
 
-        if st.button("🔐 修改密码", type="primary"):
+        if st.button("修改密码", type="primary"):
             if new_password != confirm_password:
                 st.error("两次输入的新密码不一致")
             elif not old_password or not new_password:
@@ -4194,11 +4194,11 @@ def render_account_settings():
 
     # API 密钥管理
     st.divider()
-    st.subheader("🔑 API 密钥管理")
+    st.subheader("API 密钥管理")
     with st.container(border=True):
         st.info("API密钥用于第三方系统调用，请妥善保管。")
 
-        if st.button("🔁 重新生成密钥"):
+        if st.button("重新生成密钥"):
             st.warning("确定要重新生成API密钥吗？旧的密钥将立即失效。")
 
 
@@ -4209,7 +4209,7 @@ def render_case_center():
     <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
         <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(236,72,153,0.15); border-radius: 50%; filter: blur(60px);"></div>
         <div style="position: relative; z-index: 1;">
-            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">📖 案例中心</h2>
+            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 案例中心</h2>
             <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">A股历史舞弊案例库，深度解析典型风险模式</p>
         </div>
     </div>
@@ -4224,9 +4224,9 @@ def render_case_center():
 
     # 案例分类
     case_types = {
-        "fraud": "🔴 已确认舞弊案例",
-        "normal": "🟢 健康企业案例",
-        "warning": "🟡 风险提示案例"
+        "fraud": "已确认舞弊案例",
+        "normal": "健康企业案例",
+        "warning": "风险提示案例"
     }
 
     # 按类型分组
@@ -4235,7 +4235,7 @@ def render_case_center():
 
     # 舞弊案例
     if fraud_cases:
-        st.markdown("<h3 style='font-size: 1.4rem; font-weight: 700; margin: 1.5rem 0 1rem; display: flex; align-items: center; gap: 10px;'>🔴 已确认舞弊案例</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='font-size: 1.4rem; font-weight: 700; margin: 1.5rem 0 1rem; display: flex; align-items: center; gap: 10px;'> 已确认舞弊案例</h3>", unsafe_allow_html=True)
         cols = st.columns(min(len(fraud_cases), 3))
         for idx, case in enumerate(fraud_cases):
             with cols[idx % 3]:
@@ -4251,7 +4251,7 @@ def render_case_center():
                     <p style="font-size: 0.85rem; opacity: 0.7; line-height: 1.5; margin-bottom: 1rem; min-height: 40px;">{case.get('description', '')[:80]}...</p>
                 </div>
                 """, unsafe_allow_html=True)
-                if st.button("🔍 查看详情", key=f"case_detail_{case['id']}", use_container_width=True):
+                if st.button("查看详情", key=f"case_detail_{case['id']}", use_container_width=True):
                     demo_data = make_api_request(f"/detection/cases/{case['id']}/load", method="POST")
                     if demo_data:
                         st.session_state.demo_data = demo_data
@@ -4262,7 +4262,7 @@ def render_case_center():
     if normal_cases:
         st.markdown("")
         st.markdown("<hr style='margin: 2rem 0;'>", unsafe_allow_html=True)
-        st.markdown("<h3 style='font-size: 1.4rem; font-weight: 700; margin: 1.5rem 0 1rem; display: flex; align-items: center; gap: 10px;'>🟢 健康企业案例</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='font-size: 1.4rem; font-weight: 700; margin: 1.5rem 0 1rem; display: flex; align-items: center; gap: 10px;'>健康企业案例</h3>", unsafe_allow_html=True)
         cols = st.columns(min(len(normal_cases), 3))
         for idx, case in enumerate(normal_cases):
             with cols[idx % 3]:
@@ -4276,7 +4276,7 @@ def render_case_center():
                     <p style="font-size: 0.85rem; opacity: 0.7; line-height: 1.5; margin-bottom: 1rem; min-height: 40px;">{case.get('description', '')[:80]}...</p>
                 </div>
                 """, unsafe_allow_html=True)
-                if st.button("🔍 查看详情", key=f"case_normal_{case['id']}", use_container_width=True):
+                if st.button("查看详情", key=f"case_normal_{case['id']}", use_container_width=True):
                     demo_data = make_api_request(f"/detection/cases/{case['id']}/load", method="POST")
                     if demo_data:
                         st.session_state.demo_data = demo_data
@@ -4284,7 +4284,7 @@ def render_case_center():
 
     # 案例学习资料
     st.divider()
-    st.markdown("### 📚 学习资料")
+    st.markdown("###  学习资料")
 
     with st.expander("财务舞弊常见手段"):
         st.markdown("""
@@ -4315,7 +4315,7 @@ def render_case_center():
 # ================= 登录/注册页面 (保留但不在侧边栏显示) =================
 def render_login_register():
     """渲染登录/注册页面 - 备用页面"""
-    st.title("🔐 用户登录/注册")
+    st.title("用户登录/注册")
 
     tab1, tab2 = st.tabs(["登录", "注册"])
 
@@ -4418,7 +4418,7 @@ def main():
             <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
                 <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(245,158,11,0.15); border-radius: 50%; filter: blur(60px);"></div>
                 <div style="position: relative; z-index: 1;">
-                    <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">📋 价格中心</h2>
+                    <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 价格中心</h2>
                 </div>
             </div>
             """, unsafe_allow_html=True)
