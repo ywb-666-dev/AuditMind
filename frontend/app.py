@@ -1171,12 +1171,16 @@ def render_sidebar():
 def render_home():
     """渲染首页 - Premium Design"""
     # ========== Hero Section ==========
-    st.markdown("""
-    <div style="margin: -4rem -4rem 2.5rem -4rem; padding: 5rem 2rem 4.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 30%, #1e40af 60%, #312e81 100%); background-size: 400% 400%; animation: gradient-shift 15s ease infinite; position: relative; overflow: hidden; text-align: center;">
+    hero_html = '''
+    <style>
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes gradient-shift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    </style>
+    <div style="margin: 0; padding: 80px 24px 72px; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 30%, #1e40af 60%, #312e81 100%); background-size: 400% 400%; animation: gradient-shift 15s ease infinite; position: relative; overflow: hidden; text-align: center; font-family: system-ui, -apple-system, sans-serif;">
         <div style="position: absolute; top: -100px; right: -100px; width: 400px; height: 400px; background: rgba(59,130,246,0.1); border-radius: 50%; filter: blur(100px);"></div>
         <div style="position: absolute; bottom: -150px; left: -150px; width: 500px; height: 500px; background: rgba(245,158,11,0.06); border-radius: 50%; filter: blur(120px);"></div>
         <div style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); width: 700px; height: 700px; background: rgba(139,92,246,0.04); border-radius: 50%; filter: blur(140px);"></div>
-
         <div style="position: relative; z-index: 2; max-width: 900px; margin: 0 auto;">
             <div style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border-radius: 100px; font-size: 0.9rem; font-weight: 600; background: rgba(255,255,255,0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.12); color: #bfdbfe; margin-bottom: 1.5rem; animation: fadeIn 1s ease-out 0.3s both;">
                 <span style="font-size: 1.1rem;">🚀</span> AI-Powered Financial Audit Intelligence
@@ -1190,7 +1194,8 @@ def render_home():
             </p>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    '''
+    st.components.v1.html(hero_html, height=420, scrolling=False)
 
     # CTA Buttons row
     c1, c2, c3, c4 = st.columns([1, 1, 1, 3])
