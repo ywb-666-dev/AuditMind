@@ -3246,6 +3246,19 @@ def render_qa():
         render_login_register()
         return
 
+    # 欢迎卡片
+    if not st.session_state.chat_history:
+        st.markdown('''
+        <div class="glass-card" style="text-align: center; padding: 3rem 2rem; margin-bottom: 1.5rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🤖</div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">财务舞弊智能问答助手</h3>
+            <p style="font-size: 0.95rem; opacity: 0.7; line-height: 1.6; max-width: 500px; margin: 0 auto;">
+                我可以帮您解答财务舞弊识别、审计方法、案例分析等专业问题。
+                <br>支持流式输出，即问即答。
+            </p>
+        </div>
+        ''', unsafe_allow_html=True)
+
     # 初始化流式输出相关状态
     if 'streaming_answer' not in st.session_state:
         st.session_state.streaming_answer = ""
@@ -3387,29 +3400,70 @@ def render_my_detections():
             st.rerun()
 
     if history:
-        # 表格展示
         df = pd.DataFrame(history)
 
-        # 格式化显示
-        display_data = []
-        for _, row in df.iterrows():
-            display_data.append({
-                "企业名称": row.get("company_name", ""),
-                "证券代码": row.get("stock_code", "-"),
-                "年度": row.get("year", "-"),
-                "舞弊概率": f"{row.get('fraud_probability', 0)*100:.1f}%",
-                "风险等级": show_risk_level_badge(row.get("risk_level", "low")),
-                "检测时间": row.get("created_at", "")[:10]
-            })
+        # 统计栏
+        total = len(df)
+        high_risk = len(df[df['risk_level'] == 'high'])
+        medium_risk = len(df[df['risk_level'] == 'medium'])
+        avg_prob = df['fraud_probability'].mean() if total > 0 else 0
 
-        st.dataframe(display_data, use_container_width=True)
+        stat_cols = st.columns(4)
+        stats = [
+            (str(total), "检测总数"),
+            (f"{avg_prob*100:.0f}%", "平均风险"),
+            (str(high_risk), "高风险"),
+            (str(medium_risk), "中风险"),
+        ]
+        for i, (val, label) in enumerate(stats):
+            with stat_cols[i]:
+                st.markdown(f'''
+                <div class="stat-card" style="animation-delay: {i*0.1}s;">
+                    <div style="font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">{val}</div>
+                    <div style="font-size: 0.85rem; opacity: 0.6; font-weight: 500; margin-top: 4px;">{label}</div>
+                </div>
+                ''', unsafe_allow_html=True)
 
-        # 点击查看详情
-        if len(df) > 0:
-            selected_company = st.selectbox("查看检测详情", df["company_name"].tolist())
-            if selected_company:
-                detection = df[df["company_name"] == selected_company].iloc[0].to_dict()
-                render_detection_result(detection)
+        st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
+
+        # 卡片化检测记录
+        st.markdown("<h3 style='font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;'>📋 检测记录</h3>", unsafe_allow_html=True)
+
+        for idx, row in df.iterrows():
+            risk = row.get('risk_level', 'low')
+            prob = row.get('fraud_probability', 0)
+            company = row.get('company_name', '未知')
+            stock = row.get('stock_code', '-')
+            year = row.get('year', '-')
+            created = row.get('created_at', '')[:10]
+
+            risk_color = {"high": "#ef4444", "medium": "#f59e0b", "low": "#10b981"}.get(risk, "#3b82f6")
+            risk_bg = {"high": "rgba(239,68,68,0.1)", "medium": "rgba(245,158,11,0.1)", "low": "rgba(16,185,129,0.1)"}.get(risk, "rgba(59,130,246,0.1)")
+            badge_text = show_risk_level_badge(risk)
+
+            card_html = f'''
+            <div class="glass-card" style="padding: 1.25rem 1.5rem; margin-bottom: 0.75rem; animation-delay: {idx*0.05}s; cursor: pointer;">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <div style="width: 48px; height: 48px; border-radius: 14px; background: {risk_bg}; border: 1px solid {risk_color}33; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; color: {risk_color};">
+                            {prob*100:.0f}%
+                        </div>
+                        <div>
+                            <div style="font-size: 1.05rem; font-weight: 700;">{company}</div>
+                            <div style="font-size: 0.85rem; opacity: 0.6; margin-top: 2px;">{stock} · {year}年度 · {created}</div>
+                        </div>
+                    </div>
+                    <span class="badge" style="background: {risk_bg}; color: {risk_color}; border: 1px solid {risk_color}33;">{badge_text}</span>
+                </div>
+            </div>
+            '''
+            st.markdown(card_html, unsafe_allow_html=True)
+
+            # 详情展开按钮（放在每个卡片下方）
+            detail_key = f"detail_{row.get('id', idx)}"
+            if st.button("🔍 查看详情", key=detail_key, use_container_width=True):
+                render_detection_result(row.to_dict())
+
     else:
         st.info("暂无检测记录，快去试试吧！")
 
@@ -3816,7 +3870,15 @@ def render_report_management():
 # ================= 账号设置页面 =================
 def render_account_settings():
     """渲染账号设置页面"""
-    st.title("⚙️ 账号设置")
+    st.markdown("""
+    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(99,102,241,0.15); border-radius: 50%; filter: blur(60px);"></div>
+        <div style="position: relative; z-index: 1;">
+            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">⚙️ 账号设置</h2>
+            <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">管理账户信息、会员状态与安全设置</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     if not st.session_state.logged_in:
         st.warning("请先登录")
@@ -3868,8 +3930,15 @@ def render_account_settings():
 # ================= 案例中心页面 =================
 def render_case_center():
     """渲染案例中心页面"""
-    st.title("📖 案例中心")
-    st.subheader("A股历史舞弊案例库")
+    st.markdown("""
+    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(236,72,153,0.15); border-radius: 50%; filter: blur(60px);"></div>
+        <div style="position: relative; z-index: 1;">
+            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">📖 案例中心</h2>
+            <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">A股历史舞弊案例库，深度解析典型风险模式</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     # 获取所有案例
     cases = make_api_request("/detection/cases")
