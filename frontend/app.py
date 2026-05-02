@@ -1203,7 +1203,7 @@ def render_login_modal():
 
 # ================= 侧边栏导航 =================
 def render_sidebar():
-    """渲染侧边栏导航 - Premium Design"""
+    """渲染侧边栏导航 - Premium Design (Button-based, no widget state conflicts)"""
     with st.sidebar:
         # 品牌区域
         st.markdown("""
@@ -1215,21 +1215,37 @@ def render_sidebar():
         """, unsafe_allow_html=True)
         st.divider()
 
+        # 初始化当前页面
+        if "current_page" not in st.session_state:
+            st.session_state.current_page = "home"
+
         # 主导航 - 根据登录状态显示不同选项
         if st.session_state.logged_in:
-            menu = st.radio(
-                "导航",
-                ["🏠 首页", "📋 财务助手", "🔍 舞弊检测", "💬 AI 问答", "📊 我的检测", "📁 报告管理", "💎 会员中心", "⚙️ 账号设置"],
-                label_visibility="collapsed",
-                key="main_navigation"
-            )
+            pages = [
+                ("🏠 首页", "home"),
+                ("📋 财务助手", "fs"),
+                ("🔍 舞弊检测", "detect"),
+                ("💬 AI 问答", "qa"),
+                ("📊 我的检测", "history"),
+                ("📁 报告管理", "reports"),
+                ("💎 会员中心", "membership"),
+                ("⚙️ 账号设置", "settings"),
+            ]
         else:
-            menu = st.radio(
-                "导航",
-                ["🏠 首页", "💬 AI 问答(预览)", "📋 价格中心", "📖 案例中心"],
-                label_visibility="collapsed",
-                key="main_navigation"
-            )
+            pages = [
+                ("🏠 首页", "home"),
+                ("💬 AI 问答(预览)", "qa"),
+                ("📋 价格中心", "pricing"),
+                ("📖 案例中心", "cases"),
+            ]
+
+        current = st.session_state.current_page
+        for label, key in pages:
+            active = current == key
+            btn_type = "primary" if active else "secondary"
+            if st.button(label, key=f"nav_{key}", use_container_width=True, type=btn_type):
+                st.session_state.current_page = key
+                st.rerun()
 
         st.divider()
 
@@ -1241,7 +1257,7 @@ def render_sidebar():
             - [联系客服](#)
             """)
 
-        return menu
+        return current
 
 
 # ================= 首页 =================
@@ -1279,7 +1295,7 @@ def render_home():
     with c1:
         if st.button("🔍 开始检测", type="primary", use_container_width=True, key="hero_cta_detect"):
             if st.session_state.logged_in:
-                st.session_state.main_navigation = "🔍 舞弊检测"
+                st.session_state.current_page = "detect"
                 st.rerun()
             else:
                 st.session_state.show_login_modal = True
@@ -1287,14 +1303,14 @@ def render_home():
     with c2:
         if st.button("📋 财务助手", use_container_width=True, key="hero_cta_fs"):
             if st.session_state.logged_in:
-                st.session_state.main_navigation = "📋 财务助手"
+                st.session_state.current_page = "fs"
                 st.rerun()
             else:
                 st.session_state.show_login_modal = True
                 st.rerun()
     with c3:
         if st.button("💬 AI 问答", use_container_width=True, key="hero_cta_qa"):
-            st.session_state.main_navigation = "💬 AI 问答" if st.session_state.logged_in else "💬 AI 问答(预览)"
+            st.session_state.current_page = "qa"
             st.rerun()
 
     # Demo hint
@@ -4099,32 +4115,40 @@ def main():
     menu = render_sidebar()
 
     # 路由分发
+    page = menu
     if st.session_state.logged_in:
-        if menu == "🏠 首页":
+        if page == "home":
             render_home()
-        elif menu == "📋 财务助手":
+        elif page == "fs":
             render_financial_assistant()
-        elif menu == "🔍 舞弊检测":
+        elif page == "detect":
             render_detection()
-        elif menu == "💬 AI 问答":
+        elif page == "qa":
             render_qa()
-        elif menu == "📊 我的检测":
+        elif page == "history":
             render_my_detections()
-        elif menu == "📁 报告管理":
+        elif page == "reports":
             render_report_management()
-        elif menu == "💎 会员中心":
+        elif page == "membership":
             render_membership()
-        elif menu == "⚙️ 账号设置":
+        elif page == "settings":
             render_account_settings()
     else:
-        if menu == "🏠 首页":
+        if page == "home":
             render_home()
-        elif menu == "💬 AI 问答(预览)":
+        elif page == "qa":
             render_qa()
-        elif menu == "📋 价格中心":
-            st.title("📋 价格中心")
+        elif page == "pricing":
+            st.markdown("""
+            <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
+                <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(245,158,11,0.15); border-radius: 50%; filter: blur(60px);"></div>
+                <div style="position: relative; z-index: 1;">
+                    <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">📋 价格中心</h2>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             render_membership()
-        elif menu == "📖 案例中心":
+        elif page == "cases":
             render_case_center()
 
 
