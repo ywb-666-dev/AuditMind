@@ -29,126 +29,542 @@ st.set_page_config(
 # 仅注入轻量增强样式，不强制主题色，跟随浏览器/系统 light/dark 偏好
 st.markdown("""
 <style>
-/* ===== 通用增强 ===== */
+/* ===== Animation Keyframes ===== */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(59,130,246,0.3); }
+    50% { box-shadow: 0 0 40px rgba(59,130,246,0.6); }
+}
+@keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+@keyframes shimmer {
+    0% { background-position: -1000px 0; }
+    100% { background-position: 1000px 0; }
+}
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(40px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* ===== Global Layout ===== */
 .main .block-container {
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+    padding-top: 1rem;
+    padding-bottom: 3rem;
     max-width: 1400px;
 }
 
-/* ===== 按钮圆角与过渡 ===== */
+/* ===== Button System ===== */
 .stButton > button {
-    border-radius: 10px !important;
+    border-radius: 12px !important;
     font-weight: 600 !important;
-    padding: 0.6rem 1.5rem !important;
-    transition: all 0.25s ease !important;
-}
-.stButton > button:hover {
-    transform: translateY(-2px);
-}
-
-/* ===== 输入框聚焦效果 ===== */
-.stTextInput > div > div > input:focus,
-.stNumberInput > div > div > input:focus,
-.stTextArea > div > div > textarea:focus {
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
-}
-
-/* ===== 数据表格圆角 ===== */
-[data-testid="stDataFrame"] {
-    border-radius: 12px;
+    padding: 0.65rem 1.75rem !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    letter-spacing: 0.3px;
+    position: relative;
     overflow: hidden;
 }
+.stButton > button:hover {
+    transform: translateY(-2px) scale(1.02);
+}
+.stButton > button:active {
+    transform: translateY(0) scale(0.98);
+}
+.stButton > button[kind="primary"] {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%) !important;
+    background-size: 200% 200% !important;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35) !important;
+    border: none !important;
+}
+.stButton > button[kind="primary"]:hover {
+    background-position: 100% 0 !important;
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5) !important;
+}
+.stButton > button[kind="secondary"] {
+    border: 1.5px solid rgba(148, 163, 184, 0.4) !important;
+    background: transparent !important;
+}
 
-/* ===== Tab 圆角 ===== */
-.stTabs [data-baseweb="tab-list"] {
-    border-radius: 12px;
-    padding: 4px;
-    gap: 4px;
+/* ===== Input System ===== */
+.stTextInput > div > div > input,
+.stNumberInput > div > div > input,
+.stTextArea > div > div > textarea,
+.stSelectbox > div > div {
+    border-radius: 12px !important;
+    transition: all 0.2s ease !important;
 }
-.stTabs [data-baseweb="tab"] {
-    border-radius: 8px;
-    padding: 10px 20px !important;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-/* ===== 文件上传器圆角 ===== */
-[data-testid="stFileUploader"] > section {
-    border-radius: 16px !important;
+.stTextInput > div > div > input:focus,
+.stNumberInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus,
+.stSelectbox > div > div:focus-within {
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12) !important;
+    border-color: #3b82f6 !important;
 }
 
-/* ===== Pricing Card 动效 ===== */
-.pricing-card {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* ===== Card Systems ===== */
+.glass-card {
+    border-radius: 20px;
+    padding: 2rem;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: fadeInUp 0.6s ease-out forwards;
 }
-.pricing-card:hover {
+.glass-card:hover {
     transform: translateY(-6px);
 }
+.feature-card {
+    border-radius: 20px;
+    padding: 2rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: fadeInUp 0.6s ease-out forwards;
+    border: 1px solid transparent;
+}
+.feature-card:hover {
+    transform: translateY(-8px);
+}
+.stat-card {
+    border-radius: 20px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    animation: scaleIn 0.5s ease-out forwards;
+}
+.stat-card:hover {
+    transform: translateY(-4px) scale(1.02);
+}
 
-/* ===== 隐藏默认水印和菜单 ===== */
+/* ===== Data Table ===== */
+[data-testid="stDataFrame"] {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+[data-testid="stDataFrame"] th {
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+/* ===== Tab System ===== */
+.stTabs [data-baseweb="tab-list"] {
+    border-radius: 16px;
+    padding: 6px;
+    gap: 6px;
+    background: rgba(128,128,128,0.08);
+}
+.stTabs [data-baseweb="tab"] {
+    border-radius: 12px;
+    padding: 12px 24px !important;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.25s ease;
+    border: none !important;
+}
+.stTabs [data-baseweb="tab"][aria-selected="true"] {
+    background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+.stTabs [data-baseweb="tab-panel"] {
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-top: 12px;
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* ===== File Uploader ===== */
+[data-testid="stFileUploader"] > section {
+    border-radius: 20px !important;
+    border: 2px dashed rgba(148, 163, 184, 0.4) !important;
+    transition: all 0.3s ease !important;
+    padding: 2rem !important;
+}
+[data-testid="stFileUploader"] > section:hover {
+    border-color: #3b82f6 !important;
+    background: rgba(59, 130, 246, 0.04) !important;
+    transform: scale(1.01);
+}
+
+/* ===== Expander ===== */
+.streamlit-expanderHeader {
+    border-radius: 16px !important;
+    font-weight: 600 !important;
+    padding: 1rem 1.25rem !important;
+    transition: all 0.2s ease;
+    border: 1px solid rgba(148, 163, 184, 0.2) !important;
+}
+.streamlit-expanderHeader:hover {
+    border-color: rgba(59, 130, 246, 0.3) !important;
+}
+.streamlit-expanderContent {
+    border-radius: 0 0 16px 16px !important;
+    padding: 1.25rem !important;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* ===== Metric Card ===== */
+[data-testid="stMetric"] {
+    border-radius: 20px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    animation: scaleIn 0.5s ease-out forwards;
+}
+[data-testid="stMetric"] label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+[data-testid="stMetric"] .css-1xarl3l {
+    font-weight: 800;
+    font-size: 2rem;
+}
+
+/* ===== Divider ===== */
+hr {
+    border: none !important;
+    height: 1px !important;
+    background: linear-gradient(90deg, transparent, rgba(148,163,184,0.3), transparent) !important;
+    margin: 2rem 0 !important;
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.6); }
+
+/* ===== Alert/Toast ===== */
+.stSuccess, .stInfo, .stWarning, .stError {
+    border-radius: 16px !important;
+    padding: 1rem 1.25rem !important;
+    border: 1px solid !important;
+    animation: slideInRight 0.4s ease-out;
+}
+.stSuccess { background: rgba(16, 185, 129, 0.08) !important; border-color: rgba(16, 185, 129, 0.25) !important; }
+.stInfo { background: rgba(59, 130, 246, 0.08) !important; border-color: rgba(59, 130, 246, 0.25) !important; }
+.stWarning { background: rgba(245, 158, 11, 0.08) !important; border-color: rgba(245, 158, 11, 0.25) !important; }
+.stError { background: rgba(239, 68, 68, 0.08) !important; border-color: rgba(239, 68, 68, 0.25) !important; }
+
+/* ===== Hero Section Styles ===== */
+.hero-gradient {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 30%, #1e40af 60%, #312e81 100%);
+    background-size: 400% 400%;
+    animation: gradient-shift 15s ease infinite;
+}
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #ffffff 0%, #bfdbfe 50%, #60a5fa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeInUp 0.8s ease-out;
+}
+.hero-subtitle {
+    font-size: 1.25rem;
+    opacity: 0.85;
+    line-height: 1.6;
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.15);
+    animation: fadeIn 1s ease-out 0.4s both;
+}
+.hero-stat {
+    text-align: center;
+    padding: 1.5rem;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: all 0.3s ease;
+    animation: scaleIn 0.5s ease-out both;
+}
+.hero-stat:hover {
+    background: rgba(255,255,255,0.1);
+    transform: translateY(-4px);
+}
+.hero-stat-value {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #60a5fa, #fbbf24);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.hero-stat-label {
+    font-size: 0.85rem;
+    opacity: 0.7;
+    margin-top: 4px;
+}
+
+/* ===== Pricing Cards ===== */
+.pricing-card {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+.pricing-card:hover {
+    transform: translateY(-8px);
+}
+
+/* ===== Sidebar Navigation ===== */
+.sidebar-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    margin-bottom: 4px;
+    border: 1px solid transparent;
+}
+.sidebar-nav-item:hover {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+.sidebar-nav-active {
+    background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(37,99,235,0.1)) !important;
+    border-color: rgba(59, 130, 246, 0.3) !important;
+    font-weight: 600 !important;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+
+/* ===== Section Headers ===== */
+.section-header {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* ===== Case Cards ===== */
+.case-card {
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: fadeInUp 0.6s ease-out forwards;
+    position: relative;
+}
+.case-card:hover {
+    transform: translateY(-6px) scale(1.02);
+}
+.case-card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+}
+
+/* ===== Spinner ===== */
+[data-testid="stSpinner"] > div {
+    border-top-color: #3b82f6 !important;
+    border-width: 3px !important;
+}
+
+/* ===== Progress Bar / Step Indicator ===== */
+.step-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 2rem 0;
+}
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+.step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+.step-line {
+    flex: 1;
+    height: 2px;
+    margin: 0 12px;
+    margin-bottom: 24px;
+    border-radius: 1px;
+    transition: all 0.3s ease;
+}
+.step-active .step-circle {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+.step-completed .step-circle {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+.step-pending .step-circle {
+    background: rgba(148, 163, 184, 0.2);
+    color: #94a3b8;
+}
+
+/* ===== Hide Default Elements ===== */
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 header {visibility: hidden;}
 
-/* ===== Light Mode Pricing Cards ===== */
+/* ===== Light Mode Overrides ===== */
 @media (prefers-color-scheme: light) {
+    .glass-card {
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+    .glass-card:hover {
+        box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+        border-color: rgba(59, 130, 246, 0.2);
+    }
+    .feature-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
+    .feature-card:hover {
+        box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+        border-color: rgba(59, 130, 246, 0.25);
+    }
+    .stat-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
+    .stat-card:hover {
+        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+    [data-testid="stMetric"] {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
     .pricing-card {
         background: #ffffff !important;
         border: 1px solid #e2e8f0 !important;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
     }
     .pricing-card:hover {
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12) !important;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12) !important;
     }
-    .pricing-card h3 {
-        color: #0f172a !important;
-    }
+    .pricing-card h3 { color: #0f172a !important; }
     .pricing-card .price-text {
         background: linear-gradient(135deg, #1e3a5f, #3b82f6);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
-    .pricing-card .feature-yes {
-        color: #047857 !important;
-    }
-    .pricing-card .feature-no {
-        color: #9ca3af !important;
-    }
+    .pricing-card .feature-yes { color: #047857 !important; }
+    .pricing-card .feature-no { color: #9ca3af !important; }
     .pricing-highlight {
         background: linear-gradient(180deg, rgba(245,158,11,0.06) 0%, #ffffff 100%) !important;
         border: 2px solid #f59e0b !important;
     }
+    [data-testid="stDataFrame"] th { background: #f8fafc !important; color: #0f172a !important; }
+    .streamlit-expanderHeader { background: #ffffff !important; border-color: #e2e8f0 !important; }
+    .streamlit-expanderHeader:hover { border-color: rgba(59, 130, 246, 0.3) !important; }
 }
 
-/* ===== Dark Mode Pricing Cards ===== */
+/* ===== Dark Mode Overrides ===== */
 @media (prefers-color-scheme: dark) {
+    .glass-card {
+        background: rgba(30, 41, 59, 0.5);
+        border: 1px solid rgba(51, 65, 85, 0.5);
+        box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+    }
+    .glass-card:hover {
+        box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+        border-color: rgba(59, 130, 246, 0.3);
+        background: rgba(30, 41, 59, 0.7);
+    }
+    .feature-card {
+        background: rgba(30, 41, 59, 0.4);
+        border: 1px solid rgba(51, 65, 85, 0.4);
+        box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+    .feature-card:hover {
+        box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+        border-color: rgba(59, 130, 246, 0.3);
+        background: rgba(30, 41, 59, 0.6);
+    }
+    .stat-card {
+        background: rgba(30, 41, 59, 0.4);
+        border: 1px solid rgba(51, 65, 85, 0.4);
+        box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+    .stat-card:hover {
+        box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+    [data-testid="stMetric"] {
+        background: rgba(30, 41, 59, 0.4);
+        border: 1px solid rgba(51, 65, 85, 0.4);
+        box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
     .pricing-card {
-        background: rgba(30, 41, 59, 0.7) !important;
-        border: 1px solid #334155 !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+        background: rgba(30, 41, 59, 0.6) !important;
+        border: 1px solid rgba(51, 65, 85, 0.5) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
     }
     .pricing-card:hover {
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35) !important;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4) !important;
     }
-    .pricing-card h3 {
-        color: #f1f5f9 !important;
-    }
+    .pricing-card h3 { color: #f1f5f9 !important; }
     .pricing-card .price-text {
-        background: linear-gradient(135deg, #f1f5f9, #cbd5e1);
+        background: linear-gradient(135deg, #f1f5f9, #93c5fd);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
-    .pricing-card .feature-yes {
-        color: #34d399 !important;
-    }
-    .pricing-card .feature-no {
-        color: #64748b !important;
-    }
+    .pricing-card .feature-yes { color: #34d399 !important; }
+    .pricing-card .feature-no { color: #64748b !important; }
     .pricing-highlight {
-        background: linear-gradient(180deg, rgba(245,158,11,0.08) 0%, rgba(30,41,59,0.9) 100%) !important;
+        background: linear-gradient(180deg, rgba(245,158,11,0.08) 0%, rgba(30,41,59,0.8) 100%) !important;
         border: 2px solid #f59e0b !important;
     }
+    [data-testid="stDataFrame"] th { background: #1e293b !important; color: #f1f5f9 !important; }
+    .streamlit-expanderHeader { background: rgba(30, 41, 59, 0.5) !important; border-color: rgba(51, 65, 85, 0.5) !important; }
+    .streamlit-expanderHeader:hover { border-color: rgba(59, 130, 246, 0.3) !important; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -710,9 +1126,16 @@ def render_login_modal():
 
 # ================= 侧边栏导航 =================
 def render_sidebar():
-    """渲染侧边栏导航 - 纯导航菜单"""
+    """渲染侧边栏导航 - Premium Design"""
     with st.sidebar:
-        st.markdown("### 📍 功能导航")
+        # 品牌区域
+        st.markdown("""
+        <div style="text-align: center; padding: 1rem 0 0.5rem;">
+            <div style="font-size: 2rem; margin-bottom: 0.25rem;">🔍</div>
+            <div style="font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, #3b82f6, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Audit Mind</div>
+            <div style="font-size: 0.75rem; opacity: 0.6; margin-top: 2px;">AI 财务舞弊识别</div>
+        </div>
+        """, unsafe_allow_html=True)
         st.divider()
 
         # 主导航 - 根据登录状态显示不同选项
@@ -720,13 +1143,15 @@ def render_sidebar():
             menu = st.radio(
                 "导航",
                 ["🏠 首页", "📋 财务助手", "🔍 舞弊检测", "💬 AI 问答", "📊 我的检测", "📁 报告管理", "💎 会员中心", "⚙️ 账号设置"],
-                label_visibility="collapsed"
+                label_visibility="collapsed",
+                key="main_navigation"
             )
         else:
             menu = st.radio(
                 "导航",
                 ["🏠 首页", "💬 AI 问答(预览)", "📋 价格中心", "📖 案例中心"],
-                label_visibility="collapsed"
+                label_visibility="collapsed",
+                key="main_navigation"
             )
 
         st.divider()
@@ -744,81 +1169,141 @@ def render_sidebar():
 
 # ================= 首页 =================
 def render_home():
-    """渲染首页"""
-    st.title("🔍 Audit Mind")
-    st.subheader("基于生成式 AI 的上市公司财务舞弊智能识别系统")
+    """渲染首页 - Premium Design"""
+    # ========== Hero Section ==========
+    st.markdown("""
+    <div style="margin: -4rem -4rem 2.5rem -4rem; padding: 5rem 2rem 4.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 30%, #1e40af 60%, #312e81 100%); background-size: 400% 400%; animation: gradient-shift 15s ease infinite; position: relative; overflow: hidden; text-align: center;">
+        <div style="position: absolute; top: -100px; right: -100px; width: 400px; height: 400px; background: rgba(59,130,246,0.1); border-radius: 50%; filter: blur(100px);"></div>
+        <div style="position: absolute; bottom: -150px; left: -150px; width: 500px; height: 500px; background: rgba(245,158,11,0.06); border-radius: 50%; filter: blur(120px);"></div>
+        <div style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); width: 700px; height: 700px; background: rgba(139,92,246,0.04); border-radius: 50%; filter: blur(140px);"></div>
 
-    # Hero Section
-    col1, col2 = st.columns([2, 1])
-    with col1:
-        st.markdown("""
-        ### 核心功能
+        <div style="position: relative; z-index: 2; max-width: 900px; margin: 0 auto;">
+            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border-radius: 100px; font-size: 0.9rem; font-weight: 600; background: rgba(255,255,255,0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.12); color: #bfdbfe; margin-bottom: 1.5rem; animation: fadeIn 1s ease-out 0.3s both;">
+                <span style="font-size: 1.1rem;">🚀</span> AI-Powered Financial Audit Intelligence
+            </div>
+            <h1 style="font-size: 4rem; font-weight: 800; letter-spacing: -2px; line-height: 1.05; margin-bottom: 1rem; background: linear-gradient(135deg, #ffffff 0%, #bfdbfe 40%, #60a5fa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: fadeInUp 0.8s ease-out;">
+                Audit Mind
+            </h1>
+            <p style="font-size: 1.3rem; color: rgba(255,255,255,0.75); line-height: 1.7; max-width: 620px; margin: 0 auto 2.5rem; font-weight: 400; animation: fadeInUp 0.8s ease-out 0.2s both;">
+                基于生成式 AI 的上市公司财务舞弊智能识别系统<br>
+                <span style="font-size: 1rem; opacity: 0.7;">双模分析 · SHAP 可解释 · 风险标签可视化</span>
+            </p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
-        - **📊 双模输入分析**: 结构化财务数据 + MD&A 非结构化文本
-        - **🤖 AI 可解释性**: SHAP 特征重要性分析，解决"黑箱"问题
-        - **🏷️ 风险标签可视化**: 自动生成"存贷双高"等可读性强的风险标签
-        - **💬 AI 智能问答**: 财务舞弊理论、案例解析、实操指导
+    # CTA Buttons row
+    c1, c2, c3, c4 = st.columns([1, 1, 1, 3])
+    with c1:
+        if st.button("🔍 开始检测", type="primary", use_container_width=True, key="hero_cta_detect"):
+            if st.session_state.logged_in:
+                st.session_state.main_navigation = "🔍 舞弊检测"
+            else:
+                st.session_state.main_navigation = "🔍 舞弊检测"
+            st.rerun()
+    with c2:
+        if st.button("📋 财务助手", use_container_width=True, key="hero_cta_fs"):
+            st.session_state.main_navigation = "📋 财务助手"
+            st.rerun()
+    with c3:
+        if st.button("💬 AI 问答", use_container_width=True, key="hero_cta_qa"):
+            st.session_state.main_navigation = "💬 AI 问答" if st.session_state.logged_in else "💬 AI 问答(预览)"
+            st.rerun()
 
-        ### 适用场景
+    # Demo hint
+    if not st.session_state.logged_in:
+        st.info("💡 **快速体验** — 点击右上角 🔐 登录/注册，选择「✨ 一键登录演示账号」即可体验全部功能（AuditMind / 123）")
 
-        | 用户类型 | 应用场景 |
-        |---------|---------|
-        | 监管机构 | 非现场监管、风险预警 |
-        | 会计师事务所 | 审计辅助分析 |
-        | 投资者 | 个股风险检测、投资标的筛查 |
-        | 上市公司 | 财务舞弊自查、信息披露优化 |
-        """)
+    # ========== Stats Bar ==========
+    st.markdown("<div style='margin: 2.5rem 0 1.5rem;'></div>", unsafe_allow_html=True)
+    stat_cols = st.columns(4)
+    stats = [
+        ("92%+", "AI 识别准确率", "0s"),
+        ("1000+", "已检测企业", "0.1s"),
+        ("96%", "用户满意度", "0.2s"),
+        ("7", "风险分析维度", "0.3s"),
+    ]
+    for i, (value, label, delay) in enumerate(stats):
+        with stat_cols[i]:
+            st.markdown(f"""
+            <div class="stat-card" style="animation-delay: {delay};">
+                <div style="font-size: 2.4rem; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 6px;">{value}</div>
+                <div style="font-size: 0.9rem; opacity: 0.7; font-weight: 600;">{label}</div>
+            </div>
+            """, unsafe_allow_html=True)
 
-        # 演示账号提示
-        if not st.session_state.logged_in:
-            st.info("""
-            💡 **快速体验**
+    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
 
-            点击右上角 🔐 登录/注册，然后选择「✨ 一键登录演示账号」即可体验全部功能，无需注册！
+    # ========== Features Grid ==========
+    st.markdown("<h2 style='font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px;'>⚡ 核心能力</h2>", unsafe_allow_html=True)
 
-            📋 演示账号：AuditMind / 123
-            """)
+    features = [
+        ("📊", "双模输入分析", "结构化财务数据 + MD&A 非结构化文本，全方位透视企业风险"),
+        ("🤖", "AI 可解释性", "SHAP 特征重要性分析，每个预测都有明确依据，告别黑箱"),
+        ("🏷️", "风险标签可视化", "自动生成「存贷双高」等可读性强的风险标签，一目了然"),
+        ("💬", "AI 智能问答", "财务舞弊理论、案例解析、实操指导，7×24 随时解答"),
+    ]
 
-    with col2:
-        st.image("https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400", caption="AI 驱动的财务分析")
+    feat_cols = st.columns(2)
+    for i, (icon, title, desc) in enumerate(features):
+        with feat_cols[i % 2]:
+            st.markdown(f"""
+            <div class="feature-card" style="margin-bottom: 1rem; animation-delay: {i * 0.12}s;">
+                <div style="font-size: 2.2rem; margin-bottom: 0.75rem;">{icon}</div>
+                <h4 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem;">{title}</h4>
+                <p style="font-size: 0.95rem; opacity: 0.75; line-height: 1.6;">{desc}</p>
+            </div>
+            """, unsafe_allow_html=True)
 
-    st.divider()
+    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
 
-    # 经典案例展示
-    st.subheader("📚 经典案例库")
+    # ========== Use Cases ==========
+    st.markdown("<h2 style='font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px;'>🎯 适用场景</h2>", unsafe_allow_html=True)
+    uc_cols = st.columns(4)
+    use_cases = [
+        ("🏛️", "监管机构", "非现场监管、风险预警"),
+        ("🏢", "会计师事务所", "审计辅助分析、底稿复核"),
+        ("📈", "投资者", "个股风险检测、标的筛查"),
+        ("🏭", "上市公司", "财务舞弊自查、信披优化"),
+    ]
+    for i, (icon, title, desc) in enumerate(use_cases):
+        with uc_cols[i]:
+            st.markdown(f"""
+            <div class="glass-card" style="text-align: center; padding: 1.75rem 1rem; animation-delay: {i * 0.1}s;">
+                <div style="font-size: 2rem; margin-bottom: 0.75rem;">{icon}</div>
+                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem;">{title}</h4>
+                <p style="font-size: 0.85rem; opacity: 0.7;">{desc}</p>
+            </div>
+            """, unsafe_allow_html=True)
 
-    # 获取预设案例(使用缓存)
+    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+
+    # ========== Cases Showcase ==========
+    st.markdown("<h2 style='font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px;'>📚 经典案例库</h2>", unsafe_allow_html=True)
+
     cases = get_cached_demo_cases(featured_only=True, _token=st.session_state.token)
-
     if cases:
-        cols = st.columns(min(len(cases), 4))
+        case_cols = st.columns(min(len(cases), 4))
         for idx, case in enumerate(cases[:4]):
-            with cols[idx]:
-                case_type_emoji = "🔴" if case["case_type"] == "fraud" else "🟢"
-                st.markdown(f"### {case_type_emoji} {case['case_name']}")
-                st.caption(case.get('description', '')[:50] + "...")
+            with case_cols[idx]:
+                badge = '<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.7rem;font-weight:700;background:rgba(239,68,68,0.15);color:#ef4444;">舞弊案例</span>' if case["case_type"] == "fraud" else '<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.7rem;font-weight:700;background:rgba(16,185,129,0.15);color:#10b981;">正常案例</span>'
+                st.markdown(f"""
+                <div class="glass-card" style="padding: 1.5rem; animation-delay: {idx * 0.1}s;">
+                    <div style="margin-bottom: 0.75rem;">{badge}</div>
+                    <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.3;">{case['case_name']}</h4>
+                    <p style="font-size: 0.85rem; opacity: 0.7; line-height: 1.5;">{case.get('description', '')[:55]}...</p>
+                </div>
+                """, unsafe_allow_html=True)
+    else:
+        st.caption("暂无案例数据")
 
-    st.divider()
+    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
 
-    # 核心优势
-    st.subheader("🌟 核心优势")
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("AI 识别准确率", "92%+")
-        st.caption("基于多模型融合 + SHAP 分析")
-    with col2:
-        st.metric("已检测企业", "1000+")
-        st.caption("涵盖 A 股、港股、中概股")
-    with col3:
-        st.metric("用户满意度", "96%")
-        st.caption("来自会计师事务所和投资机构")
-
-    # 技术亮点展示（供评委查看）
-    st.divider()
-    with st.expander("🔬 查看核心技术细节（AI提示词与算法原理）", expanded=False):
+    # ========== Tech Details ==========
+    with st.expander("🔬 查看核心技术细节（AI提示词与算法原理）"):
         st.info("本展示专为评委/技术评审设计，展示系统的核心技术实现")
 
-        tab1, tab2, tab3 = st.tabs(["📝 AI提示词", "🧮 算法原理", "📊 特征体系"])
+        tab1, tab2, tab3 = st.tabs(["📝 AI 提示词", "🧮 算法原理", "📊 特征体系"])
 
         with tab1:
             try:
@@ -858,18 +1343,18 @@ def render_home():
                 st.error(f"加载提示词失败: {e}")
 
         with tab2:
-            st.markdown("### 🧮 GMM-SHAP可解释性算法")
+            st.markdown("### 🧮 GMM-SHAP 可解释性算法")
             st.markdown("""
             **算法流程：**
             1. **多模型集成预测**：结合逻辑回归、XGBoost、神经网络预测
-            2. **动态阈值优化**：通过Youden指数确定最优分类阈值
-            3. **GMM聚类解释**：使用高斯混合模型将样本聚为低/中/高风险簇
-            4. **SHAP归因分析**：在每个簇内计算特征贡献度，生成定制化解释
+            2. **动态阈值优化**：通过 Youden 指数确定最优分类阈值
+            3. **GMM 聚类解释**：使用高斯混合模型将样本聚为低/中/高风险簇
+            4. **SHAP 归因分析**：在每个簇内计算特征贡献度，生成定制化解释
 
             **技术创新点：**
-            - 解决AI"黑箱"问题，每个预测都有明确依据
+            - 解决 AI "黑箱"问题，每个预测都有明确依据
             - 针对不同风险等级提供差异化解释
-            - 结合7维文本特征 + 传统财务指标
+            - 结合 7 维文本特征 + 传统财务指标
             """)
 
         with tab3:
@@ -879,9 +1364,9 @@ def render_home():
             - 存贷双高检测
             - 现金流背离分析
             - 存货异常识别
-            - ROE/资产负债率监控
+            - ROE / 资产负债率监控
 
-            **维度2: 非结构化文本特征（AI提取）**
+            **维度2: 非结构化文本特征（AI 提取）**
             - 语义矛盾度（CON_SEM_AI）
             - 风险披露完整性（COV_RISK_AI）
             - 异常乐观语调（TONE_ABN_AI）
