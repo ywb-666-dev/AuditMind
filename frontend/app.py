@@ -63,6 +63,146 @@ st.markdown("""
     from { opacity: 0; transform: translateX(40px); }
     to { opacity: 1; transform: translateX(0); }
 }
+@keyframes bounceIn {
+    0% { opacity: 0; transform: scale(0.3); }
+    50% { transform: scale(1.05); }
+    70% { transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1); }
+}
+@keyframes rotate-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+@keyframes breathe {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.05); opacity: 1; }
+}
+@keyframes ripple {
+    0% { transform: scale(0); opacity: 1; }
+    100% { transform: scale(4); opacity: 0; }
+}
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* ===== Noise Texture Background ===== */
+.noise-bg {
+    position: relative;
+}
+.noise-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ===== Grid Background ===== */
+.grid-bg {
+    background-size: 40px 40px;
+    background-image: linear-gradient(to right, rgba(148,163,184,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(148,163,184,0.05) 1px, transparent 1px);
+}
+
+/* ===== 3D Card Hover ===== */
+.card-3d {
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
+    transform-style: preserve-3d;
+}
+.card-3d:hover {
+    transform: translateY(-8px) rotateX(2deg) rotateY(-2deg);
+}
+
+/* ===== Floating Orbs ===== */
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.5;
+    animation: float 6s ease-in-out infinite;
+}
+.orb-1 { width: 300px; height: 300px; background: rgba(59,130,246,0.15); top: -100px; right: -50px; animation-delay: 0s; }
+.orb-2 { width: 250px; height: 250px; background: rgba(245,158,11,0.1); bottom: -80px; left: -60px; animation-delay: 2s; }
+.orb-3 { width: 200px; height: 200px; background: rgba(139,92,246,0.1); top: 40%; left: 30%; animation-delay: 4s; }
+
+/* ===== Ripple Button Effect ===== */
+.ripple-btn {
+    position: relative;
+    overflow: hidden;
+}
+.ripple-btn::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.3) 10%, transparent 10.01%);
+    background-repeat: no-repeat;
+    background-position: 50%;
+    transform: scale(10, 10);
+    opacity: 0;
+    transition: transform 0.5s, opacity 1s;
+}
+.ripple-btn:active::after {
+    transform: scale(0, 0);
+    opacity: 0.3;
+    transition: 0s;
+}
+
+/* ===== Animated Border Gradient ===== */
+.gradient-border {
+    position: relative;
+    border-radius: 20px;
+    background: transparent;
+}
+.gradient-border::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 22px;
+    background: linear-gradient(45deg, #3b82f6, #8b5cf6, #f59e0b, #3b82f6);
+    background-size: 400% 400%;
+    animation: gradient-shift 8s ease infinite;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.gradient-border:hover::before { opacity: 0.6; }
+
+/* ===== Stagger Animation Helper ===== */
+.stagger-1 { animation-delay: 0.1s !important; }
+.stagger-2 { animation-delay: 0.2s !important; }
+.stagger-3 { animation-delay: 0.3s !important; }
+.stagger-4 { animation-delay: 0.4s !important; }
+.stagger-5 { animation-delay: 0.5s !important; }
+
+/* ===== Scroll Indicator ===== */
+.scroll-indicator {
+    width: 24px;
+    height: 40px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-radius: 12px;
+    position: relative;
+}
+.scroll-indicator::before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    width: 4px;
+    height: 8px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 2px;
+    transform: translateX(-50%);
+    animation: float 2s ease-in-out infinite;
+}
 
 /* ===== Global Layout ===== */
 .main .block-container {
@@ -1360,6 +1500,48 @@ def render_home():
 
     st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
 
+    # ========== How It Works ==========
+    how_it_works_html = '''
+    <style>
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse-dot { 0%,100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.4); } 50% { box-shadow: 0 0 0 12px rgba(59,130,246,0); } }
+    @keyframes connect-grow { from { width: 0; } to { width: 100%; } }
+    </style>
+    <div style="margin: 3rem 0; padding: 3rem 1.5rem; position: relative; overflow: hidden;">
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <h2 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem;">🚀 三步完成智能检测</h2>
+            <p style="opacity: 0.7; font-size: 1rem;">上传财务报告 → AI深度解析 → 获取风险报告</p>
+        </div>
+        <div style="display: flex; align-items: flex-start; justify-content: center; gap: 0; max-width: 1000px; margin: 0 auto; position: relative;">
+            <!-- Step 1 -->
+            <div style="flex: 1; text-align: center; position: relative; z-index: 2; animation: fadeInUp 0.6s ease-out 0s both;">
+                <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #2563eb); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem; animation: pulse-dot 2s infinite; box-shadow: 0 4px 20px rgba(59,130,246,0.3);">📤</div>
+                <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">上传报告</h4>
+                <p style="font-size: 0.85rem; opacity: 0.7; line-height: 1.6; padding: 0 0.5rem;">支持 PDF 年报、Excel 财务表、Word 文档等多格式上传</p>
+            </div>
+            <!-- Connector 1 -->
+            <div style="flex: 0.5; height: 2px; background: linear-gradient(90deg, #3b82f6, #10b981); margin-top: 32px; position: relative; z-index: 1; animation: connect-grow 0.8s ease-out 0.3s both;"></div>
+            <!-- Step 2 -->
+            <div style="flex: 1; text-align: center; position: relative; z-index: 2; animation: fadeInUp 0.6s ease-out 0.2s both;">
+                <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #7c3aed); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem; animation: pulse-dot 2s infinite 0.5s; box-shadow: 0 4px 20px rgba(139,92,246,0.3);">🤖</div>
+                <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">AI 深度解析</h4>
+                <p style="font-size: 0.85rem; opacity: 0.7; line-height: 1.6; padding: 0 0.5rem;">7 维风险特征提取 + SHAP 可解释性分析 + IPO 对标</p>
+            </div>
+            <!-- Connector 2 -->
+            <div style="flex: 0.5; height: 2px; background: linear-gradient(90deg, #10b981, #f59e0b); margin-top: 32px; position: relative; z-index: 1; animation: connect-grow 0.8s ease-out 0.6s both;"></div>
+            <!-- Step 3 -->
+            <div style="flex: 1; text-align: center; position: relative; z-index: 2; animation: fadeInUp 0.6s ease-out 0.4s both;">
+                <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem; animation: pulse-dot 2s infinite 1s; box-shadow: 0 4px 20px rgba(245,158,11,0.3);">📊</div>
+                <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">获取报告</h4>
+                <p style="font-size: 0.85rem; opacity: 0.7; line-height: 1.6; padding: 0 0.5rem;">可视化风险标签、整改建议、完整证据链下载</p>
+            </div>
+        </div>
+    </div>
+    '''
+    st.components.v1.html(how_it_works_html, height=320, scrolling=False)
+
+    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+
     # ========== Use Cases ==========
     st.markdown("<h2 style='font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px;'>🎯 适用场景</h2>", unsafe_allow_html=True)
     uc_cols = st.columns(4)
@@ -1399,6 +1581,57 @@ def render_home():
                 """, unsafe_allow_html=True)
     else:
         st.caption("暂无案例数据")
+
+    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+
+    # ========== Trust Badges ==========
+    trust_html = '''
+    <style>
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+    </style>
+    <div style="margin: 3rem 0; padding: 3rem 1.5rem; position: relative; overflow: hidden;">
+        <div style="text-align: center; margin-bottom: 2.5rem;">
+            <h2 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem;">🛡️ 技术信任背书</h2>
+            <p style="opacity: 0.7; font-size: 1rem;">源自顶尖学术成果，服务专业审计场景</p>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; max-width: 1100px; margin: 0 auto;">
+            <div style="text-align: center; padding: 1.5rem; animation: fadeInUp 0.5s ease-out 0s both;">
+                <div style="font-size: 2.5rem; margin-bottom: 0.75rem; animation: float 4s ease-in-out infinite;">🏆</div>
+                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem;">学术认可</h4>
+                <p style="font-size: 0.8rem; opacity: 0.65; line-height: 1.5;">基于前沿财务舞弊识别研究成果</p>
+            </div>
+            <div style="text-align: center; padding: 1.5rem; animation: fadeInUp 0.5s ease-out 0.1s both;">
+                <div style="font-size: 2.5rem; margin-bottom: 0.75rem; animation: float 4s ease-in-out infinite 1s;">🔒</div>
+                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem;">数据安全</h4>
+                <p style="font-size: 0.8rem; opacity: 0.65; line-height: 1.5;">企业级加密存储，报告阅后即焚</p>
+            </div>
+            <div style="text-align: center; padding: 1.5rem; animation: fadeInUp 0.5s ease-out 0.2s both;">
+                <div style="font-size: 2.5rem; margin-bottom: 0.75rem; animation: float 4s ease-in-out infinite 2s;">⚡</div>
+                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem;">高效处理</h4>
+                <p style="font-size: 0.8rem; opacity: 0.65; line-height: 1.5;">单次检测仅需 30-60 秒</p>
+            </div>
+            <div style="text-align: center; padding: 1.5rem; animation: fadeInUp 0.5s ease-out 0.3s both;">
+                <div style="font-size: 2.5rem; margin-bottom: 0.75rem; animation: float 4s ease-in-out infinite 3s;">🎯</div>
+                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem;">精准识别</h4>
+                <p style="font-size: 0.8rem; opacity: 0.65; line-height: 1.5;">92%+ AI 识别准确率，可解释</p>
+            </div>
+        </div>
+        <!-- Tech Stack Tags -->
+        <div style="text-align: center; margin-top: 2rem;">
+            <p style="font-size: 0.8rem; opacity: 0.5; margin-bottom: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Powered By</p>
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;">
+                <span style="display:inline-block;padding:6px 14px;border-radius:100px;font-size:0.8rem;font-weight:600;background:rgba(59,130,246,0.1);color:#3b82f6;border:1px solid rgba(59,130,246,0.2);">DeepSeek-V3.2</span>
+                <span style="display:inline-block;padding:6px 14px;border-radius:100px;font-size:0.8rem;font-weight:600;background:rgba(139,92,246,0.1);color:#8b5cf6;border:1px solid rgba(139,92,246,0.2);">XGBoost</span>
+                <span style="display:inline-block;padding:6px 14px;border-radius:100px;font-size:0.8rem;font-weight:600;background:rgba(16,185,129,0.1);color:#10b981;border:1px solid rgba(16,185,129,0.2);">SHAP</span>
+                <span style="display:inline-block;padding:6px 14px;border-radius:100px;font-size:0.8rem;font-weight:600;background:rgba(245,158,11,0.1);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);">GMM</span>
+                <span style="display:inline-block;padding:6px 14px;border-radius:100px;font-size:0.8rem;font-weight:600;background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);">FastAPI</span>
+                <span style="display:inline-block;padding:6px 14px;border-radius:100px;font-size:0.8rem;font-weight:600;background:rgba(6,182,212,0.1);color:#06b6d4;border:1px solid rgba(6,182,212,0.2);">Streamlit</span>
+            </div>
+        </div>
+    </div>
+    '''
+    st.components.v1.html(trust_html, height=380, scrolling=False)
 
     st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
 
@@ -1478,6 +1711,32 @@ def render_home():
             - 信息密度异常（DEN_ABN_AI）
             - 回避表述强度（STR_EVA_AI）
             """)
+
+    # ========== Bottom CTA Banner ==========
+    cta_html = '''
+    <style>
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse-glow { 0%,100% { box-shadow: 0 0 20px rgba(59,130,246,0.3); } 50% { box-shadow: 0 0 40px rgba(59,130,246,0.6); } }
+    @keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+    </style>
+    <div style="margin: 3rem -1rem -1rem -1rem; padding: 4rem 2rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 40%, #1e40af 70%, #312e81 100%); position: relative; overflow: hidden; text-align: center;"
+        onmouseover="this.style.backgroundPosition='100% 50%'" onmouseout="this.style.backgroundPosition='0% 50%'">
+        <div style="position: absolute; top: -80px; left: -80px; width: 300px; height: 300px; background: rgba(59,130,246,0.08); border-radius: 50%; filter: blur(80px); animation: float 8s ease-in-out infinite;"></div>
+        <div style="position: absolute; bottom: -60px; right: -60px; width: 250px; height: 250px; background: rgba(245,158,11,0.06); border-radius: 50%; filter: blur(60px); animation: float 8s ease-in-out infinite 2s;"></div>
+        <div style="position: relative; z-index: 2; max-width: 700px; margin: 0 auto; animation: fadeInUp 0.8s ease-out;">
+            <h2 style="font-size: 2.2rem; font-weight: 800; color: #ffffff; margin-bottom: 1rem; letter-spacing: -1px;">准备好开始了吗？</h2>
+            <p style="font-size: 1.1rem; color: rgba(255,255,255,0.75); margin-bottom: 2rem; line-height: 1.7;">立即体验 Audit Mind 的智能财务舞弊检测能力<br>上传第一份报告，3 分钟内获取专业级风险分析</p>
+            <a href="#" onclick="window.parent.postMessage({type: 'streamlit:setComponentValue', value: 'detect'}, '*'); return false;"
+               style="display:inline-block;padding:14px 40px;border-radius:14px;font-size:1.1rem;font-weight:700;color:#1e3a5f;background:linear-gradient(135deg,#ffffff 0%,#e0e7ff 100%);text-decoration:none;box-shadow:0 8px 30px rgba(255,255,255,0.2);transition:all 0.3s ease;animation:pulse-glow 3s infinite;"
+               onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 12px 40px rgba(255,255,255,0.3)';"
+               onmouseout="this.style.transform='';this.style.boxShadow='0 8px 30px rgba(255,255,255,0.2)';">
+                🔍 立即开始检测
+            </a>
+            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 1.5rem;">新用户免费体验 3 次完整检测 · 无需信用卡</p>
+        </div>
+    </div>
+    '''
+    st.components.v1.html(cta_html, height=320, scrolling=False)
 
 
 # ================= 舞弊检测页面 =================
@@ -3976,36 +4235,52 @@ def render_case_center():
 
     # 舞弊案例
     if fraud_cases:
-        st.markdown("### 🔴 已确认舞弊案例")
+        st.markdown("<h3 style='font-size: 1.4rem; font-weight: 700; margin: 1.5rem 0 1rem; display: flex; align-items: center; gap: 10px;'>🔴 已确认舞弊案例</h3>", unsafe_allow_html=True)
         cols = st.columns(min(len(fraud_cases), 3))
         for idx, case in enumerate(fraud_cases):
             with cols[idx % 3]:
-                with st.container(border=True):
-                    st.markdown(f"#### {case['case_name']}")
-                    st.caption(case.get('description', '')[:100])
-                    if st.button("查看详情", key=f"case_detail_{case['id']}", use_container_width=True):
-                        # 加载案例
-                        demo_data = make_api_request(f"/detection/cases/{case['id']}/load", method="POST")
-                        if demo_data:
-                            st.session_state.demo_data = demo_data
-                            st.session_state.active_tab = "内置案例库"
-                            st.success("案例已加载！请到「舞弊检测」页面查看")
+                risk_level = case.get('risk_level', 'high')
+                risk_color = "#ef4444" if risk_level == "high" else "#f59e0b"
+                st.markdown(f"""
+                <div class="glass-card" style="padding: 1.5rem; animation-delay: {idx * 0.1}s; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, {risk_color}, rgba(239,68,68,0.3));"></div>
+                    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; background: rgba(239,68,68,0.12); color: #ef4444; margin-bottom: 0.75rem;">
+                        舞弊案例
+                    </div>
+                    <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.3;">{case['case_name']}</h4>
+                    <p style="font-size: 0.85rem; opacity: 0.7; line-height: 1.5; margin-bottom: 1rem; min-height: 40px;">{case.get('description', '')[:80]}...</p>
+                </div>
+                """, unsafe_allow_html=True)
+                if st.button("🔍 查看详情", key=f"case_detail_{case['id']}", use_container_width=True):
+                    demo_data = make_api_request(f"/detection/cases/{case['id']}/load", method="POST")
+                    if demo_data:
+                        st.session_state.demo_data = demo_data
+                        st.session_state.active_tab = "内置案例库"
+                        st.success("案例已加载！请到「舞弊检测」页面查看")
 
     # 健康企业案例
     if normal_cases:
-        st.divider()
-        st.markdown("### 🟢 健康企业案例")
+        st.markdown(""")
+        st.markdown("<hr style='margin: 2rem 0;'>", unsafe_allow_html=True)
+        st.markdown("<h3 style='font-size: 1.4rem; font-weight: 700; margin: 1.5rem 0 1rem; display: flex; align-items: center; gap: 10px;'>🟢 健康企业案例</h3>", unsafe_allow_html=True)
         cols = st.columns(min(len(normal_cases), 3))
         for idx, case in enumerate(normal_cases):
             with cols[idx % 3]:
-                with st.container(border=True):
-                    st.markdown(f"#### {case['case_name']}")
-                    st.caption(case.get('description', '')[:100])
-                    if st.button("查看详情", key=f"case_normal_{case['id']}", use_container_width=True):
-                        demo_data = make_api_request(f"/detection/cases/{case['id']}/load", method="POST")
-                        if demo_data:
-                            st.session_state.demo_data = demo_data
-                            st.success("案例已加载！请到「舞弊检测」页面查看")
+                st.markdown(f"""
+                <div class="glass-card" style="padding: 1.5rem; animation-delay: {idx * 0.1}s; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #10b981, rgba(16,185,129,0.3));"></div>
+                    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; background: rgba(16,185,129,0.12); color: #10b981; margin-bottom: 0.75rem;">
+                        健康企业
+                    </div>
+                    <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.3;">{case['case_name']}</h4>
+                    <p style="font-size: 0.85rem; opacity: 0.7; line-height: 1.5; margin-bottom: 1rem; min-height: 40px;">{case.get('description', '')[:80]}...</p>
+                </div>
+                """, unsafe_allow_html=True)
+                if st.button("🔍 查看详情", key=f"case_normal_{case['id']}", use_container_width=True):
+                    demo_data = make_api_request(f"/detection/cases/{case['id']}/load", method="POST")
+                    if demo_data:
+                        st.session_state.demo_data = demo_data
+                        st.success("案例已加载！请到「舞弊检测」页面查看")
 
     # 案例学习资料
     st.divider()
