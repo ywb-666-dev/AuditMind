@@ -1198,13 +1198,18 @@ def render_home():
         if st.button("🔍 开始检测", type="primary", use_container_width=True, key="hero_cta_detect"):
             if st.session_state.logged_in:
                 st.session_state.main_navigation = "🔍 舞弊检测"
+                st.rerun()
             else:
-                st.session_state.main_navigation = "🔍 舞弊检测"
-            st.rerun()
+                st.session_state.show_login_modal = True
+                st.rerun()
     with c2:
         if st.button("📋 财务助手", use_container_width=True, key="hero_cta_fs"):
-            st.session_state.main_navigation = "📋 财务助手"
-            st.rerun()
+            if st.session_state.logged_in:
+                st.session_state.main_navigation = "📋 财务助手"
+                st.rerun()
+            else:
+                st.session_state.show_login_modal = True
+                st.rerun()
     with c3:
         if st.button("💬 AI 问答", use_container_width=True, key="hero_cta_qa"):
             st.session_state.main_navigation = "💬 AI 问答" if st.session_state.logged_in else "💬 AI 问答(预览)"
