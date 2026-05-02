@@ -71,6 +71,83 @@ st.markdown("""
     max-width: 1400px;
 }
 
+/* ===== Typography System ===== */
+.stApp, .stApp * {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+}
+h1 { font-weight: 800 !important; letter-spacing: -0.02em !important; }
+h2 { font-weight: 700 !important; letter-spacing: -0.01em !important; }
+h3 { font-weight: 700 !important; }
+p, li, td, th, label, .stMarkdown { line-height: 1.7 !important; }
+
+/* ===== Content Wrapper ===== */
+.content-wrapper {
+    border-radius: 24px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ===== Badge System ===== */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+.badge-primary { background: rgba(59,130,246,0.12); color: #3b82f6; border: 1px solid rgba(59,130,246,0.2); }
+.badge-success { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.2); }
+.badge-warning { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.2); }
+.badge-danger { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+
+/* ===== Radio & Checkbox ===== */
+.stRadio > div { display: flex; flex-direction: column; gap: 6px; }
+.stRadio label { padding: 10px 14px !important; border-radius: 12px !important; transition: all 0.2s ease !important; border: 1.5px solid transparent !important; font-weight: 500 !important; }
+.stRadio label:hover { background: rgba(59,130,246,0.06) !important; border-color: rgba(59,130,246,0.15) !important; }
+.stCheckbox > label { padding: 8px 12px !important; border-radius: 10px !important; transition: all 0.2s ease !important; }
+.stCheckbox > label:hover { background: rgba(59,130,246,0.06) !important; }
+
+/* ===== Slider ===== */
+.stSlider > div > div > div > div { background: linear-gradient(90deg, #3b82f6, #60a5fa) !important; border-radius: 4px !important; }
+.stSlider > div > div > div > div > div { background: #ffffff !important; box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important; border: 2px solid #3b82f6 !important; }
+
+/* ===== Progress Bar ===== */
+.stProgress > div > div { background: linear-gradient(90deg, #3b82f6, #60a5fa) !important; border-radius: 8px !important; }
+
+/* ===== Table Row Hover ===== */
+[data-testid="stDataFrame"] tr { transition: background 0.2s ease; }
+[data-testid="stDataFrame"] tr:hover { background: rgba(59,130,246,0.04) !important; }
+
+/* ===== Skeleton / Shimmer ===== */
+.skeleton {
+    background: linear-gradient(90deg, rgba(148,163,184,0.1) 25%, rgba(148,163,184,0.2) 50%, rgba(148,163,184,0.1) 75%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite linear;
+    border-radius: 12px;
+}
+
+/* ===== Glow Border ===== */
+.glow-border {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+}
+.glow-border::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: 21px;
+    background: linear-gradient(135deg, rgba(59,130,246,0.4), rgba(139,92,246,0.2), rgba(245,158,11,0.3));
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+.glow-border:hover::before { opacity: 1; }
+
 /* ===== Button System ===== */
 .stButton > button {
     border-radius: 12px !important;
