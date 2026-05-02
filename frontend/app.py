@@ -4260,7 +4260,7 @@ def render_case_center():
 
     # 健康企业案例
     if normal_cases:
-        st.markdown(""")
+        st.markdown("")
         st.markdown("<hr style='margin: 2rem 0;'>", unsafe_allow_html=True)
         st.markdown("<h3 style='font-size: 1.4rem; font-weight: 700; margin: 1.5rem 0 1rem; display: flex; align-items: center; gap: 10px;'>🟢 健康企业案例</h3>", unsafe_allow_html=True)
         cols = st.columns(min(len(normal_cases), 3))
