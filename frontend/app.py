@@ -1388,8 +1388,15 @@ def render_home():
 # ================= 财务助手页面 (v2 - AI自动生成) =================
 def render_financial_assistant():
     """渲染财务助手页面 - 支持AI自动生成四表一注"""
-    st.title("📋 财务助手")
-    st.caption("智能提取四表一注：上传文件 → AI解析 → 审核编辑 → 完成")
+    st.markdown("""
+    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(59,130,246,0.15); border-radius: 50%; filter: blur(60px);"></div>
+        <div style="position: relative; z-index: 1;">
+            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">📋 财务助手</h2>
+            <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">智能提取四表一注：上传文件 → AI解析 → 审核编辑 → 完成</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     if not st.session_state.logged_in:
         st.warning("请先登录")
@@ -1949,8 +1956,17 @@ def _save_statement_field(statement_id: int, field: str, value):
         st.error("保存失败")
 
 def render_detection():
-    """渲染舞弊检测页面 - 文件上传为主"""
-    st.title("🔍 舞弊检测")
+    """渲染舞弊检测页面 - Premium Design"""
+    # 高级页面头部
+    st.markdown("""
+    <div style="margin: -1rem -1rem 2rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(59,130,246,0.15); border-radius: 50%; filter: blur(60px);"></div>
+        <div style="position: relative; z-index: 1;">
+            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">🔍 舞弊检测</h2>
+            <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">上传财务数据，AI 智能识别潜在舞弊风险</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     # 检查登录状态
     if not st.session_state.logged_in:
@@ -2488,46 +2504,59 @@ def render_multi_year_results(multi_year_data):
 
 
 def render_detection_result(result, show_divider=True):
-    """渲染检测结果 - 增强版智能报告"""
-    if show_divider:
-        st.divider()
-    st.subheader(f"📊 智能检测报告 - {result.get('year', '')}年")
+    """渲染检测结果 - Premium Design"""
+    year = result.get('year', '')
+    fraud_prob = result.get("fraud_probability", 0)
+    risk_level = result.get("risk_level", "low")
+    risk_score = result.get("risk_score", 0)
+
+    risk_colors = {"high": "#ef4444", "medium": "#f59e0b", "low": "#10b981"}
+    risk_bg = {"high": "rgba(239,68,68,0.1)", "medium": "rgba(245,158,11,0.1)", "low": "rgba(16,185,129,0.1)"}
+    rc = risk_colors.get(risk_level, "#3b82f6")
+    rbg = risk_bg.get(risk_level, "rgba(59,130,246,0.1)")
+
+    # 高级报告头部
+    st.markdown(f"""
+    <div style="margin: 0 0 2rem 0; padding: 2rem; border-radius: 24px; background: linear-gradient(135deg, {rbg} 0%, rgba(15,23,42,0.4) 100%); border: 1px solid {rc}33; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -60px; right: -60px; width: 250px; height: 250px; background: {rc}15; border-radius: 50%; filter: blur(80px);"></div>
+        <div style="position: relative; z-index: 1;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;">
+                <span style="display: inline-flex; padding: 6px 16px; border-radius: 100px; font-size: 0.85rem; font-weight: 700; background: {rbg}; color: {rc}; border: 1px solid {rc}44;">{show_risk_level_badge(risk_level)}</span>
+                <span style="font-size: 1.5rem; font-weight: 700;">{year}年度 智能检测报告</span>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+                <div style="text-align: center; padding: 1rem; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 4px;">舞弊概率</div>
+                    <div style="font-size: 1.8rem; font-weight: 800; color: {rc};">{fraud_prob:.1%}</div>
+                </div>
+                <div style="text-align: center; padding: 1rem; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 4px;">风险评分</div>
+                    <div style="font-size: 1.8rem; font-weight: 800;">{risk_score:.1f}</div>
+                </div>
+                <div style="text-align: center; padding: 1rem; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 4px;">风险标签</div>
+                    <div style="font-size: 1.8rem; font-weight: 800;">{len(result.get('risk_labels', []))}</div>
+                </div>
+                <div style="text-align: center; padding: 1rem; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="font-size: 0.8rem; opacity: 0.6; margin-bottom: 4px;">置信度</div>
+                    <div style="font-size: 1.8rem; font-weight: 800;">{(1-fraud_prob)*100:.0f}%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     # 获取智能报告详情
     smart_report = None
     if result.get('id'):
         smart_report = make_api_request(f"/detection/{result['id']}/smart-report")
 
-    # ============ 1. 风险概览卡片 ============
-    col1, col2, col3, col4 = st.columns(4)
-
+    # 仪表盘与详情列
+    col1, col2 = st.columns([1, 1])
     with col1:
-        fraud_prob = result.get("fraud_probability", 0)
-        st.metric("舞弊概率", f"{fraud_prob:.2%}")
-
-        # 仪表盘图表
         fig = create_fraud_probability_gauge(fraud_prob)
         st.plotly_chart(fig, use_container_width=True)
-
     with col2:
-        risk_level = result.get("risk_level", "low")
-        st.metric("风险等级", show_risk_level_badge(risk_level))
-
-        risk_score = result.get("risk_score", 0)
-        st.metric("风险评分", f"{risk_score:.1f}")
-
-    with col3:
-        # IPO对标信息
-        if smart_report and smart_report.get('ipo_comparison', {}).get('similar_cases'):
-            similar_count = len(smart_report['ipo_comparison']['similar_cases'])
-            st.metric("相似被否案例", f"{similar_count}家")
-            top_similarity = smart_report['ipo_comparison']['comparison_summary'].get('highest_similarity', 0)
-            st.caption(f"最高相似度: {top_similarity:.1%}")
-        else:
-            st.metric("相似被否案例", "0家")
-            st.caption("无显著相似")
-
-    with col4:
         # 整改任务数
         if smart_report and smart_report.get('remediation_plan', {}).get('summary'):
             total_tasks = smart_report['remediation_plan']['summary'].get('total_risks', 0)
@@ -2536,8 +2565,14 @@ def render_detection_result(result, show_divider=True):
             if high_priority > 0:
                 st.caption(f"⚠️ 高优先级: {high_priority}项")
         else:
-            risk_labels = result.get("risk_labels", [])
-            st.metric("风险标签", f"{len(risk_labels)}个")
+            st.metric("风险标签数", f"{len(result.get('risk_labels', []))}个")
+        # IPO对标信息
+        if smart_report and smart_report.get('ipo_comparison', {}).get('similar_cases'):
+            similar_count = len(smart_report['ipo_comparison']['similar_cases'])
+            top_similarity = smart_report['ipo_comparison']['comparison_summary'].get('highest_similarity', 0)
+            st.caption(f"相似被否案例: {similar_count}家 (最高相似度 {top_similarity:.1%})")
+        else:
+            st.caption("无显著相似被否案例")
 
     # ============ 2. 技术细节展示（供评委查看）============
     with st.expander("🔍 查看本次检测的AI技术细节", expanded=False):
@@ -3112,8 +3147,15 @@ def render_detection_result(result, show_divider=True):
 # ================= AI 问答页面 =================
 def render_qa():
     """渲染 AI 问答页面 - 支持流式输出"""
-    st.title("💬 AI 智能问答")
-    st.subheader("财务舞弊领域专业问答助手")
+    st.markdown("""
+    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(139,92,246,0.15); border-radius: 50%; filter: blur(60px);"></div>
+        <div style="position: relative; z-index: 1;">
+            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">💬 AI 智能问答</h2>
+            <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">财务舞弊领域专业问答助手，7×24 随时解答</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     # 检查登录状态
     if not st.session_state.logged_in:
@@ -3236,7 +3278,15 @@ def render_qa():
 # ================= 我的检测页面 =================
 def render_my_detections():
     """渲染「我的检测」页面"""
-    st.title("📊 我的检测")
+    st.markdown("""
+    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(16,185,129,0.15); border-radius: 50%; filter: blur(60px);"></div>
+        <div style="position: relative; z-index: 1;">
+            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">📊 我的检测</h2>
+            <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">历史检测记录与报告管理</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     if not st.session_state.logged_in:
         st.warning("请先登录")
@@ -3439,7 +3489,15 @@ def render_membership():
 
 def render_report_management():
     """渲染报告管理页面"""
-    st.title("📁 报告管理")
+    st.markdown("""
+    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(245,158,11,0.15); border-radius: 50%; filter: blur(60px);"></div>
+        <div style="position: relative; z-index: 1;">
+            <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">📁 报告管理</h2>
+            <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">检测报告归档与导出下载</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     if not st.session_state.logged_in:
         st.warning("请先登录以查看报告")
