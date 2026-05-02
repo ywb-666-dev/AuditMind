@@ -29,203 +29,111 @@ st.set_page_config(
 # 仅注入轻量增强样式，不强制主题色，跟随浏览器/系统 light/dark 偏好
 st.markdown("""
 <style>
-/* ===== Animation Keyframes ===== */
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-}
-@keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px rgba(59,130,246,0.3); }
-    50% { box-shadow: 0 0 40px rgba(59,130,246,0.6); }
-}
-@keyframes gradient-shift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-@keyframes shimmer {
-    0% { background-position: -1000px 0; }
-    100% { background-position: 1000px 0; }
-}
-@keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
-}
-@keyframes slideInRight {
-    from { opacity: 0; transform: translateX(40px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-@keyframes bounceIn {
-    0% { opacity: 0; transform: scale(0.3); }
-    50% { transform: scale(1.05); }
-    70% { transform: scale(0.9); }
-    100% { opacity: 1; transform: scale(1); }
-}
-@keyframes rotate-slow {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-@keyframes breathe {
-    0%, 100% { transform: scale(1); opacity: 0.8; }
-    50% { transform: scale(1.05); opacity: 1; }
-}
-@keyframes ripple {
-    0% { transform: scale(0); opacity: 1; }
-    100% { transform: scale(4); opacity: 0; }
-}
-@keyframes typing {
-    from { width: 0; }
-    to { width: 100%; }
-}
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
+/* ===== Design Tokens ===== */
+:root {
+    --bg-primary: #FAF9F6;
+    --bg-secondary: #F5F3EF;
+    --bg-card: #FFFFFF;
+    --bg-elevated: #FFFFFF;
+    --text-primary: #1C1C1E;
+    --text-secondary: #6E6B68;
+    --text-muted: #A39E99;
+    --accent: #8B7E74;
+    --accent-hover: #7A6F66;
+    --border: #E8E4DF;
+    --border-light: #F0EDE8;
+    --success: #6B8E6B;
+    --warning: #B89A5E;
+    --danger: #A0706A;
+    --info: #6B8294;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.08);
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
 }
 
-/* ===== Noise Texture Background ===== */
-.noise-bg {
-    position: relative;
-}
-.noise-bg::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-}
-
-/* ===== Grid Background ===== */
-.grid-bg {
-    background-size: 40px 40px;
-    background-image: linear-gradient(to right, rgba(148,163,184,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(148,163,184,0.05) 1px, transparent 1px);
-}
-
-/* ===== 3D Card Hover ===== */
-.card-3d {
-    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
-    transform-style: preserve-3d;
-}
-.card-3d:hover {
-    transform: translateY(-8px) rotateX(2deg) rotateY(-2deg);
-}
-
-/* ===== Floating Orbs ===== */
-.orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.5;
-    animation: float 6s ease-in-out infinite;
-}
-.orb-1 { width: 300px; height: 300px; background: rgba(59,130,246,0.15); top: -100px; right: -50px; animation-delay: 0s; }
-.orb-2 { width: 250px; height: 250px; background: rgba(245,158,11,0.1); bottom: -80px; left: -60px; animation-delay: 2s; }
-.orb-3 { width: 200px; height: 200px; background: rgba(139,92,246,0.1); top: 40%; left: 30%; animation-delay: 4s; }
-
-/* ===== Ripple Button Effect ===== */
-.ripple-btn {
-    position: relative;
-    overflow: hidden;
-}
-.ripple-btn::after {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    background-image: radial-gradient(circle, rgba(255,255,255,0.3) 10%, transparent 10.01%);
-    background-repeat: no-repeat;
-    background-position: 50%;
-    transform: scale(10, 10);
-    opacity: 0;
-    transition: transform 0.5s, opacity 1s;
-}
-.ripple-btn:active::after {
-    transform: scale(0, 0);
-    opacity: 0.3;
-    transition: 0s;
-}
-
-/* ===== Animated Border Gradient ===== */
-.gradient-border {
-    position: relative;
-    border-radius: 20px;
-    background: transparent;
-}
-.gradient-border::before {
-    content: "";
-    position: absolute;
-    inset: -2px;
-    border-radius: 22px;
-    background: linear-gradient(45deg, #3b82f6, #8b5cf6, #f59e0b, #3b82f6);
-    background-size: 400% 400%;
-    animation: gradient-shift 8s ease infinite;
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-.gradient-border:hover::before { opacity: 0.6; }
-
-/* ===== Stagger Animation Helper ===== */
-.stagger-1 { animation-delay: 0.1s !important; }
-.stagger-2 { animation-delay: 0.2s !important; }
-.stagger-3 { animation-delay: 0.3s !important; }
-.stagger-4 { animation-delay: 0.4s !important; }
-.stagger-5 { animation-delay: 0.5s !important; }
-
-/* ===== Scroll Indicator ===== */
-.scroll-indicator {
-    width: 24px;
-    height: 40px;
-    border: 2px solid rgba(255,255,255,0.4);
-    border-radius: 12px;
-    position: relative;
-}
-.scroll-indicator::before {
-    content: "";
-    position: absolute;
-    top: 6px;
-    left: 50%;
-    width: 4px;
-    height: 8px;
-    background: rgba(255,255,255,0.6);
-    border-radius: 2px;
-    transform: translateX(-50%);
-    animation: float 2s ease-in-out infinite;
-}
-
-/* ===== Global Layout ===== */
+/* ===== Reset & Base ===== */
 .main .block-container {
-    padding-top: 1rem;
-    padding-bottom: 3rem;
-    max-width: 1400px;
+    padding-top: 1.5rem;
+    padding-bottom: 2rem;
+    max-width: 1200px;
 }
-
-/* ===== Typography System ===== */
 .stApp, .stApp * {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
-h1 { font-weight: 800 !important; letter-spacing: -0.02em !important; }
-h2 { font-weight: 700 !important; letter-spacing: -0.01em !important; }
-h3 { font-weight: 700 !important; }
-p, li, td, th, label, .stMarkdown { line-height: 1.7 !important; }
+h1 { font-weight: 700 !important; letter-spacing: -0.03em !important; font-size: 2rem !important; color: var(--text-primary) !important; }
+h2 { font-weight: 600 !important; letter-spacing: -0.02em !important; font-size: 1.5rem !important; color: var(--text-primary) !important; }
+h3 { font-weight: 600 !important; font-size: 1.15rem !important; color: var(--text-primary) !important; }
+p, li, td, th, label, .stMarkdown { line-height: 1.65 !important; color: var(--text-secondary) !important; }
 
-/* ===== Content Wrapper ===== */
-.content-wrapper {
-    border-radius: 24px;
-    padding: 2rem;
-    margin-bottom: 1.5rem;
-    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+/* ===== Buttons ===== */
+.stButton > button {
+    border-radius: var(--radius-sm) !important;
+    font-weight: 500 !important;
+    padding: 0.5rem 1.25rem !important;
+    transition: all 0.15s ease !important;
+    letter-spacing: 0.01em;
+    border: 1px solid transparent !important;
+    font-size: 0.9rem !important;
+}
+.stButton > button:hover { transform: translateY(-1px); }
+.stButton > button:active { transform: translateY(0); }
+.stButton > button[kind="primary"] {
+    background: var(--text-primary) !important;
+    color: var(--bg-primary) !important;
+    border-color: var(--text-primary) !important;
+}
+.stButton > button[kind="primary"]:hover {
+    background: var(--text-secondary) !important;
+    border-color: var(--text-secondary) !important;
+}
+.stButton > button[kind="secondary"] {
+    background: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border) !important;
+}
+.stButton > button[kind="secondary"]:hover {
+    background: var(--bg-secondary) !important;
+    border-color: var(--accent) !important;
+}
+
+/* ===== Inputs ===== */
+.stTextInput > div > div > input,
+.stTextArea > div > div > textarea,
+.stNumberInput > div > div > input,
+.stSelectbox > div > div > div {
+    border-radius: var(--radius-sm) !important;
+    border: 1px solid var(--border) !important;
+    background: var(--bg-card) !important;
+    color: var(--text-primary) !important;
+    padding: 0.6rem 0.875rem !important;
+    font-size: 0.9rem !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+.stTextInput > div > div > input:focus,
+.stTextArea > div > div > textarea:focus,
+.stNumberInput > div > div > input:focus,
+.stSelectbox > div > div > div:focus {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px rgba(139,126,116,0.08) !important;
+}
+
+/* ===== Cards ===== */
+.glass-card, .feature-card, .stat-card, .pricing-card {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 1.5rem !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.glass-card:hover, .feature-card:hover, .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md) !important;
 }
 
 /* ===== Badge System ===== */
@@ -239,549 +147,101 @@ p, li, td, th, label, .stMarkdown { line-height: 1.7 !important; }
     font-weight: 600;
     letter-spacing: 0.3px;
 }
-.badge-primary { background: rgba(59,130,246,0.12); color: #3b82f6; border: 1px solid rgba(59,130,246,0.2); }
-.badge-success { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.2); }
-.badge-warning { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.2); }
-.badge-danger { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+.badge-primary { background: rgba(107,130,148,0.10); color: var(--info); border: 1px solid rgba(107,130,148,0.15); }
+.badge-success { background: rgba(107,142,107,0.10); color: var(--success); border: 1px solid rgba(107,142,107,0.15); }
+.badge-warning { background: rgba(184,154,94,0.10); color: var(--warning); border: 1px solid rgba(184,154,94,0.15); }
+.badge-danger { background: rgba(160,112,106,0.10); color: var(--danger); border: 1px solid rgba(160,112,106,0.15); }
 
-/* ===== Radio & Checkbox ===== */
+/* ===== Sidebar ===== */
+[data-testid="stSidebar"] { background: var(--bg-secondary) !important; border-right: 1px solid var(--border) !important; }
+[data-testid="stSidebar"] .stButton > button { width: 100% !important; text-align: left !important; justify-content: flex-start !important; border-radius: var(--radius-sm) !important; border: none !important; background: transparent !important; color: var(--text-secondary) !important; font-weight: 500 !important; padding: 0.6rem 0.875rem !important; }
+[data-testid="stSidebar"] .stButton > button:hover { background: rgba(0,0,0,0.04) !important; color: var(--text-primary) !important; }
+[data-testid="stSidebar"] hr { border-color: var(--border) !important; margin: 0.75rem 0 !important; }
+
+/* ===== Tables ===== */
+[data-testid="stDataFrame"] th { background: var(--bg-secondary) !important; color: var(--text-primary) !important; font-weight: 600 !important; border-bottom: 1px solid var(--border) !important; }
+[data-testid="stDataFrame"] td { border-bottom: 1px solid var(--border-light) !important; }
+[data-testid="stDataFrame"] tr:hover { background: var(--bg-secondary) !important; }
+
+/* ===== Tabs ===== */
+.stTabs [data-baseweb="tab-list"] { border-bottom: 1px solid var(--border) !important; gap: 4px !important; }
+.stTabs [data-baseweb="tab"] { color: var(--text-muted) !important; font-weight: 500 !important; padding: 0.6rem 1rem !important; border-radius: var(--radius-sm) var(--radius-sm) 0 0 !important; }
+.stTabs [data-baseweb="tab-highlight"] { background: var(--text-primary) !important; }
+.stTabs [aria-selected="true"] { color: var(--text-primary) !important; }
+
+/* ===== Expanders ===== */
+.streamlit-expanderHeader { background: var(--bg-secondary) !important; border: 1px solid var(--border) !important; border-radius: var(--radius-sm) !important; font-weight: 500 !important; }
+.streamlit-expanderHeader:hover { border-color: var(--accent) !important; }
+
+/* ===== Alerts ===== */
+.stAlert { border-radius: var(--radius-sm) !important; border: 1px solid !important; }
+.stAlert[data-baseweb="notification"] { box-shadow: none !important; }
+
+/* ===== Progress & Slider ===== */
+.stProgress > div > div { background: var(--accent) !important; border-radius: 8px !important; }
+.stSlider > div > div > div > div { background: var(--accent) !important; border-radius: 4px !important; }
+
+/* ===== Radio ===== */
 .stRadio > div { display: flex; flex-direction: column; gap: 6px; }
-.stRadio label { padding: 10px 14px !important; border-radius: 12px !important; transition: all 0.2s ease !important; border: 1.5px solid transparent !important; font-weight: 500 !important; }
-.stRadio label:hover { background: rgba(59,130,246,0.06) !important; border-color: rgba(59,130,246,0.15) !important; }
-.stCheckbox > label { padding: 8px 12px !important; border-radius: 10px !important; transition: all 0.2s ease !important; }
-.stCheckbox > label:hover { background: rgba(59,130,246,0.06) !important; }
+.stRadio label { padding: 10px 14px !important; border-radius: var(--radius-sm) !important; transition: all 0.2s ease !important; border: 1.5px solid transparent !important; font-weight: 500 !important; }
+.stRadio label:hover { background: var(--bg-secondary) !important; border-color: var(--border) !important; }
 
-/* ===== Slider ===== */
-.stSlider > div > div > div > div { background: linear-gradient(90deg, #3b82f6, #60a5fa) !important; border-radius: 4px !important; }
-.stSlider > div > div > div > div > div { background: #ffffff !important; box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important; border: 2px solid #3b82f6 !important; }
+/* ===== Checkbox ===== */
+.stCheckbox > label { padding: 8px 12px !important; border-radius: var(--radius-sm) !important; transition: all 0.2s ease !important; }
+.stCheckbox > label:hover { background: var(--bg-secondary) !important; }
 
-/* ===== Progress Bar ===== */
-.stProgress > div > div { background: linear-gradient(90deg, #3b82f6, #60a5fa) !important; border-radius: 8px !important; }
+/* ===== Markdown Code ===== */
+.stMarkdown code { background: var(--bg-secondary) !important; color: var(--text-primary) !important; padding: 2px 6px !important; border-radius: 4px !important; font-size: 0.85em !important; }
+.stMarkdown pre { background: var(--bg-secondary) !important; border-radius: var(--radius-md) !important; padding: 1rem !important; border: 1px solid var(--border) !important; }
 
-/* ===== Table Row Hover ===== */
-[data-testid="stDataFrame"] tr { transition: background 0.2s ease; }
-[data-testid="stDataFrame"] tr:hover { background: rgba(59,130,246,0.04) !important; }
+/* ===== Animations (subtle only) ===== */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.animate-fadeInUp { animation: fadeInUp 0.4s ease-out both; }
+.animate-fadeIn { animation: fadeIn 0.3s ease-out both; }
 
-/* ===== Skeleton / Shimmer ===== */
-.skeleton {
-    background: linear-gradient(90deg, rgba(148,163,184,0.1) 25%, rgba(148,163,184,0.2) 50%, rgba(148,163,184,0.1) 75%);
-    background-size: 1000px 100%;
-    animation: shimmer 2s infinite linear;
-    border-radius: 12px;
-}
+/* ===== Spacing Utilities ===== */
+.gap-1 { gap: 0.25rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
 
-/* ===== Glow Border ===== */
-.glow-border {
-    position: relative;
-    border-radius: 20px;
-    overflow: hidden;
-}
-.glow-border::before {
-    content: "";
-    position: absolute;
-    inset: -1px;
-    border-radius: 21px;
-    background: linear-gradient(135deg, rgba(59,130,246,0.4), rgba(139,92,246,0.2), rgba(245,158,11,0.3));
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-}
-.glow-border:hover::before { opacity: 1; }
+/* ===== Feature List ===== */
+.feature-yes { color: var(--success); font-weight: 600; }
+.feature-no { color: var(--text-muted); }
 
-/* ===== Button System ===== */
-.stButton > button {
-    border-radius: 12px !important;
-    font-weight: 600 !important;
-    padding: 0.65rem 1.75rem !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    letter-spacing: 0.3px;
-    position: relative;
-    overflow: hidden;
-}
-.stButton > button:hover {
-    transform: translateY(-2px) scale(1.02);
-}
-.stButton > button:active {
-    transform: translateY(0) scale(0.98);
-}
-.stButton > button[kind="primary"] {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%) !important;
-    background-size: 200% 200% !important;
-    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35) !important;
-    border: none !important;
-}
-.stButton > button[kind="primary"]:hover {
-    background-position: 100% 0 !important;
-    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.5) !important;
-}
-.stButton > button[kind="secondary"] {
-    border: 1.5px solid rgba(148, 163, 184, 0.4) !important;
-    background: transparent !important;
-}
-
-/* ===== Input System ===== */
-.stTextInput > div > div > input,
-.stNumberInput > div > div > input,
-.stTextArea > div > div > textarea,
-.stSelectbox > div > div {
-    border-radius: 12px !important;
-    transition: all 0.2s ease !important;
-}
-.stTextInput > div > div > input:focus,
-.stNumberInput > div > div > input:focus,
-.stTextArea > div > div > textarea:focus,
-.stSelectbox > div > div:focus-within {
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12) !important;
-    border-color: #3b82f6 !important;
-}
-
-/* ===== Card Systems ===== */
-.glass-card {
-    border-radius: 20px;
-    padding: 2rem;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    animation: fadeInUp 0.6s ease-out forwards;
-}
-.glass-card:hover {
-    transform: translateY(-6px);
-}
-.feature-card {
-    border-radius: 20px;
-    padding: 2rem;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    animation: fadeInUp 0.6s ease-out forwards;
-    border: 1px solid transparent;
-}
-.feature-card:hover {
-    transform: translateY(-8px);
-}
-.stat-card {
-    border-radius: 20px;
-    padding: 1.5rem;
-    text-align: center;
-    transition: all 0.3s ease;
-    animation: scaleIn 0.5s ease-out forwards;
-}
-.stat-card:hover {
-    transform: translateY(-4px) scale(1.02);
-}
-
-/* ===== Data Table ===== */
-[data-testid="stDataFrame"] {
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-}
-[data-testid="stDataFrame"] th {
-    font-weight: 700 !important;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.5px;
-}
-
-/* ===== Tab System ===== */
-.stTabs [data-baseweb="tab-list"] {
-    border-radius: 16px;
-    padding: 6px;
-    gap: 6px;
-    background: rgba(128,128,128,0.08);
-}
-.stTabs [data-baseweb="tab"] {
-    border-radius: 12px;
-    padding: 12px 24px !important;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: all 0.25s ease;
-    border: none !important;
-}
-.stTabs [data-baseweb="tab"][aria-selected="true"] {
-    background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
-    color: #ffffff !important;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-.stTabs [data-baseweb="tab-panel"] {
-    border-radius: 16px;
-    padding: 1.5rem;
-    margin-top: 12px;
-    animation: fadeIn 0.4s ease-out;
-}
-
-/* ===== File Uploader ===== */
-[data-testid="stFileUploader"] > section {
-    border-radius: 20px !important;
-    border: 2px dashed rgba(148, 163, 184, 0.4) !important;
-    transition: all 0.3s ease !important;
-    padding: 2rem !important;
-}
-[data-testid="stFileUploader"] > section:hover {
-    border-color: #3b82f6 !important;
-    background: rgba(59, 130, 246, 0.04) !important;
-    transform: scale(1.01);
-}
-
-/* ===== Expander ===== */
-.streamlit-expanderHeader {
-    border-radius: 16px !important;
-    font-weight: 600 !important;
-    padding: 1rem 1.25rem !important;
-    transition: all 0.2s ease;
-    border: 1px solid rgba(148, 163, 184, 0.2) !important;
-}
-.streamlit-expanderHeader:hover {
-    border-color: rgba(59, 130, 246, 0.3) !important;
-}
-.streamlit-expanderContent {
-    border-radius: 0 0 16px 16px !important;
-    padding: 1.25rem !important;
-    animation: fadeIn 0.3s ease-out;
-}
-
-/* ===== Metric Card ===== */
-[data-testid="stMetric"] {
-    border-radius: 20px;
-    padding: 1.5rem;
-    transition: all 0.3s ease;
-    animation: scaleIn 0.5s ease-out forwards;
-}
-[data-testid="stMetric"] label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-[data-testid="stMetric"] .css-1xarl3l {
-    font-weight: 800;
-    font-size: 2rem;
-}
-
-/* ===== Divider ===== */
-hr {
-    border: none !important;
-    height: 1px !important;
-    background: linear-gradient(90deg, transparent, rgba(148,163,184,0.3), transparent) !important;
-    margin: 2rem 0 !important;
+/* ===== Pricing Highlight ===== */
+.pricing-highlight {
+    border: 2px solid var(--accent) !important;
+    box-shadow: var(--shadow-md) !important;
 }
 
 /* ===== Scrollbar ===== */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.6); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-/* ===== Alert/Toast ===== */
-.stSuccess, .stInfo, .stWarning, .stError {
-    border-radius: 16px !important;
-    padding: 1rem 1.25rem !important;
-    border: 1px solid !important;
-    animation: slideInRight 0.4s ease-out;
-}
-.stSuccess { background: rgba(16, 185, 129, 0.08) !important; border-color: rgba(16, 185, 129, 0.25) !important; }
-.stInfo { background: rgba(59, 130, 246, 0.08) !important; border-color: rgba(59, 130, 246, 0.25) !important; }
-.stWarning { background: rgba(245, 158, 11, 0.08) !important; border-color: rgba(245, 158, 11, 0.25) !important; }
-.stError { background: rgba(239, 68, 68, 0.08) !important; border-color: rgba(239, 68, 68, 0.25) !important; }
-
-/* ===== Hero Section Styles ===== */
-.hero-gradient {
-    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 30%, #1e40af 60%, #312e81 100%);
-    background-size: 400% 400%;
-    animation: gradient-shift 15s ease infinite;
-}
-.hero-title {
-    font-size: 3.5rem;
-    font-weight: 800;
-    letter-spacing: -1.5px;
-    line-height: 1.1;
-    background: linear-gradient(135deg, #ffffff 0%, #bfdbfe 50%, #60a5fa 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: fadeInUp 0.8s ease-out;
-}
-.hero-subtitle {
-    font-size: 1.25rem;
-    opacity: 0.85;
-    line-height: 1.6;
-    animation: fadeInUp 0.8s ease-out 0.2s both;
-}
-.hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    border-radius: 100px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.15);
-    animation: fadeIn 1s ease-out 0.4s both;
-}
-.hero-stat {
-    text-align: center;
-    padding: 1.5rem;
-    border-radius: 20px;
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.1);
-    transition: all 0.3s ease;
-    animation: scaleIn 0.5s ease-out both;
-}
-.hero-stat:hover {
-    background: rgba(255,255,255,0.1);
-    transform: translateY(-4px);
-}
-.hero-stat-value {
-    font-size: 2.5rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, #60a5fa, #fbbf24);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-.hero-stat-label {
-    font-size: 0.85rem;
-    opacity: 0.7;
-    margin-top: 4px;
-}
-
-/* ===== Pricing Cards ===== */
-.pricing-card {
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    animation: fadeInUp 0.6s ease-out forwards;
-}
-.pricing-card:hover {
-    transform: translateY(-8px);
-}
-
-/* ===== Sidebar Navigation ===== */
-.sidebar-nav-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
-    border-radius: 12px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    cursor: pointer;
-    margin-bottom: 4px;
-    border: 1px solid transparent;
-}
-.sidebar-nav-item:hover {
-    background: rgba(59, 130, 246, 0.1);
-    border-color: rgba(59, 130, 246, 0.2);
-}
-.sidebar-nav-active {
-    background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(37,99,235,0.1)) !important;
-    border-color: rgba(59, 130, 246, 0.3) !important;
-    font-weight: 600 !important;
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
-}
-
-/* ===== Section Headers ===== */
-.section-header {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-/* ===== Case Cards ===== */
-.case-card {
-    border-radius: 20px;
-    overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    animation: fadeInUp 0.6s ease-out forwards;
-    position: relative;
-}
-.case-card:hover {
-    transform: translateY(-6px) scale(1.02);
-}
-.case-card-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 1.5rem;
-    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-}
-
-/* ===== Spinner ===== */
-[data-testid="stSpinner"] > div {
-    border-top-color: #3b82f6 !important;
-    border-width: 3px !important;
-}
-
-/* ===== Progress Bar / Step Indicator ===== */
-.step-indicator {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 2rem 0;
-}
-.step-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-}
-.step-circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-}
-.step-line {
-    flex: 1;
-    height: 2px;
-    margin: 0 12px;
-    margin-bottom: 24px;
-    border-radius: 1px;
-    transition: all 0.3s ease;
-}
-.step-active .step-circle {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    color: white;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-}
-.step-completed .step-circle {
-    background: linear-gradient(135deg, #10b981, #059669);
-    color: white;
-}
-.step-pending .step-circle {
-    background: rgba(148, 163, 184, 0.2);
-    color: #94a3b8;
-}
-
-/* ===== Hide Default Elements ===== */
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
-header {visibility: hidden;}
-
-/* ===== Light Mode Overrides ===== */
-@media (prefers-color-scheme: light) {
-    .glass-card {
-        background: rgba(255, 255, 255, 0.7);
-        border: 1px solid rgba(226, 232, 240, 0.8);
-        box-shadow: 0 4px 24px rgba(0,0,0,0.06);
-    }
-    .glass-card:hover {
-        box-shadow: 0 12px 40px rgba(0,0,0,0.1);
-        border-color: rgba(59, 130, 246, 0.2);
-    }
-    .feature-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-    }
-    .feature-card:hover {
-        box-shadow: 0 12px 32px rgba(0,0,0,0.1);
-        border-color: rgba(59, 130, 246, 0.25);
-    }
-    .stat-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-    }
-    .stat-card:hover {
-        box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-    }
-    [data-testid="stMetric"] {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-    }
-    .pricing-card {
-        background: #ffffff !important;
-        border: 1px solid #e2e8f0 !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
-    }
-    .pricing-card:hover {
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12) !important;
-    }
-    .pricing-card h3 { color: #0f172a !important; }
-    .pricing-card .price-text {
-        background: linear-gradient(135deg, #1e3a5f, #3b82f6);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-    .pricing-card .feature-yes { color: #047857 !important; }
-    .pricing-card .feature-no { color: #9ca3af !important; }
-    .pricing-highlight {
-        background: linear-gradient(180deg, rgba(245,158,11,0.06) 0%, #ffffff 100%) !important;
-        border: 2px solid #f59e0b !important;
-    }
-    [data-testid="stDataFrame"] th { background: #f8fafc !important; color: #0f172a !important; }
-    .streamlit-expanderHeader { background: #ffffff !important; border-color: #e2e8f0 !important; }
-    .streamlit-expanderHeader:hover { border-color: rgba(59, 130, 246, 0.3) !important; }
-}
-
-/* ===== Dark Mode Overrides ===== */
+/* ===== Dark Mode Support ===== */
 @media (prefers-color-scheme: dark) {
-    .glass-card {
-        background: rgba(30, 41, 59, 0.5);
-        border: 1px solid rgba(51, 65, 85, 0.5);
-        box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+    :root {
+        --bg-primary: #1C1C1E;
+        --bg-secondary: #2C2C2E;
+        --bg-card: #2C2C2E;
+        --text-primary: #F5F3EF;
+        --text-secondary: #A39E99;
+        --text-muted: #6E6B68;
+        --border: #3A3A3C;
+        --border-light: #3A3A3C;
     }
-    .glass-card:hover {
-        box-shadow: 0 12px 40px rgba(0,0,0,0.35);
-        border-color: rgba(59, 130, 246, 0.3);
-        background: rgba(30, 41, 59, 0.7);
-    }
-    .feature-card {
-        background: rgba(30, 41, 59, 0.4);
-        border: 1px solid rgba(51, 65, 85, 0.4);
-        box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-    }
-    .feature-card:hover {
-        box-shadow: 0 12px 32px rgba(0,0,0,0.3);
-        border-color: rgba(59, 130, 246, 0.3);
-        background: rgba(30, 41, 59, 0.6);
-    }
-    .stat-card {
-        background: rgba(30, 41, 59, 0.4);
-        border: 1px solid rgba(51, 65, 85, 0.4);
-        box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-    }
-    .stat-card:hover {
-        box-shadow: 0 8px 24px rgba(0,0,0,0.25);
-    }
-    [data-testid="stMetric"] {
-        background: rgba(30, 41, 59, 0.4);
-        border: 1px solid rgba(51, 65, 85, 0.4);
-        box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-    }
-    .pricing-card {
-        background: rgba(30, 41, 59, 0.6) !important;
-        border: 1px solid rgba(51, 65, 85, 0.5) !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25) !important;
-    }
-    .pricing-card:hover {
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4) !important;
-    }
-    .pricing-card h3 { color: #f1f5f9 !important; }
-    .pricing-card .price-text {
-        background: linear-gradient(135deg, #f1f5f9, #93c5fd);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-    .pricing-card .feature-yes { color: #34d399 !important; }
-    .pricing-card .feature-no { color: #64748b !important; }
-    .pricing-highlight {
-        background: linear-gradient(180deg, rgba(245,158,11,0.08) 0%, rgba(30,41,59,0.8) 100%) !important;
-        border: 2px solid #f59e0b !important;
-    }
-    [data-testid="stDataFrame"] th { background: #1e293b !important; color: #f1f5f9 !important; }
-    .streamlit-expanderHeader { background: rgba(30, 41, 59, 0.5) !important; border-color: rgba(51, 65, 85, 0.5) !important; }
-    .streamlit-expanderHeader:hover { border-color: rgba(59, 130, 246, 0.3) !important; }
+    .stButton > button[kind="secondary"] { background: var(--bg-secondary) !important; border-color: var(--border) !important; }
+    [data-testid="stDataFrame"] th { background: var(--bg-secondary) !important; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -1349,7 +809,7 @@ def render_sidebar():
         st.markdown("""
         <div style="text-align: center; padding: 1rem 0 0.5rem;">
             <div style="font-size: 2rem; margin-bottom: 0.25rem;"></div>
-            <div style="font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, #3b82f6, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Audit Mind</div>
+            <div style="font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; color: #1C1C1E;">Audit Mind</div>
             <div style="font-size: 0.75rem; opacity: 0.6; margin-top: 2px;">AI 财务舞弊识别</div>
         </div>
         """, unsafe_allow_html=True)
@@ -1405,23 +865,15 @@ def render_home():
     """渲染首页 - Premium Design"""
     # ========== Hero Section ==========
     hero_html = '''
-    <style>
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes gradient-shift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-    </style>
-    <div style="margin: 0; padding: 80px 24px 72px; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 30%, #1e40af 60%, #312e81 100%); background-size: 400% 400%; animation: gradient-shift 15s ease infinite; position: relative; overflow: hidden; text-align: center; font-family: system-ui, -apple-system, sans-serif;">
-        <div style="position: absolute; top: -100px; right: -100px; width: 400px; height: 400px; background: rgba(59,130,246,0.1); border-radius: 50%; filter: blur(100px);"></div>
-        <div style="position: absolute; bottom: -150px; left: -150px; width: 500px; height: 500px; background: rgba(245,158,11,0.06); border-radius: 50%; filter: blur(120px);"></div>
-        <div style="position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); width: 700px; height: 700px; background: rgba(139,92,246,0.04); border-radius: 50%; filter: blur(140px);"></div>
-        <div style="position: relative; z-index: 2; max-width: 900px; margin: 0 auto;">
-            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border-radius: 100px; font-size: 0.9rem; font-weight: 600; background: rgba(255,255,255,0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.12); color: #bfdbfe; margin-bottom: 1.5rem; animation: fadeIn 1s ease-out 0.3s both;">
-                <span style="font-size: 1.1rem;"></span> AI-Powered Financial Audit Intelligence
+    <div style="margin: -1.5rem -1rem 2rem; padding: 72px 24px 64px; background: #FAF9F6; text-align: center; border-bottom: 1px solid #E8E4DF;">
+        <div style="max-width: 800px; margin: 0 auto;">
+            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: 100px; font-size: 0.85rem; font-weight: 600; background: #F5F3EF; border: 1px solid #E8E4DF; color: #8B7E74; margin-bottom: 1.5rem; letter-spacing: 0.02em;">
+                AI-Powered Financial Audit Intelligence
             </div>
-            <h1 style="font-size: 4rem; font-weight: 800; letter-spacing: -2px; line-height: 1.05; margin-bottom: 1rem; background: linear-gradient(135deg, #ffffff 0%, #bfdbfe 40%, #60a5fa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: fadeInUp 0.8s ease-out;">
+            <h1 style="font-size: 3.2rem; font-weight: 700; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 1rem; color: #1C1C1E;">
                 Audit Mind
             </h1>
-            <p style="font-size: 1.3rem; color: rgba(255,255,255,0.75); line-height: 1.7; max-width: 620px; margin: 0 auto 2.5rem; font-weight: 400; animation: fadeInUp 0.8s ease-out 0.2s both;">
+            <p style="font-size: 1.15rem; color: #6E6B68; line-height: 1.7; max-width: 560px; margin: 0 auto 2rem; font-weight: 400;">
                 基于生成式 AI 的上市公司财务舞弊智能识别系统<br>
                 <span style="font-size: 1rem; opacity: 0.7;">双模分析 · SHAP 可解释 · 风险标签可视化</span>
             </p>
@@ -1469,9 +921,9 @@ def render_home():
     for i, (value, label, delay) in enumerate(stats):
         with stat_cols[i]:
             st.markdown(f"""
-            <div class="stat-card" style="animation-delay: {delay};">
-                <div style="font-size: 2.4rem; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 6px;">{value}</div>
-                <div style="font-size: 0.9rem; opacity: 0.7; font-weight: 600;">{label}</div>
+            <div class="stat-card">
+                <div style="font-size: 2.2rem; font-weight: 700; color: #1C1C1E; margin-bottom: 4px;">{value}</div>
+                <div style="font-size: 0.85rem; color: #6E6B68; font-weight: 500;">{label}</div>
             </div>
             """, unsafe_allow_html=True)
 
@@ -1491,10 +943,9 @@ def render_home():
     for i, (icon, title, desc) in enumerate(features):
         with feat_cols[i % 2]:
             st.markdown(f"""
-            <div class="feature-card" style="margin-bottom: 1rem; animation-delay: {i * 0.12}s;">
-                <div style="font-size: 2.2rem; margin-bottom: 0.75rem;">{icon}</div>
-                <h4 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem;">{title}</h4>
-                <p style="font-size: 0.95rem; opacity: 0.75; line-height: 1.6;">{desc}</p>
+            <div class="feature-card" style="margin-bottom: 1rem;">
+                <h4 style="font-size: 1.05rem; font-weight: 600; margin-bottom: 0.4rem; color: #1C1C1E;">{title}</h4>
+                <p style="font-size: 0.9rem; color: #6E6B68; line-height: 1.6;">{desc}</p>
             </div>
             """, unsafe_allow_html=True)
 
@@ -1502,38 +953,34 @@ def render_home():
 
     # ========== How It Works ==========
     how_it_works_html = '''
-    <style>
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes pulse-dot { 0%,100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.4); } 50% { box-shadow: 0 0 0 12px rgba(59,130,246,0); } }
-    @keyframes connect-grow { from { width: 0; } to { width: 100%; } }
-    </style>
-    <div style="margin: 3rem 0; padding: 3rem 1.5rem; position: relative; overflow: hidden;">
-        <div style="text-align: center; margin-bottom: 3rem;">
-            <h2 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem;"> 三步完成智能检测</h2>
-            <p style="opacity: 0.7; font-size: 1rem;">上传财务报告 → AI深度解析 → 获取风险报告</p>
+    <div style="margin: 2.5rem 0; padding: 2rem 1.5rem; background: #FAF9F6; border-radius: 14px; border: 1px solid #E8E4DF;">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.4rem; color: #1C1C1E;">三步完成智能检测</h2>
+            <p style="color: #6E6B68; font-size: 0.95rem;">上传财务报告 → AI深度解析 → 获取风险报告</p>
         </div>
-        <div style="display: flex; align-items: flex-start; justify-content: center; gap: 0; max-width: 1000px; margin: 0 auto; position: relative;">
-            <!-- Step 1 -->
-            <div style="flex: 1; text-align: center; position: relative; z-index: 2; animation: fadeInUp 0.6s ease-out 0s both;">
-                <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #3b82f6, #2563eb); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem; animation: pulse-dot 2s infinite; box-shadow: 0 4px 20px rgba(59,130,246,0.3);"></div>
-                <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">上传报告</h4>
-                <p style="font-size: 0.85rem; opacity: 0.7; line-height: 1.6; padding: 0 0.5rem;">支持 PDF 年报、Excel 财务表、Word 文档等多格式上传</p>
+        <div style="display: flex; align-items: flex-start; justify-content: center; gap: 0; max-width: 900px; margin: 0 auto;">
+            <div style="flex: 1; text-align: center; position: relative;">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: #F5F3EF; border: 2px solid #E8E4DF; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                    <span style="font-size: 1rem; font-weight: 700; color: #8B7E74;">1</span>
+                </div>
+                <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; color: #1C1C1E;">上传报告</h4>
+                <p style="font-size: 0.8rem; color: #6E6B68; line-height: 1.5; padding: 0 0.5rem;">支持 PDF 年报、Excel 财务表、Word 文档等多格式上传</p>
             </div>
-            <!-- Connector 1 -->
-            <div style="flex: 0.5; height: 2px; background: linear-gradient(90deg, #3b82f6, #10b981); margin-top: 32px; position: relative; z-index: 1; animation: connect-grow 0.8s ease-out 0.3s both;"></div>
-            <!-- Step 2 -->
-            <div style="flex: 1; text-align: center; position: relative; z-index: 2; animation: fadeInUp 0.6s ease-out 0.2s both;">
-                <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #8b5cf6, #7c3aed); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem; animation: pulse-dot 2s infinite 0.5s; box-shadow: 0 4px 20px rgba(139,92,246,0.3);"></div>
-                <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">AI 深度解析</h4>
-                <p style="font-size: 0.85rem; opacity: 0.7; line-height: 1.6; padding: 0 0.5rem;">7 维风险特征提取 + SHAP 可解释性分析 + IPO 对标</p>
+            <div style="flex: 0.4; height: 1px; background: #E8E4DF; margin-top: 24px;"></div>
+            <div style="flex: 1; text-align: center; position: relative;">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: #F5F3EF; border: 2px solid #E8E4DF; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                    <span style="font-size: 1rem; font-weight: 700; color: #8B7E74;">2</span>
+                </div>
+                <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; color: #1C1C1E;">AI 深度解析</h4>
+                <p style="font-size: 0.8rem; color: #6E6B68; line-height: 1.5; padding: 0 0.5rem;">7 维风险特征提取 + SHAP 可解释性分析 + IPO 对标</p>
             </div>
-            <!-- Connector 2 -->
-            <div style="flex: 0.5; height: 2px; background: linear-gradient(90deg, #10b981, #f59e0b); margin-top: 32px; position: relative; z-index: 1; animation: connect-grow 0.8s ease-out 0.6s both;"></div>
-            <!-- Step 3 -->
-            <div style="flex: 1; text-align: center; position: relative; z-index: 2; animation: fadeInUp 0.6s ease-out 0.4s both;">
-                <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.5rem; animation: pulse-dot 2s infinite 1s; box-shadow: 0 4px 20px rgba(245,158,11,0.3);"></div>
-                <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">获取报告</h4>
-                <p style="font-size: 0.85rem; opacity: 0.7; line-height: 1.6; padding: 0 0.5rem;">可视化风险标签、整改建议、完整证据链下载</p>
+            <div style="flex: 0.4; height: 1px; background: #E8E4DF; margin-top: 24px;"></div>
+            <div style="flex: 1; text-align: center; position: relative;">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: #F5F3EF; border: 2px solid #E8E4DF; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
+                    <span style="font-size: 1rem; font-weight: 700; color: #8B7E74;">3</span>
+                </div>
+                <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; color: #1C1C1E;">获取报告</h4>
+                <p style="font-size: 0.8rem; color: #6E6B68; line-height: 1.5; padding: 0 0.5rem;">可视化风险标签、整改建议、完整证据链下载</p>
             </div>
         </div>
     </div>
@@ -1554,10 +1001,9 @@ def render_home():
     for i, (icon, title, desc) in enumerate(use_cases):
         with uc_cols[i]:
             st.markdown(f"""
-            <div class="glass-card" style="text-align: center; padding: 1.75rem 1rem; animation-delay: {i * 0.1}s;">
-                <div style="font-size: 2rem; margin-bottom: 0.75rem;">{icon}</div>
-                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem;">{title}</h4>
-                <p style="font-size: 0.85rem; opacity: 0.7;">{desc}</p>
+            <div class="glass-card" style="text-align: center; padding: 1.5rem 1rem;">
+                <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; color: #1C1C1E;">{title}</h4>
+                <p style="font-size: 0.8rem; color: #6E6B68;">{desc}</p>
             </div>
             """, unsafe_allow_html=True)
 
@@ -1586,47 +1032,38 @@ def render_home():
 
     # ========== Trust Badges ==========
     trust_html = '''
-    <style>
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
-    </style>
-    <div style="margin: 3rem 0; padding: 3rem 1.5rem; position: relative; overflow: hidden;">
-        <div style="text-align: center; margin-bottom: 2.5rem;">
-            <h2 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem;"> 技术信任背书</h2>
-            <p style="opacity: 0.7; font-size: 1rem;">源自顶尖学术成果，服务专业审计场景</p>
+    <div style="margin: 2.5rem 0; padding: 2rem 1.5rem; background: #FAF9F6; border-radius: 14px; border: 1px solid #E8E4DF;">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.4rem; color: #1C1C1E;">技术信任背书</h2>
+            <p style="color: #6E6B68; font-size: 0.95rem;">源自顶尖学术成果，服务专业审计场景</p>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; max-width: 1100px; margin: 0 auto;">
-            <div style="text-align: center; padding: 1.5rem; animation: fadeInUp 0.5s ease-out 0s both;">
-                <div style="font-size: 2.5rem; margin-bottom: 0.75rem; animation: float 4s ease-in-out infinite;"></div>
-                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem;">学术认可</h4>
-                <p style="font-size: 0.8rem; opacity: 0.65; line-height: 1.5;">基于前沿财务舞弊识别研究成果</p>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; max-width: 1000px; margin: 0 auto;">
+            <div style="text-align: center; padding: 1.25rem;">
+                <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; color: #1C1C1E;">学术认可</h4>
+                <p style="font-size: 0.8rem; color: #6E6B68; line-height: 1.5;">基于前沿财务舞弊识别研究成果</p>
             </div>
-            <div style="text-align: center; padding: 1.5rem; animation: fadeInUp 0.5s ease-out 0.1s both;">
-                <div style="font-size: 2.5rem; margin-bottom: 0.75rem; animation: float 4s ease-in-out infinite 1s;"></div>
-                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem;">数据安全</h4>
-                <p style="font-size: 0.8rem; opacity: 0.65; line-height: 1.5;">企业级加密存储，报告阅后即焚</p>
+            <div style="text-align: center; padding: 1.25rem;">
+                <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; color: #1C1C1E;">数据安全</h4>
+                <p style="font-size: 0.8rem; color: #6E6B68; line-height: 1.5;">企业级加密存储，报告阅后即焚</p>
             </div>
-            <div style="text-align: center; padding: 1.5rem; animation: fadeInUp 0.5s ease-out 0.2s both;">
-                <div style="font-size: 2.5rem; margin-bottom: 0.75rem; animation: float 4s ease-in-out infinite 2s;"></div>
-                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem;">高效处理</h4>
-                <p style="font-size: 0.8rem; opacity: 0.65; line-height: 1.5;">单次检测仅需 30-60 秒</p>
+            <div style="text-align: center; padding: 1.25rem;">
+                <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; color: #1C1C1E;">高效处理</h4>
+                <p style="font-size: 0.8rem; color: #6E6B68; line-height: 1.5;">单次检测仅需 30-60 秒</p>
             </div>
-            <div style="text-align: center; padding: 1.5rem; animation: fadeInUp 0.5s ease-out 0.3s both;">
-                <div style="font-size: 2.5rem; margin-bottom: 0.75rem; animation: float 4s ease-in-out infinite 3s;"></div>
-                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem;">精准识别</h4>
-                <p style="font-size: 0.8rem; opacity: 0.65; line-height: 1.5;">92%+ AI 识别准确率，可解释</p>
+            <div style="text-align: center; padding: 1.25rem;">
+                <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; color: #1C1C1E;">精准识别</h4>
+                <p style="font-size: 0.8rem; color: #6E6B68; line-height: 1.5;">92%+ AI 识别准确率，可解释</p>
             </div>
         </div>
-        <!-- Tech Stack Tags -->
-        <div style="text-align: center; margin-top: 2rem;">
-            <p style="font-size: 0.8rem; opacity: 0.5; margin-bottom: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Powered By</p>
-            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;">
-                <span style="display:inline-block;padding:6px 14px;border-radius:100px;font-size:0.8rem;font-weight:600;background:rgba(59,130,246,0.1);color:#3b82f6;border:1px solid rgba(59,130,246,0.2);">DeepSeek-V3.2</span>
-                <span style="display:inline-block;padding:6px 14px;border-radius:100px;font-size:0.8rem;font-weight:600;background:rgba(139,92,246,0.1);color:#8b5cf6;border:1px solid rgba(139,92,246,0.2);">XGBoost</span>
-                <span style="display:inline-block;padding:6px 14px;border-radius:100px;font-size:0.8rem;font-weight:600;background:rgba(16,185,129,0.1);color:#10b981;border:1px solid rgba(16,185,129,0.2);">SHAP</span>
-                <span style="display:inline-block;padding:6px 14px;border-radius:100px;font-size:0.8rem;font-weight:600;background:rgba(245,158,11,0.1);color:#f59e0b;border:1px solid rgba(245,158,11,0.2);">GMM</span>
-                <span style="display:inline-block;padding:6px 14px;border-radius:100px;font-size:0.8rem;font-weight:600;background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2);">FastAPI</span>
-                <span style="display:inline-block;padding:6px 14px;border-radius:100px;font-size:0.8rem;font-weight:600;background:rgba(6,182,212,0.1);color:#06b6d4;border:1px solid rgba(6,182,212,0.2);">Streamlit</span>
+        <div style="text-align: center; margin-top: 1.5rem;">
+            <p style="font-size: 0.75rem; color: #A39E99; margin-bottom: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Powered By</p>
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;">
+                <span style="display:inline-block;padding:5px 12px;border-radius:100px;font-size:0.75rem;font-weight:600;background:#F5F3EF;color:#6E6B68;border:1px solid #E8E4DF;">DeepSeek-V3.2</span>
+                <span style="display:inline-block;padding:5px 12px;border-radius:100px;font-size:0.75rem;font-weight:600;background:#F5F3EF;color:#6E6B68;border:1px solid #E8E4DF;">XGBoost</span>
+                <span style="display:inline-block;padding:5px 12px;border-radius:100px;font-size:0.75rem;font-weight:600;background:#F5F3EF;color:#6E6B68;border:1px solid #E8E4DF;">SHAP</span>
+                <span style="display:inline-block;padding:5px 12px;border-radius:100px;font-size:0.75rem;font-weight:600;background:#F5F3EF;color:#6E6B68;border:1px solid #E8E4DF;">GMM</span>
+                <span style="display:inline-block;padding:5px 12px;border-radius:100px;font-size:0.75rem;font-weight:600;background:#F5F3EF;color:#6E6B68;border:1px solid #E8E4DF;">FastAPI</span>
+                <span style="display:inline-block;padding:5px 12px;border-radius:100px;font-size:0.75rem;font-weight:600;background:#F5F3EF;color:#6E6B68;border:1px solid #E8E4DF;">Streamlit</span>
             </div>
         </div>
     </div>
@@ -1719,10 +1156,10 @@ def render_home():
     @keyframes pulse-glow { 0%,100% { box-shadow: 0 0 20px rgba(59,130,246,0.3); } 50% { box-shadow: 0 0 40px rgba(59,130,246,0.6); } }
     @keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
     </style>
-    <div style="margin: 3rem -1rem -1rem -1rem; padding: 4rem 2rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 40%, #1e40af 70%, #312e81 100%); position: relative; overflow: hidden; text-align: center;"
+    <div style="margin: 3rem -1rem -1rem -1rem; padding: 4rem 2rem; background: #FAF9F6; border-top: 1px solid #E8E4DF; border-bottom: 1px solid #E8E4DF; position: relative; overflow: hidden; text-align: center;"
         onmouseover="this.style.backgroundPosition='100% 50%'" onmouseout="this.style.backgroundPosition='0% 50%'">
-        <div style="position: absolute; top: -80px; left: -80px; width: 300px; height: 300px; background: rgba(59,130,246,0.08); border-radius: 50%; filter: blur(80px); animation: float 8s ease-in-out infinite;"></div>
-        <div style="position: absolute; bottom: -60px; right: -60px; width: 250px; height: 250px; background: rgba(245,158,11,0.06); border-radius: 50%; filter: blur(60px); animation: float 8s ease-in-out infinite 2s;"></div>
+        <div style="position: absolute; top: -80px; left: -80px; width: 300px; height: 300px; background: rgba(59,130,246,0.08); border-radius: 50%; "></div>
+        <div style="position: absolute; bottom: -60px; right: -60px; width: 250px; height: 250px; background: rgba(245,158,11,0.06); border-radius: 50%; "></div>
         <div style="position: relative; z-index: 2; max-width: 700px; margin: 0 auto; animation: fadeInUp 0.8s ease-out;">
             <h2 style="font-size: 2.2rem; font-weight: 800; color: #ffffff; margin-bottom: 1rem; letter-spacing: -1px;">准备好开始了吗？</h2>
             <p style="font-size: 1.1rem; color: rgba(255,255,255,0.75); margin-bottom: 2rem; line-height: 1.7;">立即体验 Audit Mind 的智能财务舞弊检测能力<br>上传第一份报告，3 分钟内获取专业级风险分析</p>
@@ -1746,8 +1183,8 @@ def render_home():
 def render_financial_assistant():
     """渲染财务助手页面 - 支持AI自动生成四表一注"""
     st.markdown("""
-    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(59,130,246,0.15); border-radius: 50%; filter: blur(60px);"></div>
+    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #FAF9F6; border-bottom: 1px solid #E8E4DF; border-radius: 20px; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(59,130,246,0.15); border-radius: 50%; "></div>
         <div style="position: relative; z-index: 1;">
             <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 财务助手</h2>
             <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">智能提取四表一注：上传文件 → AI解析 → 审核编辑 → 完成</p>
@@ -2316,8 +1753,8 @@ def render_detection():
     """渲染舞弊检测页面 - Premium Design"""
     # 高级页面头部
     st.markdown("""
-    <div style="margin: -1rem -1rem 2rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(59,130,246,0.15); border-radius: 50%; filter: blur(60px);"></div>
+    <div style="margin: -1rem -1rem 2rem -1rem; padding: 2rem 1.5rem; background: #FAF9F6; border-bottom: 1px solid #E8E4DF; border-radius: 20px; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(59,130,246,0.15); border-radius: 50%; "></div>
         <div style="position: relative; z-index: 1;">
             <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 舞弊检测</h2>
             <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">上传财务数据，AI 智能识别潜在舞弊风险</p>
@@ -2874,8 +2311,8 @@ def render_detection_result(result, show_divider=True):
 
     # 高级报告头部
     st.markdown(f"""
-    <div style="margin: 0 0 2rem 0; padding: 2rem; border-radius: 24px; background: linear-gradient(135deg, {rbg} 0%, rgba(15,23,42,0.4) 100%); border: 1px solid {rc}33; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -60px; right: -60px; width: 250px; height: 250px; background: {rc}15; border-radius: 50%; filter: blur(80px);"></div>
+    <div style="margin: 0 0 2rem 0; padding: 2rem; border-radius: 24px; background: #F5F3EF; border: 1px solid {rc}33; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -60px; right: -60px; width: 250px; height: 250px; background: {rc}15; border-radius: 50%; "></div>
         <div style="position: relative; z-index: 1;">
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 1rem;">
                 <span style="display: inline-flex; padding: 6px 16px; border-radius: 100px; font-size: 0.85rem; font-weight: 700; background: {rbg}; color: {rc}; border: 1px solid {rc}44;">{show_risk_level_badge(risk_level)}</span>
@@ -3095,7 +2532,7 @@ def render_detection_result(result, show_divider=True):
         st.markdown("""
         <style>
         .evidence-chain-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #8B7E74;
             border-radius: 10px;
             padding: 15px;
             margin: 10px 0;
@@ -3505,8 +2942,8 @@ def render_detection_result(result, show_divider=True):
 def render_qa():
     """渲染 AI 问答页面 - 支持流式输出"""
     st.markdown("""
-    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(139,92,246,0.15); border-radius: 50%; filter: blur(60px);"></div>
+    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #FAF9F6; border-bottom: 1px solid #E8E4DF; border-radius: 20px; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(139,92,246,0.15); border-radius: 50%; "></div>
         <div style="position: relative; z-index: 1;">
             <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> AI 智能问答</h2>
             <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">财务舞弊领域专业问答助手，7×24 随时解答</p>
@@ -3649,8 +3086,8 @@ def render_qa():
 def render_my_detections():
     """渲染「我的检测」页面"""
     st.markdown("""
-    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(16,185,129,0.15); border-radius: 50%; filter: blur(60px);"></div>
+    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #FAF9F6; border-bottom: 1px solid #E8E4DF; border-radius: 20px; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(16,185,129,0.15); border-radius: 50%; "></div>
         <div style="position: relative; z-index: 1;">
             <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 我的检测</h2>
             <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">历史检测记录与报告管理</p>
@@ -3694,7 +3131,7 @@ def render_my_detections():
             with stat_cols[i]:
                 st.markdown(f'''
                 <div class="stat-card" style="animation-delay: {i*0.1}s;">
-                    <div style="font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">{val}</div>
+                    <div style="font-size: 1.8rem; font-weight: 800; color: #1C1C1E;">{val}</div>
                     <div style="font-size: 0.85rem; opacity: 0.6; font-weight: 500; margin-top: 4px;">{label}</div>
                 </div>
                 ''', unsafe_allow_html=True)
@@ -3749,7 +3186,7 @@ def render_membership():
     st.markdown("""
     <div style="text-align:center; padding: 40px 0 20px 0;">
         <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 8px;">
-            <span style="background: linear-gradient(135deg, #3b82f6, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            <span style="color: #1C1C1E;">
                 选择适合您的方案
             </span>
         </h1>
@@ -3829,7 +3266,7 @@ def render_membership():
     for idx, plan in enumerate(plans):
         with cols[idx]:
             card_cls = "pricing-card pricing-highlight" if plan["highlight"] else "pricing-card"
-            badge = '<div style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #0f172a; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 12px;">最受欢迎</div>' if plan["highlight"] else '<div style="height: 32px;"></div>'
+            badge = '<div style="background: #8B7E74; color: #FFFFFF; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 12px;">最受欢迎</div>' if plan["highlight"] else '<div style="height: 32px;"></div>'
 
             st.markdown(f"""
             <div style="border-radius: 20px; padding: 28px; height: 100%;" class="{card_cls}">
@@ -3901,8 +3338,8 @@ def render_membership():
 def render_report_management():
     """渲染报告管理页面"""
     st.markdown("""
-    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(245,158,11,0.15); border-radius: 50%; filter: blur(60px);"></div>
+    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #FAF9F6; border-bottom: 1px solid #E8E4DF; border-radius: 20px; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(245,158,11,0.15); border-radius: 50%; "></div>
         <div style="position: relative; z-index: 1;">
             <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 报告管理</h2>
             <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">检测报告归档与导出下载</p>
@@ -4146,8 +3583,8 @@ def render_report_management():
 def render_account_settings():
     """渲染账号设置页面"""
     st.markdown("""
-    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(99,102,241,0.15); border-radius: 50%; filter: blur(60px);"></div>
+    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #FAF9F6; border-bottom: 1px solid #E8E4DF; border-radius: 20px; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(99,102,241,0.15); border-radius: 50%; "></div>
         <div style="position: relative; z-index: 1;">
             <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 账号设置</h2>
             <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">管理账户信息、会员状态与安全设置</p>
@@ -4206,8 +3643,8 @@ def render_account_settings():
 def render_case_center():
     """渲染案例中心页面"""
     st.markdown("""
-    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(236,72,153,0.15); border-radius: 50%; filter: blur(60px);"></div>
+    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #FAF9F6; border-bottom: 1px solid #E8E4DF; border-radius: 20px; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(236,72,153,0.15); border-radius: 50%; "></div>
         <div style="position: relative; z-index: 1;">
             <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 案例中心</h2>
             <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">A股历史舞弊案例库，深度解析典型风险模式</p>
@@ -4243,7 +3680,7 @@ def render_case_center():
                 risk_color = "#ef4444" if risk_level == "high" else "#f59e0b"
                 st.markdown(f"""
                 <div class="glass-card" style="padding: 1.5rem; animation-delay: {idx * 0.1}s; position: relative; overflow: hidden;">
-                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, {risk_color}, rgba(239,68,68,0.3));"></div>
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: {risk_color};"></div>
                     <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; background: rgba(239,68,68,0.12); color: #ef4444; margin-bottom: 0.75rem;">
                         舞弊案例
                     </div>
@@ -4268,7 +3705,7 @@ def render_case_center():
             with cols[idx % 3]:
                 st.markdown(f"""
                 <div class="glass-card" style="padding: 1.5rem; animation-delay: {idx * 0.1}s; position: relative; overflow: hidden;">
-                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #10b981, rgba(16,185,129,0.3));"></div>
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #6B8E6B;"></div>
                     <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; background: rgba(16,185,129,0.12); color: #10b981; margin-bottom: 0.75rem;">
                         健康企业
                     </div>
@@ -4415,8 +3852,8 @@ def main():
             render_qa()
         elif page == "pricing":
             st.markdown("""
-            <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%); border-radius: 20px; position: relative; overflow: hidden;">
-                <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(245,158,11,0.15); border-radius: 50%; filter: blur(60px);"></div>
+            <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #FAF9F6; border-bottom: 1px solid #E8E4DF; border-radius: 20px; position: relative; overflow: hidden;">
+                <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(245,158,11,0.15); border-radius: 50%; "></div>
                 <div style="position: relative; z-index: 1;">
                     <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 价格中心</h2>
                 </div>
