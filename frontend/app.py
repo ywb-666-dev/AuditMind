@@ -3355,8 +3355,10 @@ def render_qa():
                                 content = event_data.get("content")
                                 if content and isinstance(content, str):
                                     full_answer += content
-                                    # 实时更新显示
+                                    # 实时更新显示（加入微小延迟让 Streamlit 分帧渲染）
                                     answer_placeholder.markdown(full_answer + "▌")
+                                    import time
+                                    time.sleep(0.03)
 
                                 # 处理完成标记
                                 if event_data.get("done"):
@@ -3371,7 +3373,7 @@ def render_qa():
                                 continue
 
                     # 最终显示(去掉光标)
-                    answer_placeholder.markdown(full_answer)
+                    answer_placeholder.markdown(full_answer, unsafe_allow_html=True)
 
                     # 保存到历史记录
                     st.session_state.chat_history.append({"role": "assistant", "content": full_answer})
