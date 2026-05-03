@@ -3523,106 +3523,130 @@ def render_report_management():
     if st.session_state.get("selected_reports") is None:
         st.session_state.selected_reports = set()
 
-    # 报告列表
+    # 报告列表 - 精美卡片设计
+    format_icons = {"PDF": "📄", "Word": "📝", "Excel": "📊"}
+    format_map = {"PDF": "pdf", "Word": "word", "Excel": "excel"}
+
     for report in filtered_history[:20]:  # 限制显示前20条
         risk_level = report.get("risk_level", "low")
-        risk_emoji = {"high": "高", "medium": "中", "low": "低"}.get(risk_level, "低")
+        risk_config = {
+            "high": {"emoji": "🔴", "label": "高风险", "color": "#EF4444", "bg": "rgba(239,68,68,0.08)"},
+            "medium": {"emoji": "🟡", "label": "中风险", "color": "#F59E0B", "bg": "rgba(245,158,11,0.08)"},
+            "low": {"emoji": "🟢", "label": "低风险", "color": "#10B981", "bg": "rgba(16,185,129,0.08)"}
+        }.get(risk_level, risk_config["low"])
 
-        with st.container(border=True):
-            cols = st.columns([0.5, 3, 1.5, 1.5, 1.5])
+        has_report = report['id'] in report_map
+        report_info = report_map.get(report['id'])
+        is_selected = report["id"] in st.session_state.selected_reports
 
-            with cols[0]:
-                is_selected = report["id"] in st.session_state.selected_reports
-                if st.checkbox("", value=is_selected, key=f"select_{report['id']}"):
-                    st.session_state.selected_reports.add(report["id"])
-                else:
-                    st.session_state.selected_reports.discard(report["id"])
+        # 卡片头部信息
+        card_html = f"""
+        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 16px 20px; margin-bottom: 12px;
+                    transition: all 0.2s ease; position: relative; overflow: hidden;"
+             onmouseover="this.style.boxShadow='0 4px 16px rgba(37,99,235,0.1)'; this.style.borderColor='#BFDBFE';"
+             onmouseout="this.style.boxShadow='none'; this.style.borderColor='#E2E8F0';">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                <!-- 左侧：公司信息 -->
+                <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 200px;">
+                    <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
+                                display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">🏢</div>
+                    <div>
+                        <div style="font-size: 1rem; font-weight: 700; color: #0F172A;">{report.get('company_name', '未命名')}</div>
+                        <div style="font-size: 0.8rem; color: #64748B; margin-top: 2px;">{report.get('stock_code', '-')} · {report.get('year', '-')}年度 · {report.get('created_at', '')[:10]}</div>
+                    </div>
+                </div>
 
-            with cols[1]:
-                st.markdown(f"**{report.get('company_name', '未命名')}**")
-                st.caption(f"{report.get('stock_code', '-')} | {report.get('year', '-')}年度")
+                <!-- 中间：风险标签 -->
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div style="text-align: center; padding: 6px 14px; border-radius: 10px; background: {risk_config['bg']}; border: 1px solid {risk_config['color']}22;">
+                        <div style="font-size: 0.75rem; font-weight: 700; color: {risk_config['color']};">{risk_config['emoji']} {risk_config['label']}</div>
+                        <div style="font-size: 0.85rem; font-weight: 600; color: {risk_config['color']}; margin-top: 2px;">{report.get('fraud_probability', 0):.1%}</div>
+                    </div>
+                </div>
 
-            with cols[2]:
-                fraud_prob = report.get("fraud_probability", 0)
-                st.markdown(f"{risk_emoji} {fraud_prob:.1%}")
-                st.caption(f"风险评分: {report.get('risk_score', 0):.1f}")
+                <!-- 右侧：状态 -->
+                <div style="text-align: right;">
+                    {'<span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: rgba(16,185,129,0.08); color: #10B981;">✅ 已生成</span>' if has_report else '<span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: rgba(148,163,184,0.1); color: #64748B;">⏳ 未生成</span>'}
+                </div>
+            </div>
+        </div>
+        """
+        st.markdown(card_html, unsafe_allow_html=True)
 
-            with cols[3]:
-                created = report.get("created_at", "")[:10]
-                st.caption(f"检测日期: {created}")
+        # 操作按钮区
+        op_cols = st.columns([0.5, 2, 2, 2, 1.5])
 
-            with cols[4]:
-                # 检查是否有已生成的报告
-                has_report = report['id'] in report_map
-                report_info = report_map.get(report['id'])
+        with op_cols[0]:
+            if st.checkbox("选择", value=is_selected, key=f"select_{report['id']}", label_visibility="collapsed"):
+                st.session_state.selected_reports.add(report["id"])
+            else:
+                st.session_state.selected_reports.discard(report["id"])
 
-                if has_report and report_info:
-                    st.success("已生成")
-                    if report_info.get('report_type'):
-                        st.caption(f"格式: {report_info['report_type'].upper()}")
-                else:
-                    st.info("未生成")
+        with op_cols[1]:
+            st.caption(f"风险评分: **{report.get('risk_score', 0):.1f}**")
 
-                col_dl, col_del = st.columns(2)
-                with col_dl:
-                    # 导出格式选择
-                    export_formats = ["PDF", "Word", "Excel"]
-                    selected_format = st.selectbox(
-                        "格式",
-                        export_formats,
-                        key=f"format_{report['id']}",
-                        label_visibility="collapsed"
-                    )
-                    format_map = {"PDF": "pdf", "Word": "word", "Excel": "excel"}
+        with op_cols[2]:
+            if has_report and report_info and report_info.get('report_type'):
+                st.caption(f"报告格式: {report_info['report_type'].upper()}")
 
-                    if st.button("", key=f"dl_report_{report['id']}", help=f"下载{selected_format}报告"):
-                        with st.spinner(f"生成{selected_format}报告中..."):
-                            format_code = format_map[selected_format]
-                            # 调用新的导出API
-                            result = make_api_request(
-                                f"/report/{report['id']}/export?format={format_code}",
-                                method="POST"
-                            )
-                            if result and result.get("download_url"):
-                                st.success(f"{selected_format}报告已生成！")
-                                # 使用 Python 下载文件内容
-                                try:
-                                    import requests
-                                    download_url = f"{API_BASE_URL}{result['download_url']}"
-                                    headers = {"Authorization": f"Bearer {st.session_state.token}"}
-                                    response = requests.get(download_url, headers=headers, timeout=30)
+        with op_cols[3]:
+            # 格式选择 + 下载按钮
+            dl_cols = st.columns([2, 1])
+            with dl_cols[0]:
+                selected_format = st.selectbox(
+                    "格式",
+                    ["📄 PDF", "📝 Word", "📊 Excel"],
+                    key=f"format_{report['id']}",
+                    label_visibility="collapsed"
+                )
+                # 提取纯格式名（去掉emoji）
+                selected_format_clean = selected_format.replace("📄 ", "").replace("📝 ", "").replace("📊 ", "")
+            with dl_cols[1]:
+                if st.button("📥 下载", key=f"dl_report_{report['id']}", help=f"下载{selected_format_clean}报告", use_container_width=True):
+                    with st.spinner(f"生成{selected_format_clean}报告中..."):
+                        format_code = format_map[selected_format_clean]
+                        result = make_api_request(
+                            f"/report/{report['id']}/export?format={format_code}",
+                            method="POST"
+                        )
+                        if result and result.get("download_url"):
+                            st.success(f"✅ {selected_format_clean}报告已生成！")
+                            try:
+                                import requests
+                                download_url = f"{API_BASE_URL}{result['download_url']}"
+                                headers = {"Authorization": f"Bearer {st.session_state.token}"}
+                                response = requests.get(download_url, headers=headers, timeout=30)
 
-                                    if response.status_code == 200:
-                                        filename = result.get("filename", f"报告.{format_code}")
-                                        # 获取文件内容
-                                        file_content = response.content
+                                if response.status_code == 200:
+                                    filename = result.get("filename", f"报告.{format_code}")
+                                    file_content = response.content
 
-                                        # 使用 Streamlit 原生下载按钮
-                                        mime_types = {
-                                            "pdf": "application/pdf",
-                                            "word": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                                            "excel": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                                        }
-                                        mime_type = mime_types.get(format_code, "application/octet-stream")
+                                    mime_types = {
+                                        "pdf": "application/pdf",
+                                        "word": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                        "excel": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                    }
+                                    mime_type = mime_types.get(format_code, "application/octet-stream")
 
-                                        st.download_button(
-                                            label=f"下载 {filename}",
-                                            data=file_content,
-                                            file_name=filename,
-                                            mime=mime_type,
-                                            key=f"download_btn_{report['id']}_{format_code}"
-                                        )
-                                    else:
-                                        st.error(f"下载失败: HTTP {response.status_code}")
-                                except Exception as e:
-                                    st.error(f"下载出错: {str(e)}")
-                            else:
-                                st.error("生成失败")
-                with col_del:
-                    if st.button("", key=f"del_report_{report['id']}", help="删除"):
-                        if make_api_request(f"/detection/{report['id']}", method="DELETE"):
-                            st.success("已删除")
-                            st.rerun()
+                                    st.download_button(
+                                        label=f"📥 下载 {filename}",
+                                        data=file_content,
+                                        file_name=filename,
+                                        mime=mime_type,
+                                        key=f"download_btn_{report['id']}_{format_code}"
+                                    )
+                                else:
+                                    st.error(f"❌ 下载失败: HTTP {response.status_code}")
+                            except Exception as e:
+                                st.error(f"❌ 下载出错: {str(e)}")
+                        else:
+                            st.error("❌ 生成失败")
+
+        with op_cols[4]:
+            if st.button("🗑️ 删除", key=f"del_report_{report['id']}", help="删除此报告", use_container_width=True):
+                if make_api_request(f"/detection/{report['id']}", method="DELETE"):
+                    st.success("🗑️ 已删除")
+                    st.rerun()
 
     # 批量操作栏
     if st.session_state.selected_reports:
