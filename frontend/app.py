@@ -3334,7 +3334,7 @@ def render_qa():
                 data = {"question": prompt}
 
                 # 发送流式请求
-                response = requests.post(url, json=data, headers=headers, stream=True, timeout=60)
+                response = requests.post(url, json=data, headers=headers, stream=True, timeout=120)
 
                 if response.status_code == 200:
                     full_answer = ""
@@ -3352,18 +3352,18 @@ def render_qa():
                                 event_data = json.loads(data_str)
 
                                 # 处理内容块
-                                if "content" in event_data:
-                                    content = event_data["content"]
+                                content = event_data.get("content")
+                                if content and isinstance(content, str):
                                     full_answer += content
                                     # 实时更新显示
-                                    answer_placeholder.markdown(full_answer + "|")
+                                    answer_placeholder.markdown(full_answer + "▌")
 
                                 # 处理完成标记
-                                elif event_data.get("done"):
+                                if event_data.get("done"):
                                     break
 
                                 # 处理错误
-                                elif "error" in event_data:
+                                if event_data.get("error"):
                                     st.error(f"流式输出错误: {event_data['error']}")
                                     break
 

@@ -255,8 +255,8 @@ async def call_llm_api_streaming(question: str, context: str = "") -> AsyncGener
                             data = json.loads(data_str)
                             if "choices" in data and len(data["choices"]) > 0:
                                 delta = data["choices"][0].get("delta", {})
-                                if "content" in delta:
-                                    content = delta["content"]
+                                content = delta.get("content")
+                                if content and isinstance(content, str):
                                     yield f"data: {json.dumps({'content': content})}\n\n"
                         except json.JSONDecodeError:
                             continue
@@ -330,8 +330,9 @@ async def ask_question_stream(
             try:
                 if chunk.startswith("data: "):
                     data = json.loads(chunk[6:])
-                    if "content" in data:
-                        full_answer += data["content"]
+                    content = data.get("content")
+                    if content and isinstance(content, str):
+                        full_answer += content
             except:
                 pass
 
