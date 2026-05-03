@@ -3990,7 +3990,7 @@ def render_case_center():
     """渲染案例中心页面"""
     st.markdown("""
     <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; border-radius: 20px; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(236,72,153,0.15); border-radius: 50%; "></div>
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(37,99,235,0.12); border-radius: 50%; "></div>
         <div style="position: relative; z-index: 1;">
             <h2 style="color: #0F172A; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 案例中心</h2>
             <p style="color: #475569; font-size: 1rem; margin: 0;">A股历史舞弊案例库，深度解析典型风险模式</p>
