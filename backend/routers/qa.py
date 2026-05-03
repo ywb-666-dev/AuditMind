@@ -173,7 +173,7 @@ async def call_llm_api(question: str, context: str = "") -> str:
 
     # 调用 阿里云DashScope API
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(
                 f"{settings.DASHSCOPE_BASE_URL}/chat/completions",
                 headers={
@@ -181,7 +181,7 @@ async def call_llm_api(question: str, context: str = "") -> str:
                     "Content-Type": "application/json"
                 },
                 json={
-                    "model": settings.MODEL_QWEN_DETECTION,
+                    "model": settings.MODEL_QWEN_FS,
                     "messages": [
                         {"role": "system", "content": SYSTEM_PROMPT},
                         {"role": "user", "content": user_prompt}
@@ -215,7 +215,7 @@ async def call_llm_api_streaming(question: str, context: str = "") -> AsyncGener
     user_prompt = f"{context}\n\n问题：{question}" if context else question
 
     try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
+        async with httpx.AsyncClient(timeout=120.0) as client:
             async with client.stream(
                 "POST",
                 f"{settings.DASHSCOPE_BASE_URL}/chat/completions",
@@ -224,7 +224,7 @@ async def call_llm_api_streaming(question: str, context: str = "") -> AsyncGener
                     "Content-Type": "application/json"
                 },
                 json={
-                    "model": settings.MODEL_QWEN_DETECTION,
+                    "model": settings.MODEL_QWEN_FS,
                     "messages": [
                         {"role": "system", "content": SYSTEM_PROMPT},
                         {"role": "user", "content": user_prompt}
