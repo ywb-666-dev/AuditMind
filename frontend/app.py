@@ -166,7 +166,9 @@ p, li, td, th, label, .stMarkdown { line-height: 1.65 !important; color: var(--t
 [data-testid="stSidebar"] { background: var(--bg-secondary) !important; border-right: 1px solid var(--border) !important; }
 [data-testid="stSidebar"] .stButton > button { width: 100% !important; text-align: left !important; justify-content: flex-start !important; border-radius: var(--radius-sm) !important; border: none !important; background: transparent !important; color: var(--text-secondary) !important; font-weight: 500 !important; padding: 0.6rem 0.875rem !important; }
 [data-testid="stSidebar"] .stButton > button:hover { background: var(--accent-light) !important; color: var(--accent) !important; }
-[data-testid="stSidebar"] .stButton > button[data-active="true"] { background: var(--accent-light) !important; color: var(--accent) !important; border-left: 3px solid var(--accent) !important; }
+[data-testid="stSidebar"] .stButton > button[kind="primary"] { background: linear-gradient(135deg, #2563EB, #1D4ED8) !important; color: #FFFFFF !important; border-left: 3px solid #1E40AF !important; box-shadow: 0 2px 8px rgba(37,99,235,0.2) !important; }
+[data-testid="stSidebar"] .stButton > button[kind="primary"] p,
+[data-testid="stSidebar"] .stButton > button[kind="primary"] div { color: #FFFFFF !important; }
 [data-testid="stSidebar"] hr { border-color: var(--border) !important; margin: 0.75rem 0 !important; }
 
 /* ===== Tables ===== */
@@ -923,21 +925,21 @@ def render_sidebar():
         # 主导航 - 根据登录状态显示不同选项
         if st.session_state.logged_in:
             pages = [
-                (":material/home: 首页", "home"),
-                (":material/description: 财务助手", "fs"),
-                (":material/search: 舞弊检测", "detect"),
-                (":material/chat: AI 问答", "qa"),
-                (":material/history: 我的检测", "history"),
-                (":material/folder: 报告管理", "reports"),
-                (":material/diamond: 会员中心", "membership"),
-                (":material/settings: 账号设置", "settings"),
+                ("🏠 首页", "home"),
+                ("📄 财务助手", "fs"),
+                ("🔍 舞弊检测", "detect"),
+                ("💬 AI 问答", "qa"),
+                ("📜 我的检测", "history"),
+                ("📁 报告管理", "reports"),
+                ("💎 会员中心", "membership"),
+                ("⚙️ 账号设置", "settings"),
             ]
         else:
             pages = [
-                (":material/home: 首页", "home"),
-                (":material/chat: AI 问答(预览)", "qa"),
-                (":material/payments: 价格中心", "pricing"),
-                (":material/menu_book: 案例中心", "cases"),
+                ("🏠 首页", "home"),
+                ("💬 AI 问答(预览)", "qa"),
+                ("💳 价格中心", "pricing"),
+                ("📖 案例中心", "cases"),
             ]
 
         current = st.session_state.current_page
