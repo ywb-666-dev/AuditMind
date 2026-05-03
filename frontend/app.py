@@ -495,6 +495,19 @@ if "auth_initialized" not in st.session_state:
     st.session_state.auth_initialized = False
 
 # ================= 辅助函数 =================
+def _render_empty_state(icon: str, title: str, description: str, action_hint: str = ""):
+    """渲染美观的空状态卡片"""
+    action_html = f'<p style="color: #2563EB; font-size: 0.9rem; font-weight: 600; margin-top: 8px;">{action_hint}</p>' if action_hint else ""
+    st.markdown(f"""
+    <div style="text-align: center; padding: 56px 24px; background: #F8FAFC; border-radius: 20px; border: 1.5px dashed #CBD5E1; margin: 24px 0;">
+        <div style="font-size: 3rem; margin-bottom: 16px; line-height: 1;">{icon}</div>
+        <h3 style="color: #0F172A; font-size: 1.15rem; font-weight: 700; margin-bottom: 8px;">{title}</h3>
+        <p style="color: #64748B; font-size: 0.95rem; max-width: 420px; margin: 0 auto;">{description}</p>
+        {action_html}
+    </div>
+    """, unsafe_allow_html=True)
+
+
 def make_api_request(endpoint, method="GET", data=None, headers=None, timeout=30):
     """发送 API 请求"""
     url = f"{API_BASE_URL}{endpoint}"
@@ -1392,7 +1405,7 @@ def _render_statement_list_v2():
     # 获取报表列表
     statements = make_api_request("/financial-statements?limit=100", method="GET")
     if not statements:
-        st.info("暂无财务报表。点击「AI自动生成」从文件提取，或「手动创建」填写。")
+        _render_empty_state("📊", "暂无财务报表", "您还没有创建任何财务报表。点击「AI自动生成」从上传的文件中提取，或选择「手动创建」自行填写。", "💡 提示：支持 PDF、Word、Excel 格式上传")
         return
 
     # 列表展示
@@ -1583,7 +1596,7 @@ def _render_ai_review():
 def _render_preview_table(data, *fields):
     """渲染预览表格"""
     if not data:
-        st.info("暂无数据")
+        _render_empty_state("📋", "暂无数据", "当前没有可预览的财务数据。")
         return
     for section, items in data.items():
         st.markdown(f"**{section}**")
@@ -2502,7 +2515,7 @@ def render_multi_year_results(multi_year_data):
     yearly_results = multi_year_data.get("yearly_results", [])
 
     if not yearly_results:
-        st.warning("暂无检测结果")
+        _render_empty_state("📉", "暂无检测结果", "还没有生成任何年份的检测数据。请先上传企业年报并执行检测分析。", "💡 前往「舞弊检测」开始分析")
         return
 
     # 按年份排序
@@ -3017,7 +3030,7 @@ def render_detection_result(result, show_divider=True):
                                 st.caption(f"该特征对整体风险评估影响**相对较小**")
 
             else:
-                st.info("暂无AI特征评分数据")
+                _render_empty_state("🤖", "暂无AI特征评分", "当前检测记录缺少AI文本特征评分数据，可能是通过快速检测生成的结果。", "💡 完整检测将自动提取7维AI特征")
 
             # 底部总结
             st.divider()
@@ -3478,7 +3491,7 @@ def render_my_detections():
                 render_detection_result(row.to_dict())
 
     else:
-        st.info("暂无检测记录，快去试试吧！")
+        _render_empty_state("🔍", "暂无检测记录", "您还没有执行过任何舞弊检测。上传企业年报，AI 将自动分析财务风险。", "💡 前往「舞弊检测」开始首次分析")
 
 
 # ================= 会员中心页面 =================
@@ -3683,7 +3696,7 @@ def render_report_management():
         st.write(f"报告映射: {report_map}")
 
     if not history and not reports:
-        st.info("暂无报告，请先进行检测或生成报告")
+        _render_empty_state("📑", "暂无报告", "您还没有生成任何检测报告。完成一次舞弊检测后，系统将自动生成完整的分析报告。", "💡 前往「舞弊检测」生成您的首份报告")
         return
 
     # 报告筛选
@@ -3988,7 +4001,7 @@ def render_case_center():
     cases = make_api_request("/detection/cases")
 
     if not cases:
-        st.info("暂无案例数据")
+        _render_empty_state("📚", "暂无案例数据", "案例库正在建设中。您可以关注真实的舞弊案例和健康企业标杆，学习识别技巧。", "💡 上传企业年报进行实时检测")
         return
 
     # 案例分类
