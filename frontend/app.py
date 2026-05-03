@@ -3319,84 +3319,56 @@ def render_qa():
 
         # 流式输出回答
         with st.chat_message("assistant"):
-            # 创建占位符用于流式显示
-            answer_placeholder = st.empty()
-
-            # 使用流式API
             try:
                 import requests
 
                 url = f"{API_BASE_URL}/qa/ask-stream"
-                headers = {
+                req_headers = {
                     "Authorization": f"Bearer {st.session_state.token}",
                     "Content-Type": "application/json"
                 }
-                data = {"question": prompt}
+                req_data = {"question": prompt}
 
-                # 发送流式请求
-                response = requests.post(url, json=data, headers=headers, stream=True, timeout=120)
+                response = requests.post(url, json=req_data, headers=req_headers, stream=True, timeout=120)
 
                 if response.status_code == 200:
-                    full_answer = ""
-
-                    # 逐行读取 SSE 流
-                    for line in response.iter_lines(decode_unicode=True):
-                        if not line:
-                            continue
-
-                        # 解析 SSE 数据行
-                        if line.startswith("data: "):
-                            data_str = line[6:]  # 去掉 "data: " 前缀
-
-                            try:
-                                event_data = json.loads(data_str)
-
-                                # 处理内容块
-                                content = event_data.get("content")
-                                if content and isinstance(content, str):
-                                    full_answer += content
-                                    # 实时更新显示（加入微小延迟让 Streamlit 分帧渲染）
-                                    answer_placeholder.markdown(full_answer + "▌")
-                                    import time
-                                    time.sleep(0.03)
-
-                                # 处理完成标记
-                                if event_data.get("done"):
-                                    break
-
-                                # 处理错误
-                                if event_data.get("error"):
-                                    st.error(f"流式输出错误: {event_data['error']}")
-                                    break
-
-                            except json.JSONDecodeError:
+                    def _stream_generator():
+                        for line in response.iter_lines(decode_unicode=True):
+                            if not line:
                                 continue
+                            if line.startswith("data: "):
+                                data_str = line[6:]
+                                if data_str == "[DONE]":
+                                    break
+                                try:
+                                    event_data = json.loads(data_str)
+                                    content = event_data.get("content")
+                                    if content and isinstance(content, str):
+                                        yield content
+                                    if event_data.get("error"):
+                                        break
+                                except json.JSONDecodeError:
+                                    continue
 
-                    # 最终显示(去掉光标)
-                    answer_placeholder.markdown(full_answer, unsafe_allow_html=True)
-
-                    # 保存到历史记录
+                    full_answer = st.write_stream(_stream_generator)
                     st.session_state.chat_history.append({"role": "assistant", "content": full_answer})
-
                 else:
-                    # 流式API失败，回退到非流式API
                     result = make_api_request("/qa/ask", method="POST", data={"question": prompt})
                     if result and "answer" in result:
                         answer = result["answer"]
-                        answer_placeholder.markdown(answer)
+                        st.markdown(answer)
                         st.session_state.chat_history.append({"role": "assistant", "content": answer})
                     else:
-                        answer_placeholder.error("回答失败，请稍后重试")
+                        st.error("回答失败，请稍后重试")
 
             except Exception as e:
-                # 异常时回退到非流式API
                 result = make_api_request("/qa/ask", method="POST", data={"question": prompt})
                 if result and "answer" in result:
                     answer = result["answer"]
-                    answer_placeholder.markdown(answer)
+                    st.markdown(answer)
                     st.session_state.chat_history.append({"role": "assistant", "content": answer})
                 else:
-                    answer_placeholder.error(f"回答失败: {str(e)}")
+                    st.error(f"回答失败: {str(e)}")
 
 
 # ================= 我的检测页面 =================
