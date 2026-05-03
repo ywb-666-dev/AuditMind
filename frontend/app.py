@@ -508,7 +508,7 @@ def _render_empty_state(icon: str, title: str, description: str, action_hint: st
     """, unsafe_allow_html=True)
 
 
-def make_api_request(endpoint, method="GET", data=None, headers=None, timeout=30):
+def make_api_request(endpoint, method="GET", data=None, headers=None, timeout=60):
     """发送 API 请求"""
     url = f"{API_BASE_URL}{endpoint}"
 
