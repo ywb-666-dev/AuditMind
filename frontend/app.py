@@ -2605,8 +2605,8 @@ def render_detection_result(result, show_divider=True):
     risk_level = result.get("risk_level", "low")
     risk_score = result.get("risk_score", 0)
 
-    risk_colors = {"high": "#A0706A", "medium": "#B89A5E", "low": "#6B8E6B"}
-    risk_bg = {"high": "rgba(160,112,106,0.1)", "medium": "rgba(184,154,94,0.1)", "low": "rgba(107,142,107,0.1)"}
+    risk_colors = {"high": "#EF4444", "medium": "#F59E0B", "low": "#10B981"}
+    risk_bg = {"high": "rgba(239,68,68,0.1)", "medium": "rgba(245,158,11,0.1)", "low": "rgba(16,185,129,0.1)"}
     rc = risk_colors.get(risk_level, "#6B8294")
     rbg = risk_bg.get(risk_level, "rgba(107,130,148,0.1)")
 
@@ -3388,7 +3388,7 @@ def render_my_detections():
     """渲染「我的检测」页面"""
     st.markdown("""
     <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; border-radius: 20px; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(107,142,107,0.15); border-radius: 50%; "></div>
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(37,99,235,0.12); border-radius: 50%; "></div>
         <div style="position: relative; z-index: 1;">
             <h2 style="color: #0F172A; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 我的检测</h2>
             <p style="color: #475569; font-size: 1rem; margin: 0;">历史检测记录与报告管理</p>
@@ -3501,20 +3501,21 @@ def render_membership():
         {
             "name": "个人/个体版",
             "price": "99",
+            "original_price": "199",
             "unit": "元/年",
             "target": "独立审计师 · 个人投资者 · 财务分析师",
             "highlight": False,
             "value": "个人效率工具，快速识别企业财务风险，支持单项目深度分析",
             "features": [
-                "单项目审计分析",
-                "3年财报数据对比",
-                "风险评分与底稿高亮",
-                "基础AI风险建议报告",
-                "标准案例库查询",
-                "多项目并行管理",
-                "可视化雷达图",
-                "团队协作功能",
-                "API接口",
+                ("单项目深度分析", True),
+                ("3年财报数据对比", True),
+                ("风险评分与底稿高亮", True),
+                ("AI风险建议报告", True),
+                ("标准案例库查询", True),
+                ("多项目并行管理", False),
+                ("可视化风险雷达图", False),
+                ("Open API接口", False),
+                ("私有化部署支持", False),
             ],
             "cta": "立即开通",
             "cta_type": "secondary",
@@ -3522,20 +3523,21 @@ def render_membership():
         {
             "name": "小微企业版",
             "price": "298",
+            "original_price": "598",
             "unit": "元/年",
             "target": "小型企业 · 创业团队 · 工作室",
             "highlight": True,
             "value": "团队级分析平台，支持多项目并行管理与质量把控，提升协作效率",
             "features": [
-                "多项目并行（≤5个）",
-                "可视化风险雷达图",
-                "同业案例对标分析",
-                "整改跟踪引擎",
-                "原文溯源定位",
-                "优先技术支持",
-                "团队权限管理",
-                "Open API接口",
-                "私有化部署",
+                ("单项目深度分析", True),
+                ("3年财报数据对比", True),
+                ("风险评分与底稿高亮", True),
+                ("AI风险建议报告", True),
+                ("标准案例库查询", True),
+                ("多项目并行（≤5个）", True),
+                ("可视化风险雷达图", True),
+                ("Open API接口", False),
+                ("私有化部署支持", False),
             ],
             "cta": "立即开通",
             "cta_type": "primary",
@@ -3543,19 +3545,21 @@ def render_membership():
         {
             "name": "企业分析版",
             "price": "698",
+            "original_price": "1298",
             "unit": "元/年",
             "target": "中型企业 · 投资机构 · 咨询公司",
             "highlight": False,
             "value": "全功能开放，深度数据分析与系统集成，满足企业级审计数字化需求",
             "features": [
-                "不限项目数量",
-                "团队与角色权限管理",
-                "Open API接口",
-                "高级数据分析模块",
-                "批量检测（100家/次）",
-                "私有云部署支持",
-                "专属客户经理",
-                "7×24小时技术支持",
+                ("单项目深度分析", True),
+                ("3年财报数据对比", True),
+                ("风险评分与底稿高亮", True),
+                ("AI风险建议报告", True),
+                ("标准案例库查询", True),
+                ("不限项目数量", True),
+                ("可视化风险雷达图", True),
+                ("Open API接口", True),
+                ("私有化部署支持", True),
             ],
             "cta": "联系咨询",
             "cta_type": "secondary",
@@ -3577,14 +3581,15 @@ def render_membership():
                 <div style="margin: 20px 0;">
                     <span class="price-text" style="font-size: 2.8rem; font-weight: 800; background: linear-gradient(135deg, #2563EB, #1D4ED8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">¥{plan['price']}</span>
                     <span style="color: #94A3B8; font-size: 0.9rem;">/{plan['unit']}</span>
+                    <span style="color: #94A3B8; font-size: 0.9rem; text-decoration: line-through; margin-left: 8px;">¥{plan.get('original_price', '')}</span>
                 </div>
                 <p style="color: #475569; font-size: 0.9rem; line-height: 1.6; min-height: 48px; margin-bottom: 20px;">{plan['value']}</p>
                 <div style="border-top: 1px solid #E2E8F0; padding-top: 16px;">
             """, unsafe_allow_html=True)
 
-            for feat in plan["features"]:
-                cls = "feature-yes" if feat.startswith("包含") else "feature-no"
-                icon = "✓" if not feat.startswith("—") else "—"
+            for feat, included in plan["features"]:
+                cls = "feature-yes" if included else "feature-no"
+                icon = "✓" if included else "—"
                 st.markdown(f"<p class='{cls}' style='margin: 6px 0; font-size: 0.85rem;'>{icon} {feat}</p>", unsafe_allow_html=True)
 
             st.markdown("</div></div>", unsafe_allow_html=True)
@@ -3641,7 +3646,7 @@ def render_report_management():
     """渲染报告管理页面"""
     st.markdown("""
     <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; border-radius: 20px; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(184,154,94,0.15); border-radius: 50%; "></div>
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(37,99,235,0.12); border-radius: 50%; "></div>
         <div style="position: relative; z-index: 1;">
             <h2 style="color: #0F172A; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 报告管理</h2>
             <p style="color: #475569; font-size: 1rem; margin: 0;">检测报告归档与导出下载</p>
@@ -4004,11 +4009,11 @@ def render_case_center():
         for idx, case in enumerate(fraud_cases):
             with cols[idx % 3]:
                 risk_level = case.get('risk_level', 'high')
-                risk_color = "#A0706A" if risk_level == "high" else "#B89A5E"
+                risk_color = "#EF4444" if risk_level == "high" else "#F59E0B"
                 st.markdown(f"""
                 <div class="glass-card" style="padding: 1.5rem; animation-delay: {idx * 0.1}s; position: relative; overflow: hidden;">
                     <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: {risk_color};"></div>
-                    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; background: rgba(160,112,106,0.12); color: #A0706A; margin-bottom: 0.75rem;">
+                    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; background: rgba(239,68,68,0.12); color: #EF4444; margin-bottom: 0.75rem;">
                         舞弊案例
                     </div>
                     <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.3;">{case['case_name']}</h4>
@@ -4032,8 +4037,8 @@ def render_case_center():
             with cols[idx % 3]:
                 st.markdown(f"""
                 <div class="glass-card" style="padding: 1.5rem; animation-delay: {idx * 0.1}s; position: relative; overflow: hidden;">
-                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #6B8E6B;"></div>
-                    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; background: rgba(107,142,107,0.12); color: #6B8E6B; margin-bottom: 0.75rem;">
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #10B981;"></div>
+                    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; background: rgba(16,185,129,0.12); color: #10B981; margin-bottom: 0.75rem;">
                         健康企业
                     </div>
                     <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.3;">{case['case_name']}</h4>
@@ -4180,7 +4185,7 @@ def main():
         elif page == "pricing":
             st.markdown("""
             <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; border-radius: 20px; position: relative; overflow: hidden;">
-                <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(184,154,94,0.15); border-radius: 50%; "></div>
+                <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(37,99,235,0.12); border-radius: 50%; "></div>
                 <div style="position: relative; z-index: 1;">
                     <h2 style="color: #0F172A; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 价格中心</h2>
                 </div>
