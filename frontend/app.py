@@ -3603,39 +3603,39 @@ def render_report_management():
         report_info = report_map.get(report['id'])
         is_selected = report["id"] in st.session_state.selected_reports
 
-        # 卡片头部信息
-        card_html = f"""
-        <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; padding: 16px 20px; margin-bottom: 12px;
-                    transition: all 0.2s ease; position: relative; overflow: hidden;"
-             onmouseover="this.style.boxShadow='0 4px 16px rgba(37,99,235,0.1)'; this.style.borderColor='#BFDBFE';"
-             onmouseout="this.style.boxShadow='none'; this.style.borderColor='#E2E8F0';">
-            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-                <!-- 左侧：公司信息 -->
-                <div style="display: flex; align-items: center; gap: 14px; flex: 1; min-width: 200px;">
-                    <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, #EFF6FF, #DBEAFE);
-                                display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0;">🏢</div>
-                    <div>
-                        <div style="font-size: 1rem; font-weight: 700; color: #0F172A;">{report.get('company_name', '未命名')}</div>
-                        <div style="font-size: 0.8rem; color: #64748B; margin-top: 2px;">{report.get('stock_code', '-')} · {report.get('year', '-')}年度 · {report.get('created_at', '')[:10]}</div>
-                    </div>
-                </div>
-
-                <!-- 中间：风险标签 -->
-                <div style="display: flex; align-items: center; gap: 16px;">
-                    <div style="text-align: center; padding: 6px 14px; border-radius: 10px; background: {risk_config['bg']}; border: 1px solid {risk_config['color']}22;">
-                        <div style="font-size: 0.75rem; font-weight: 700; color: {risk_config['color']};">{risk_config['emoji']} {risk_config['label']}</div>
-                        <div style="font-size: 0.85rem; font-weight: 600; color: {risk_config['color']}; margin-top: 2px;">{report.get('fraud_probability', 0):.1%}</div>
-                    </div>
-                </div>
-
-                <!-- 右侧：状态 -->
-                <div style="text-align: right;">
-                    {'<span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: rgba(16,185,129,0.08); color: #10B981;">✅ 已生成</span>' if has_report else '<span style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: rgba(148,163,184,0.1); color: #64748B;">⏳ 未生成</span>'}
-                </div>
-            </div>
-        </div>
-        """
-        st.markdown(card_html, unsafe_allow_html=True)
+        # 卡片头部信息 — 用 components.v1.html 避免 markdown 缩进被当成代码块
+        status_badge = (
+            '<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;'
+            'font-size:0.75rem;font-weight:600;background:rgba(16,185,129,0.08);color:#10B981;">✅ 已生成</span>'
+            if has_report else
+            '<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;'
+            'font-size:0.75rem;font-weight:600;background:rgba(148,163,184,0.1);color:#64748B;">⏳ 未生成</span>'
+        )
+        card_html = (
+            '<div style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:16px 20px;margin-bottom:12px;'
+            'transition:all .2s ease;position:relative;overflow:hidden;" '
+            'onmouseover="this.style.boxShadow=\'0 4px 16px rgba(37,99,235,0.1)\';this.style.borderColor=\'#BFDBFE\';" '
+            'onmouseout="this.style.boxShadow=\'none\';this.style.borderColor=\'#E2E8F0\';">'
+            '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">'
+            '<div style="display:flex;align-items:center;gap:14px;flex:1;min-width:200px;">'
+            '<div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#EFF6FF,#DBEAFE);'
+            'display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">🏢</div>'
+            '<div>'
+            '<div style="font-size:1rem;font-weight:700;color:#0F172A;">' + report.get('company_name', '未命名') + '</div>'
+            '<div style="font-size:0.8rem;color:#64748B;margin-top:2px;">'
+            + report.get('stock_code', '-') + ' · ' + str(report.get('year', '-')) + '年度 · ' + str(report.get('created_at', ''))[:10] +
+            '</div></div></div>'
+            '<div style="display:flex;align-items:center;gap:16px;">'
+            '<div style="text-align:center;padding:6px 14px;border-radius:10px;background:' + risk_config['bg'] + ';'
+            'border:1px solid ' + risk_config['color'] + '22;">'
+            '<div style="font-size:0.75rem;font-weight:700;color:' + risk_config['color'] + ';">'
+            + risk_config['emoji'] + ' ' + risk_config['label'] + '</div>'
+            '<div style="font-size:0.85rem;font-weight:600;color:' + risk_config['color'] + ';margin-top:2px;">'
+            + f"{report.get('fraud_probability', 0):.1%}" +
+            '</div></div></div>'
+            '<div style="text-align:right;">' + status_badge + '</div></div></div>'
+        )
+        st.components.v1.html(card_html, height=85, scrolling=False)
 
         # 操作按钮区
         op_cols = st.columns([0.5, 2, 2, 2, 1.5])
