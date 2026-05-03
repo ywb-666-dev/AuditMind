@@ -822,21 +822,21 @@ def render_sidebar():
         # 主导航 - 根据登录状态显示不同选项
         if st.session_state.logged_in:
             pages = [
-                ("首页", "home"),
-                ("财务助手", "fs"),
-                ("舞弊检测", "detect"),
-                ("AI 问答", "qa"),
-                ("我的检测", "history"),
-                ("报告管理", "reports"),
-                ("会员中心", "membership"),
-                ("账号设置", "settings"),
+                (":material/home: 首页", "home"),
+                (":material/description: 财务助手", "fs"),
+                (":material/search: 舞弊检测", "detect"),
+                (":material/chat: AI 问答", "qa"),
+                (":material/history: 我的检测", "history"),
+                (":material/folder: 报告管理", "reports"),
+                (":material/diamond: 会员中心", "membership"),
+                (":material/settings: 账号设置", "settings"),
             ]
         else:
             pages = [
-                ("首页", "home"),
-                ("AI 问答(预览)", "qa"),
-                ("价格中心", "pricing"),
-                ("案例中心", "cases"),
+                (":material/home: 首页", "home"),
+                (":material/chat: AI 问答(预览)", "qa"),
+                (":material/payments: 价格中心", "pricing"),
+                (":material/menu_book: 案例中心", "cases"),
             ]
 
         current = st.session_state.current_page
@@ -1017,7 +1017,7 @@ def render_home():
         case_cols = st.columns(min(len(cases), 4))
         for idx, case in enumerate(cases[:4]):
             with case_cols[idx]:
-                badge = '<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.7rem;font-weight:700;background:rgba(239,68,68,0.15);color:#ef4444;">舞弊案例</span>' if case["case_type"] == "fraud" else '<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.7rem;font-weight:700;background:rgba(16,185,129,0.15);color:#10b981;">正常案例</span>'
+                badge = '<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.7rem;font-weight:700;background:rgba(160,112,106,0.15);color:#A0706A;">舞弊案例</span>' if case["case_type"] == "fraud" else '<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.7rem;font-weight:700;background:rgba(107,142,107,0.15);color:#6B8E6B;">正常案例</span>'
                 st.markdown(f"""
                 <div class="glass-card" style="padding: 1.5rem; animation-delay: {idx * 0.1}s;">
                     <div style="margin-bottom: 0.75rem;">{badge}</div>
@@ -1151,29 +1151,21 @@ def render_home():
 
     # ========== Bottom CTA Banner ==========
     cta_html = '''
-    <style>
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes pulse-glow { 0%,100% { box-shadow: 0 0 20px rgba(59,130,246,0.3); } 50% { box-shadow: 0 0 40px rgba(59,130,246,0.6); } }
-    @keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
-    </style>
-    <div style="margin: 3rem -1rem -1rem -1rem; padding: 4rem 2rem; background: #FAF9F6; border-top: 1px solid #E8E4DF; border-bottom: 1px solid #E8E4DF; position: relative; overflow: hidden; text-align: center;"
-        onmouseover="this.style.backgroundPosition='100% 50%'" onmouseout="this.style.backgroundPosition='0% 50%'">
-        <div style="position: absolute; top: -80px; left: -80px; width: 300px; height: 300px; background: rgba(59,130,246,0.08); border-radius: 50%; "></div>
-        <div style="position: absolute; bottom: -60px; right: -60px; width: 250px; height: 250px; background: rgba(245,158,11,0.06); border-radius: 50%; "></div>
-        <div style="position: relative; z-index: 2; max-width: 700px; margin: 0 auto; animation: fadeInUp 0.8s ease-out;">
-            <h2 style="font-size: 2.2rem; font-weight: 800; color: #ffffff; margin-bottom: 1rem; letter-spacing: -1px;">准备好开始了吗？</h2>
-            <p style="font-size: 1.1rem; color: rgba(255,255,255,0.75); margin-bottom: 2rem; line-height: 1.7;">立即体验 Audit Mind 的智能财务舞弊检测能力<br>上传第一份报告，3 分钟内获取专业级风险分析</p>
+    <div style="margin: 2.5rem -1rem 0 -1rem; padding: 3rem 2rem; background: #F5F3EF; border-top: 1px solid #E8E4DF; text-align: center;">
+        <div style="max-width: 600px; margin: 0 auto;">
+            <h2 style="font-size: 1.8rem; font-weight: 700; color: #1C1C1E; margin-bottom: 0.75rem; letter-spacing: -0.5px;">准备好开始了吗？</h2>
+            <p style="font-size: 1rem; color: #6E6B68; margin-bottom: 1.5rem; line-height: 1.7;">立即体验 Audit Mind 的智能财务舞弊检测能力<br>上传第一份报告，3 分钟内获取专业级风险分析</p>
             <a href="#" onclick="window.parent.postMessage({type: 'streamlit:setComponentValue', value: 'detect'}, '*'); return false;"
-               style="display:inline-block;padding:14px 40px;border-radius:14px;font-size:1.1rem;font-weight:700;color:#1e3a5f;background:linear-gradient(135deg,#ffffff 0%,#e0e7ff 100%);text-decoration:none;box-shadow:0 8px 30px rgba(255,255,255,0.2);transition:all 0.3s ease;animation:pulse-glow 3s infinite;"
-               onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 12px 40px rgba(255,255,255,0.3)';"
-               onmouseout="this.style.transform='';this.style.boxShadow='0 8px 30px rgba(255,255,255,0.2)';">
-                 立即开始检测
+               style="display:inline-block;padding:12px 32px;border-radius:10px;font-size:1rem;font-weight:600;color:#FFFFFF;background:#1C1C1E;text-decoration:none;transition:all 0.2s ease;"
+               onmouseover="this.style.background='#3A3A3C';"
+               onmouseout="this.style.background='#1C1C1E';">
+                立即开始检测
             </a>
-            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.5); margin-top: 1.5rem;">新用户免费体验 3 次完整检测 · 无需信用卡</p>
+            <p style="font-size: 0.8rem; color: #A39E99; margin-top: 1.25rem;">新用户免费体验 3 次完整检测 · 无需信用卡</p>
         </div>
     </div>
     '''
-    st.components.v1.html(cta_html, height=320, scrolling=False)
+    st.components.v1.html(cta_html, height=260, scrolling=False)
 
 
 # ================= 舞弊检测页面 =================
@@ -1184,7 +1176,7 @@ def render_financial_assistant():
     """渲染财务助手页面 - 支持AI自动生成四表一注"""
     st.markdown("""
     <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #FAF9F6; border-bottom: 1px solid #E8E4DF; border-radius: 20px; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(59,130,246,0.15); border-radius: 50%; "></div>
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(107,130,148,0.15); border-radius: 50%; "></div>
         <div style="position: relative; z-index: 1;">
             <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 财务助手</h2>
             <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">智能提取四表一注：上传文件 → AI解析 → 审核编辑 → 完成</p>
@@ -1754,7 +1746,7 @@ def render_detection():
     # 高级页面头部
     st.markdown("""
     <div style="margin: -1rem -1rem 2rem -1rem; padding: 2rem 1.5rem; background: #FAF9F6; border-bottom: 1px solid #E8E4DF; border-radius: 20px; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(59,130,246,0.15); border-radius: 50%; "></div>
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(107,130,148,0.15); border-radius: 50%; "></div>
         <div style="position: relative; z-index: 1;">
             <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 舞弊检测</h2>
             <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">上传财务数据，AI 智能识别潜在舞弊风险</p>
@@ -2304,10 +2296,10 @@ def render_detection_result(result, show_divider=True):
     risk_level = result.get("risk_level", "low")
     risk_score = result.get("risk_score", 0)
 
-    risk_colors = {"high": "#ef4444", "medium": "#f59e0b", "low": "#10b981"}
-    risk_bg = {"high": "rgba(239,68,68,0.1)", "medium": "rgba(245,158,11,0.1)", "low": "rgba(16,185,129,0.1)"}
-    rc = risk_colors.get(risk_level, "#3b82f6")
-    rbg = risk_bg.get(risk_level, "rgba(59,130,246,0.1)")
+    risk_colors = {"high": "#A0706A", "medium": "#B89A5E", "low": "#6B8E6B"}
+    risk_bg = {"high": "rgba(160,112,106,0.1)", "medium": "rgba(184,154,94,0.1)", "low": "rgba(107,142,107,0.1)"}
+    rc = risk_colors.get(risk_level, "#6B8294")
+    rbg = risk_bg.get(risk_level, "rgba(107,130,148,0.1)")
 
     # 高级报告头部
     st.markdown(f"""
@@ -2943,7 +2935,7 @@ def render_qa():
     """渲染 AI 问答页面 - 支持流式输出"""
     st.markdown("""
     <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #FAF9F6; border-bottom: 1px solid #E8E4DF; border-radius: 20px; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(139,92,246,0.15); border-radius: 50%; "></div>
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(139,126,116,0.15); border-radius: 50%; "></div>
         <div style="position: relative; z-index: 1;">
             <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> AI 智能问答</h2>
             <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">财务舞弊领域专业问答助手，7×24 随时解答</p>
@@ -3087,7 +3079,7 @@ def render_my_detections():
     """渲染「我的检测」页面"""
     st.markdown("""
     <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #FAF9F6; border-bottom: 1px solid #E8E4DF; border-radius: 20px; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(16,185,129,0.15); border-radius: 50%; "></div>
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(107,142,107,0.15); border-radius: 50%; "></div>
         <div style="position: relative; z-index: 1;">
             <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 我的检测</h2>
             <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">历史检测记录与报告管理</p>
@@ -3149,8 +3141,8 @@ def render_my_detections():
             year = row.get('year', '-')
             created = row.get('created_at', '')[:10]
 
-            risk_color = {"high": "#ef4444", "medium": "#f59e0b", "low": "#10b981"}.get(risk, "#3b82f6")
-            risk_bg = {"high": "rgba(239,68,68,0.1)", "medium": "rgba(245,158,11,0.1)", "low": "rgba(16,185,129,0.1)"}.get(risk, "rgba(59,130,246,0.1)")
+            risk_color = {"high": "#A0706A", "medium": "#B89A5E", "low": "#6B8E6B"}.get(risk, "#6B8294")
+            risk_bg = {"high": "rgba(160,112,106,0.1)", "medium": "rgba(184,154,94,0.1)", "low": "rgba(107,142,107,0.1)"}.get(risk, "rgba(107,130,148,0.1)")
             badge_text = show_risk_level_badge(risk)
 
             card_html = f'''
@@ -3339,7 +3331,7 @@ def render_report_management():
     """渲染报告管理页面"""
     st.markdown("""
     <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #FAF9F6; border-bottom: 1px solid #E8E4DF; border-radius: 20px; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(245,158,11,0.15); border-radius: 50%; "></div>
+        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(184,154,94,0.15); border-radius: 50%; "></div>
         <div style="position: relative; z-index: 1;">
             <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 报告管理</h2>
             <p style="color: rgba(255,255,255,0.75); font-size: 1rem; margin: 0;">检测报告归档与导出下载</p>
@@ -3677,11 +3669,11 @@ def render_case_center():
         for idx, case in enumerate(fraud_cases):
             with cols[idx % 3]:
                 risk_level = case.get('risk_level', 'high')
-                risk_color = "#ef4444" if risk_level == "high" else "#f59e0b"
+                risk_color = "#A0706A" if risk_level == "high" else "#B89A5E"
                 st.markdown(f"""
                 <div class="glass-card" style="padding: 1.5rem; animation-delay: {idx * 0.1}s; position: relative; overflow: hidden;">
                     <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: {risk_color};"></div>
-                    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; background: rgba(239,68,68,0.12); color: #ef4444; margin-bottom: 0.75rem;">
+                    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; background: rgba(160,112,106,0.12); color: #A0706A; margin-bottom: 0.75rem;">
                         舞弊案例
                     </div>
                     <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.3;">{case['case_name']}</h4>
@@ -3706,7 +3698,7 @@ def render_case_center():
                 st.markdown(f"""
                 <div class="glass-card" style="padding: 1.5rem; animation-delay: {idx * 0.1}s; position: relative; overflow: hidden;">
                     <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: #6B8E6B;"></div>
-                    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; background: rgba(16,185,129,0.12); color: #10b981; margin-bottom: 0.75rem;">
+                    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; background: rgba(107,142,107,0.12); color: #6B8E6B; margin-bottom: 0.75rem;">
                         健康企业
                     </div>
                     <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.3;">{case['case_name']}</h4>
@@ -3853,7 +3845,7 @@ def main():
         elif page == "pricing":
             st.markdown("""
             <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #FAF9F6; border-bottom: 1px solid #E8E4DF; border-radius: 20px; position: relative; overflow: hidden;">
-                <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(245,158,11,0.15); border-radius: 50%; "></div>
+                <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(184,154,94,0.15); border-radius: 50%; "></div>
                 <div style="position: relative; z-index: 1;">
                     <h2 style="color: #ffffff; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 价格中心</h2>
                 </div>
