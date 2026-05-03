@@ -2197,28 +2197,91 @@ def render_detection():
         st.divider()
 
         # 财务数据录入
-        st.subheader("财务数据 (单位：亿元)")
+        st.subheader("📊 财务数据录入 (单位：亿元)")
+        st.caption("请根据企业年报中的资产负债表、利润表、现金流量表填写。鼠标悬停在字段名上可查看详细说明。")
 
-        financial_cols = st.columns(4)
         financial_data_manual = {}
+        _v = lambda k, scale=1e9: float(default_financial.get(k, 0))/scale if default_financial.get(k) else 0.0
 
-        with financial_cols[0]:
-            financial_data_manual["货币资金"] = st.number_input("货币资金", min_value=0.0, value=float(default_financial.get("货币资金", 0))/1000000000 if default_financial.get("货币资金") else 0.0, key="f1")
-            financial_data_manual["短期借款"] = st.number_input("短期借款", min_value=0.0, value=float(default_financial.get("短期借款", 0))/1000000000 if default_financial.get("短期借款") else 0.0, key="f2")
-            financial_data_manual["存货"] = st.number_input("存货", min_value=0.0, value=float(default_financial.get("存货", 0))/1000000000 if default_financial.get("存货") else 0.0, key="f3")
+        # ========== 资产负债表 ==========
+        with st.expander("📋 资产负债表 (Balance Sheet)", expanded=True):
+            st.caption("反映企业在特定日期的财务状况。资产 = 负债 + 所有者权益")
+            c1, c2, c3 = st.columns(3)
+            with c1:
+                financial_data_manual["货币资金"] = st.number_input("💰 货币资金", min_value=0.0, value=_v("货币资金"), key="f1",
+                    help="现金、银行存款及其他货币资金。取自资产负债表「流动资产」科目")
+                financial_data_manual["应收账款"] = st.number_input("📥 应收账款", min_value=0.0, value=_v("应收账款"), key="f11",
+                    help="企业因销售商品、提供劳务等应收取的款项。取自资产负债表「流动资产」科目")
+                financial_data_manual["存货"] = st.number_input("📦 存货", min_value=0.0, value=_v("存货"), key="f3",
+                    help="库存商品、在产品、原材料等。取自资产负债表「流动资产」科目")
+                financial_data_manual["流动资产合计"] = st.number_input("📊 流动资产合计", min_value=0.0, value=_v("流动资产合计"), key="f12",
+                    help="一年内可变现或耗用的资产总计。包括货币资金、应收账款、存货等")
+            with c2:
+                financial_data_manual["固定资产"] = st.number_input("🏭 固定资产", min_value=0.0, value=_v("固定资产"), key="f13",
+                    help="房屋、机器设备等长期资产净值（原值减累计折旧）。取自资产负债表「非流动资产」")
+                financial_data_manual["总资产"] = st.number_input("🏢 总资产", min_value=0.0, value=_v("总资产"), key="f6",
+                    help="企业拥有或控制的全部资产。资产 = 负债 + 所有者权益")
+                financial_data_manual["短期借款"] = st.number_input("💳 短期借款", min_value=0.0, value=_v("短期借款"), key="f2",
+                    help="一年内到期的银行借款、债券等。取自资产负债表「流动负债」科目")
+                financial_data_manual["应付账款"] = st.number_input("📤 应付账款", min_value=0.0, value=_v("应付账款"), key="f14",
+                    help="因购买商品、接受劳务等应付给供应商的款项。取自资产负债表「流动负债」")
+            with c3:
+                financial_data_manual["流动负债合计"] = st.number_input("📊 流动负债合计", min_value=0.0, value=_v("流动负债合计"), key="f15",
+                    help="一年内到期的全部负债。包括短期借款、应付账款等")
+                financial_data_manual["长期借款"] = st.number_input("🏦 长期借款", min_value=0.0, value=_v("长期借款"), key="f16",
+                    help="一年以上到期的银行借款、债券等。取自资产负债表「非流动负债」")
+                financial_data_manual["总负债"] = st.number_input("📉 总负债", min_value=0.0, value=_v("总负债"), key="f17",
+                    help="企业承担的全部债务。负债 = 资产 - 所有者权益")
+                financial_data_manual["所有者权益合计"] = st.number_input("📈 所有者权益合计", min_value=0.0, value=_v("所有者权益合计"), key="f18",
+                    help="股东对企业净资产的所有权。又称「股东权益」或「净资产」")
 
-        with financial_cols[1]:
-            financial_data_manual["营业收入"] = st.number_input("营业收入", min_value=0.0, value=float(default_financial.get("营业收入", 0))/1000000000 if default_financial.get("营业收入") else 0.0, key="f4")
-            financial_data_manual["净利润"] = st.number_input("净利润", value=float(default_financial.get("净利润", 0))/100000000 if default_financial.get("净利润") else 0.0, key="f5")
-            financial_data_manual["总资产"] = st.number_input("总资产", min_value=0.0, value=float(default_financial.get("总资产", 0))/1000000000 if default_financial.get("总资产") else 0.0, key="f6")
+        # ========== 利润表 ==========
+        with st.expander("📈 利润表 (Income Statement)", expanded=True):
+            st.caption("反映企业在一定期间内的经营成果。收入 - 成本费用 = 利润")
+            c1, c2, c3 = st.columns(3)
+            with c1:
+                financial_data_manual["营业收入"] = st.number_input("💵 营业收入", min_value=0.0, value=_v("营业收入"), key="f4",
+                    help="企业销售商品、提供劳务等主要经营活动取得的收入。利润表首行")
+                financial_data_manual["营业成本"] = st.number_input("🏗️ 营业成本", min_value=0.0, value=_v("营业成本"), key="f19",
+                    help="与营业收入直接相关的成本。如原材料、生产人工等。利润表第二行")
+                financial_data_manual["销售费用"] = st.number_input("📢 销售费用", min_value=0.0, value=_v("销售费用"), key="f20",
+                    help="广告费、销售人员薪酬、运输费等市场推广支出")
+            with c2:
+                financial_data_manual["管理费用"] = st.number_input("🗂️ 管理费用", min_value=0.0, value=_v("管理费用"), key="f21",
+                    help="行政人员薪酬、办公费、折旧费等企业管理支出")
+                financial_data_manual["财务费用"] = st.number_input("💸 财务费用", value=_v("财务费用"), key="f22",
+                    help="利息支出、汇兑损益、银行手续费等。通常为正值表示支出")
+                financial_data_manual["营业利润"] = st.number_input("⚖️ 营业利润", value=_v("营业利润"), key="f23",
+                    help="营业收入 - 营业成本 - 税金及附加 - 三项费用。反映核心经营盈利能力")
+            with c3:
+                financial_data_manual["净利润"] = st.number_input("💎 净利润", value=_v("净利润", 1e8), key="f5",
+                    help="最终归属于股东的利润。利润总额 - 所得税费用。利润表末行")
 
-        with financial_cols[2]:
-            financial_data_manual["经营活动现金流净额"] = st.number_input("经营现金流净额", value=float(default_financial.get("经营活动现金流净额", 0))/1000000000 if default_financial.get("经营活动现金流净额") else 0.0, key="f7")
-            financial_data_manual["ROE"] = st.number_input("ROE (%)", min_value=-100.0, max_value=100.0, value=float(default_financial.get("ROE", 0))*100 if default_financial.get("ROE") else 0.0, key="f8") / 100
-            financial_data_manual["资产负债率"] = st.number_input("资产负债率 (%)", min_value=0.0, max_value=100.0, value=float(default_financial.get("资产负债率", 0))*100 if default_financial.get("资产负债率") else 0.0, key="f9") / 100
-
-        with financial_cols[3]:
-            financial_data_manual["营业收入增长率"] = st.number_input("营收增长率 (%)", min_value=-100.0, max_value=1000.0, value=float(default_financial.get("营业收入增长率", 0))*100 if default_financial.get("营业收入增长率") else 0.0, key="f10") / 100
+        # ========== 现金流量表 & 财务比率 ==========
+        with st.expander("💹 现金流量表 & 关键比率 (Cash Flow & Ratios)", expanded=True):
+            st.caption("反映企业现金流入流出情况，及偿债能力、盈利能力等关键指标")
+            c1, c2, c3 = st.columns(3)
+            with c1:
+                financial_data_manual["经营活动现金流净额"] = st.number_input("🔄 经营现金流净额", value=_v("经营活动现金流净额"), key="f7",
+                    help="主营业务产生的现金净流入。正值说明经营造血能力强。取自现金流量表")
+                financial_data_manual["投资活动现金流净额"] = st.number_input("🏗️ 投资现金流净额", value=_v("投资活动现金流净额"), key="f24",
+                    help="购置/处置固定资产、股权投资等产生的现金净额。通常为负表示扩张")
+                financial_data_manual["筹资活动现金流净额"] = st.number_input("📥 筹资现金流净额", value=_v("筹资活动现金流净额"), key="f25",
+                    help="借款、还款、分红、增发等融资活动产生的现金净额")
+            with c2:
+                financial_data_manual["资产负债率"] = st.number_input("📊 资产负债率 (%)", min_value=0.0, max_value=100.0,
+                    value=float(default_financial.get("资产负债率", 0))*100 if default_financial.get("资产负债率") else 0.0, key="f9") / 100
+                st.caption(f"当前: {financial_data_manual.get('资产负债率', 0)*100:.1f}% | 计算公式: 总负债 / 总资产")
+                financial_data_manual["ROE"] = st.number_input("📈 净资产收益率 ROE (%)", min_value=-100.0, max_value=100.0,
+                    value=float(default_financial.get("ROE", 0))*100 if default_financial.get("ROE") else 0.0, key="f8") / 100
+                st.caption(f"当前: {financial_data_manual.get('ROE', 0)*100:.1f}% | 计算公式: 净利润 / 所有者权益")
+            with c3:
+                financial_data_manual["营业收入增长率"] = st.number_input("📉 营收增长率 (%)", min_value=-100.0, max_value=1000.0,
+                    value=float(default_financial.get("营业收入增长率", 0))*100 if default_financial.get("营业收入增长率") else 0.0, key="f10") / 100
+                st.caption(f"当前: {financial_data_manual.get('营业收入增长率', 0)*100:.1f}% | 计算公式: (本年营收 - 上年营收) / 上年营收")
+                financial_data_manual["毛利率"] = st.number_input("🎯 毛利率 (%)", min_value=-100.0, max_value=100.0,
+                    value=float(default_financial.get("毛利率", 0))*100 if default_financial.get("毛利率") else 0.0, key="f26") / 100
+                st.caption(f"当前: {financial_data_manual.get('毛利率', 0)*100:.1f}% | 计算公式: (营业收入 - 营业成本) / 营业收入")
 
         st.divider()
 
