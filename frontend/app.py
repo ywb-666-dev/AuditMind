@@ -3592,11 +3592,12 @@ def render_report_management():
 
     for report in filtered_history[:20]:  # 限制显示前20条
         risk_level = report.get("risk_level", "low")
-        risk_config = {
+        _risk_defaults = {
             "high": {"emoji": "🔴", "label": "高风险", "color": "#EF4444", "bg": "rgba(239,68,68,0.08)"},
             "medium": {"emoji": "🟡", "label": "中风险", "color": "#F59E0B", "bg": "rgba(245,158,11,0.08)"},
             "low": {"emoji": "🟢", "label": "低风险", "color": "#10B981", "bg": "rgba(16,185,129,0.08)"}
-        }.get(risk_level, risk_config["low"])
+        }
+        risk_config = _risk_defaults.get(risk_level, _risk_defaults["low"])
 
         has_report = report['id'] in report_map
         report_info = report_map.get(report['id'])
