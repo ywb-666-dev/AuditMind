@@ -1034,6 +1034,30 @@ def render_home():
 
     st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
 
+    # ========== Quick Start Guide ==========
+    st.markdown("<h2 style='font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px;'>🚀 快速上手指南</h2>", unsafe_allow_html=True)
+    st.caption("新用户？跟着下面三步，3 分钟完成第一次财务舞弊检测")
+
+    guide_cols = st.columns(3)
+    guides = [
+        ("1", "📤 录入数据", "注册登录后，选择「舞弊检测」上传企业年报（PDF/Excel/Word），或在「财务助手」中手动录入四表一注数据。", "#EFF6FF", "#2563EB"),
+        ("2", "🤖 AI 分析", "系统自动提取 7 维风险特征，结合 XGBoost 模型与 SHAP 可解释性分析，对标历史 IPO 被否案例。", "#F0FDF4", "#10B981"),
+        ("3", "📊 查看报告", "获取可视化风险标签（如「存贷双高」）、舞弊概率评分、整改建议，支持 PDF/Word/Excel 下载。", "#FFFBEB", "#F59E0B"),
+    ]
+    for i, (num, title, desc, bg, color) in enumerate(guides):
+        with guide_cols[i]:
+            st.markdown(f"""
+            <div style="background: {bg}; border: 1px solid {color}22; border-radius: 14px; padding: 1.25rem; height: 100%; animation: fadeInUp 0.5s ease-out {i*0.1}s both;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem;">
+                    <div style="width: 28px; height: 28px; border-radius: 50%; background: {color}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700;">{num}</div>
+                    <h4 style="font-size: 1rem; font-weight: 700; color: #0F172A; margin: 0;">{title}</h4>
+                </div>
+                <p style="font-size: 0.85rem; color: #475569; line-height: 1.6; margin: 0;">{desc}</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+
     # ========== Features Grid ==========
     st.markdown("<h2 style='font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px;'> 核心能力</h2>", unsafe_allow_html=True)
 
@@ -1391,7 +1415,7 @@ def _render_statement_list_v2():
                     st.session_state.fs_state = "edit"
                     st.rerun()
             with cols[5]:
-                if st.button("", key=f"del_{stmt['id']}", use_container_width=True):
+                if st.button("🗑️", key=f"del_{stmt['id']}", help="删除此报表", use_container_width=True):
                     if make_api_request(f"/financial-statements/{stmt['id']}", method="DELETE"):
                         st.success("已删除")
                         time.sleep(0.3)
@@ -3873,9 +3897,9 @@ def render_report_management():
             if st.button("发送邮件", use_container_width=True):
                 st.info("邮件发送功能开发中...")
         with col3:
-            if st.button("批量删除", use_container_width=True):
+            if st.button("🗑️ 批量删除", use_container_width=True):
                 st.warning("确认删除选中的报告？")
-                if st.button("确认删除"):
+                if st.button("✅ 确认删除"):
                     for rid in list(st.session_state.selected_reports):
                         make_api_request(f"/detection/{rid}", method="DELETE")
                     st.session_state.selected_reports.clear()
