@@ -668,7 +668,7 @@ def get_ai_prompt():
     prompt_data = {
         "title": "AI文本风险分析提示词",
         "description": "本提示词用于指导大语言模型对MD&A文本进行7维度风险分析",
-        "model": settings.MODEL_QWEN,
+        "model": settings.MODEL_QWEN_DETECTION,
         "prompt_template": settings.OPTIMIZED_PROMPT_TEMPLATE,
         "features": {
             "CON_SEM_AI": {

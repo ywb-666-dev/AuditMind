@@ -119,7 +119,7 @@ class FinancialDataExtractor:
     """财务数据AI提取器"""
 
     def __init__(self):
-        self.model = settings.MODEL_QWEN
+        self.model = settings.MODEL_QWEN_FS
         self.base_url = settings.DASHSCOPE_BASE_URL
         self.api_key = settings.DASHSCOPE_API_KEY
 

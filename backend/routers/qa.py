@@ -181,7 +181,7 @@ async def call_llm_api(question: str, context: str = "") -> str:
                     "Content-Type": "application/json"
                 },
                 json={
-                    "model": settings.MODEL_QWEN,
+                    "model": settings.MODEL_QWEN_DETECTION,
                     "messages": [
                         {"role": "system", "content": SYSTEM_PROMPT},
                         {"role": "user", "content": user_prompt}
@@ -224,7 +224,7 @@ async def call_llm_api_streaming(question: str, context: str = "") -> AsyncGener
                     "Content-Type": "application/json"
                 },
                 json={
-                    "model": settings.MODEL_QWEN,
+                    "model": settings.MODEL_QWEN_DETECTION,
                     "messages": [
                         {"role": "system", "content": SYSTEM_PROMPT},
                         {"role": "user", "content": user_prompt}

@@ -176,7 +176,7 @@ class FraudDetectionEngine:
                         "Content-Type": "application/json"
                     },
                     json={
-                        "model": settings.MODEL_QWEN,
+                        "model": settings.MODEL_QWEN_DETECTION,
                         "messages": [
                             {"role": "system", "content": "你是财务舞弊识别领域的专家，擅长通过文本分析识别财务风险信号。"},
                             {"role": "user", "content": prompt}

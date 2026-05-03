@@ -29,7 +29,13 @@ class Settings(BaseSettings):
     # 阿里云 DashScope (通义千问)
     DASHSCOPE_API_KEY: str = "sk-49dfdf1df5c245febf3254741c8aa381"  # 阿里云DashScope API Key
     DASHSCOPE_BASE_URL: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
-    MODEL_QWEN: str = "deepseek-v3.2"  # 使用DeepSeek-V3.2模型
+
+    # 财务助手专用模型：qwen-plus 商业稳定版，结构化输出质量好，适合财务数据提取
+    MODEL_QWEN_FS: str = "qwen-plus"
+    # 舞弊检测专用模型：qwen3-235b-a22b 旗舰推理版，深度分析能力强，适合风险判断
+    MODEL_QWEN_DETECTION: str = "qwen3-235b-a22b"
+    # 兼容旧代码的通用别名（默认指向财务助手模型）
+    MODEL_QWEN: str = "qwen-plus"
 
     # 其他备选 LLM 配置
     SILICONFLOW_API_KEY: str = ""
