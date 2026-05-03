@@ -1206,7 +1206,8 @@ def render_home():
         <div style="text-align: center; margin-top: 1.5rem;">
             <p style="font-size: 0.75rem; color: #64748B; margin-bottom: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Powered By</p>
             <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;">
-                <span style="display:inline-block;padding:5px 12px;border-radius:100px;font-size:0.75rem;font-weight:600;background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE;">DeepSeek-V3.2</span>
+                <span style="display:inline-block;padding:5px 12px;border-radius:100px;font-size:0.75rem;font-weight:600;background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE;">Qwen-Plus</span>
+                <span style="display:inline-block;padding:5px 12px;border-radius:100px;font-size:0.75rem;font-weight:600;background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE;">Qwen3-235B</span>
                 <span style="display:inline-block;padding:5px 12px;border-radius:100px;font-size:0.75rem;font-weight:600;background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE;">XGBoost</span>
                 <span style="display:inline-block;padding:5px 12px;border-radius:100px;font-size:0.75rem;font-weight:600;background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE;">SHAP</span>
                 <span style="display:inline-block;padding:5px 12px;border-radius:100px;font-size:0.75rem;font-weight:600;background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE;">GMM</span>
