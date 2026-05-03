@@ -1170,7 +1170,7 @@ def render_home():
                 </div>
                 """, unsafe_allow_html=True)
     else:
-        st.caption("暂无案例数据")
+        _render_empty_state("📚", "案例库加载中", "经典案例库正在准备中，您可以先上传企业年报体验实时检测功能。", "💡 前往「舞弊检测」开始分析")
 
     st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
 
