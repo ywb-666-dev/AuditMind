@@ -484,14 +484,14 @@ def run_detection_with_progress(detection_data, timeout=120):
                     step_text.markdown(f"**{step_name}**\n{step_desc}")
                     time.sleep(0.2)
 
-                status.update(label=" 检测完成！", state="complete", expanded=False)
+                status.update(label="检测完成！", state="complete", expanded=False)
             else:
                 error_msg = "检测请求失败"
-                status.update(label=f" {error_msg}", state="error")
+                status.update(label=f"{error_msg}", state="error")
 
         except Exception as e:
             error_msg = str(e)
-            status.update(label=f" 检测失败: {error_msg}", state="error")
+            status.update(label=f"检测失败: {error_msg}", state="error")
 
         progress_bar.empty()
         step_text.empty()
@@ -1269,7 +1269,7 @@ def _render_statement_list_v2():
                 period_map = {"annual": "年报", "quarterly": "季报", "half_year": "半年报"}
                 st.caption(f"{stmt['report_year']}年 {period_map.get(stmt['report_period'], stmt['report_period'])}")
             with cols[2]:
-                status_map = {"draft": " 草稿", "completed": " 已完成", "audited": " 已审计"}
+                status_map = {"draft": "草稿", "completed": "已完成", "audited": "已审计"}
                 st.caption(status_map.get(stmt['status'], stmt['status']))
             with cols[3]:
                 st.caption(stmt['created_at'][:10])
@@ -1588,7 +1588,7 @@ def _render_bs_editor(statement_id: int, data: dict, ai_filled: set):
             with cols[0]:
                 label = item.get('item_name', '')
                 if is_ai:
-                    label += " "
+                    label += ""
                     st.markdown(f"<span style='background-color:#FFF3CD;padding:2px 6px;border-radius:4px;'>{label}</span>", unsafe_allow_html=True)
                 else:
                     st.text(label)
@@ -1804,7 +1804,7 @@ def render_detection():
         st.caption("支持上传包含多年度数据的Excel或CSV文件，系统将自动按年份解析")
 
         uploaded_file = st.file_uploader(
-            " 上传财务数据文件（可包含多年度数据）",
+            "上传财务数据文件（可包含多年度数据）",
             type=['xlsx', 'xls', 'csv', 'txt'],
             key="financial_file_uploader",
             accept_multiple_files=False
@@ -1815,7 +1815,7 @@ def render_detection():
         st.caption("如有MD&A管理层讨论文本，可在此上传多个文件以进行文本风险分析")
 
         mdna_files = st.file_uploader(
-            " 上传MD&A文本文件（可选，可多选）",
+            "上传MD&A文本文件（可选，可多选）",
             type=['txt', 'docx', 'doc', 'pdf'],
             key="mdna_file_uploader",
             accept_multiple_files=True
@@ -3182,7 +3182,7 @@ def render_membership():
                 选择适合您的方案
             </span>
         </h1>
-        <p style="color: #94a3b8; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
+        <p style="color: #A39E99; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
             灵活的定价，专业的服务，助力每一位财务工作者高效识别风险
         </p>
     </div>
@@ -3197,15 +3197,15 @@ def render_membership():
             "highlight": False,
             "value": "个人效率工具，快速识别企业财务风险，支持单项目深度分析",
             "features": [
-                " 单项目审计分析",
-                " 3年财报数据对比",
-                " 风险评分与底稿高亮",
-                " 基础AI风险建议报告",
-                " 标准案例库查询",
-                " 多项目并行管理",
-                " 可视化雷达图",
-                " 团队协作功能",
-                " API接口",
+                "单项目审计分析",
+                "3年财报数据对比",
+                "风险评分与底稿高亮",
+                "基础AI风险建议报告",
+                "标准案例库查询",
+                "多项目并行管理",
+                "可视化雷达图",
+                "团队协作功能",
+                "API接口",
             ],
             "cta": "立即开通",
             "cta_type": "secondary",
@@ -3218,15 +3218,15 @@ def render_membership():
             "highlight": True,
             "value": "团队级分析平台，支持多项目并行管理与质量把控，提升协作效率",
             "features": [
-                " 多项目并行（≤5个）",
-                " 可视化风险雷达图",
-                " 同业案例对标分析",
-                " 整改跟踪引擎",
-                " 原文溯源定位",
-                " 优先技术支持",
-                " 团队权限管理",
-                " Open API接口",
-                " 私有化部署",
+                "多项目并行（≤5个）",
+                "可视化风险雷达图",
+                "同业案例对标分析",
+                "整改跟踪引擎",
+                "原文溯源定位",
+                "优先技术支持",
+                "团队权限管理",
+                "Open API接口",
+                "私有化部署",
             ],
             "cta": "立即开通",
             "cta_type": "primary",
@@ -3239,14 +3239,14 @@ def render_membership():
             "highlight": False,
             "value": "全功能开放，深度数据分析与系统集成，满足企业级审计数字化需求",
             "features": [
-                " 不限项目数量",
-                " 团队与角色权限管理",
-                " Open API接口",
-                " 高级数据分析模块",
-                " 批量检测（100家/次）",
-                " 私有云部署支持",
-                " 专属客户经理",
-                " 7×24小时技术支持",
+                "不限项目数量",
+                "团队与角色权限管理",
+                "Open API接口",
+                "高级数据分析模块",
+                "批量检测（100家/次）",
+                "私有云部署支持",
+                "专属客户经理",
+                "7×24小时技术支持",
             ],
             "cta": "联系咨询",
             "cta_type": "secondary",
@@ -3553,7 +3553,7 @@ def render_report_management():
                                 # Excel汇总导出
                                 csv = df.to_csv(index=False)
                                 st.download_button(
-                                    label=" 下载汇总Excel",
+                                    label="下载汇总Excel",
                                     data=csv,
                                     file_name=f"报告汇总_{datetime.now().strftime('%Y%m%d')}.csv",
                                     mime="text/csv"
