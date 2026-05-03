@@ -92,6 +92,10 @@ p, li, td, th, label, .stMarkdown { line-height: 1.65 !important; color: var(--t
     border-color: transparent !important;
     box-shadow: 0 2px 8px rgba(37,99,235,0.25) !important;
 }
+.stButton > button[kind="primary"] p,
+.stButton > button[kind="primary"] div {
+    color: #FFFFFF !important;
+}
 .stButton > button[kind="primary"]:hover {
     background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%) !important;
     box-shadow: 0 4px 16px rgba(37,99,235,0.35) !important;
