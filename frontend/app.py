@@ -2302,16 +2302,28 @@ def render_detection():
             cols = st.columns(min(len(cases), 3))
             for idx, case in enumerate(cases):
                 with cols[idx % 3]:
-                    case_type_emoji = "高" if case["case_type"] == "fraud" else "低"
-                    with st.container(border=True):
-                        st.markdown(f"### {case_type_emoji} {case['case_name']}")
-                        st.caption(case.get('description', ''))
+                    is_fraud = case.get("case_type") == "fraud"
+                    badge_color = "#EF4444" if is_fraud else "#10B981"
+                    badge_bg = "rgba(239,68,68,0.1)" if is_fraud else "rgba(16,185,129,0.1)"
+                    badge_text = "🔴 高风险" if is_fraud else "🟢 低风险"
+                    top_border = f"border-top: 3px solid {badge_color};" if is_fraud else ""
 
-                        if st.button("加载此案例", key=f"load_case_{case['id']}", use_container_width=True):
-                            demo_data = make_api_request(f"/detection/cases/{case['id']}/load", method="POST")
-                            if demo_data:
-                                st.session_state.demo_data = demo_data
-                                st.success("案例已加载！请切换到「手动录入」标签查看")
+                    card_html = f'''
+                    <div style="background: #FFFFFF; border-radius: 12px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); {top_border} margin-bottom: 8px;">
+                        <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; background: {badge_bg}; color: {badge_color}; margin-bottom: 10px;">
+                            {badge_text}
+                        </div>
+                        <h4 style="font-size: 1.05rem; font-weight: 700; margin: 0 0 6px 0; color: #0F172A;">{case['case_name']}</h4>
+                        <p style="font-size: 0.8rem; color: #64748B; line-height: 1.5; margin: 0;">{case.get('description', '')}</p>
+                    </div>
+                    '''
+                    st.components.v1.html(card_html, height=130, scrolling=False)
+
+                    if st.button("加载此案例", key=f"load_case_{case['id']}", use_container_width=True):
+                        demo_data = make_api_request(f"/detection/cases/{case['id']}/load", method="POST")
+                        if demo_data:
+                            st.session_state.demo_data = demo_data
+                            st.success("案例已加载！请切换到「手动录入」标签查看")
 
     # ============ 手动录入标签页 ============
     with tab3:
