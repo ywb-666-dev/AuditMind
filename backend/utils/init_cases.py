@@ -4,7 +4,9 @@
 """
 import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# 将项目根目录加入 Python 路径，确保能正确导入 backend 模块
+# __file__ 位于 backend/utils/init_cases.py，向上回退三级到项目根目录
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
