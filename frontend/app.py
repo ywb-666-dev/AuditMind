@@ -1324,13 +1324,13 @@ def render_home():
 # ================= 财务助手页面 =================
 # ================= 财务助手页面 (v2 - AI自动生成) =================
 def render_financial_assistant():
-    """渲染财务助手页面 - 支持AI自动生成四表一注"""
+    """渲染财务助手页面 - 支持财务报表与税务中心双模块"""
     st.markdown("""
     <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; border-radius: 20px; position: relative; overflow: hidden;">
         <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(37,99,235,0.08); border-radius: 50%; "></div>
         <div style="position: relative; z-index: 1;">
             <h2 style="color: #0F172A; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 财务助手</h2>
-            <p style="color: #475569; font-size: 1rem; margin: 0;">智能提取四表一注：上传文件 → AI解析 → 审核编辑 → 完成</p>
+            <p style="color: #475569; font-size: 1rem; margin: 0;">智能财务与税务助手：财务报表 · 税务测算 · 报税辅助 · 财税咨询</p>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -1410,28 +1410,381 @@ def render_financial_assistant():
         pricing_block = f'<div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0;">{"".join(cards_html)}</div>'
         st.markdown(pricing_block, unsafe_allow_html=True)
 
-    if not st.session_state.logged_in:
-        st.warning("请先登录")
-        return
+    # ========== 双模块入口：财务报表 / 税务中心 ==========
+    tab_fs, tab_tax = st.tabs(["财务报表", "税务中心"])
 
-    # 初始化状态机
-    if "fs_state" not in st.session_state:
-        st.session_state.fs_state = "list"
-    if "fs_selected_id" not in st.session_state:
-        st.session_state.fs_selected_id = None
-    if "fs_review_data" not in st.session_state:
-        st.session_state.fs_review_data = None
+    with tab_fs:
+        if not st.session_state.logged_in:
+            st.warning("请先登录以使用财务报表功能")
+            render_login_register()
+        else:
+            # 初始化状态机
+            if "fs_state" not in st.session_state:
+                st.session_state.fs_state = "list"
+            if "fs_selected_id" not in st.session_state:
+                st.session_state.fs_selected_id = None
+            if "fs_review_data" not in st.session_state:
+                st.session_state.fs_review_data = None
 
-    state = st.session_state.fs_state
+            state = st.session_state.fs_state
 
-    if state == "list":
-        _render_statement_list_v2()
-    elif state == "upload":
-        _render_upload_and_parse()
-    elif state == "review":
-        _render_ai_review()
-    elif state == "edit":
-        _render_statement_editor_v2(st.session_state.fs_selected_id)
+            if state == "list":
+                _render_statement_list_v2()
+            elif state == "upload":
+                _render_upload_and_parse()
+            elif state == "review":
+                _render_ai_review()
+            elif state == "edit":
+                _render_statement_editor_v2(st.session_state.fs_selected_id)
+
+    with tab_tax:
+        render_tax_module()
+
+
+def render_tax_module():
+    """渲染税务中心模块 - 包含税务测算、简易报税、财税咨询三个子功能"""
+    sub_tab1, sub_tab2, sub_tab3 = st.tabs(["税务测算", "简易报税", "财税咨询"])
+
+    # ========== 子 Tab 1: 税务测算 ==========
+    with sub_tab1:
+        st.markdown("""
+        <div style="text-align:center; padding: 12px 0 16px 0;">
+            <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 4px; color: #0F172A;">
+                智能税务测算
+            </h3>
+            <p style="color: #64748B; font-size: 0.85rem; margin: 0;">
+                按最新税法计算个税、企业税，对比最优纳税方案
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        calc_tab1, calc_tab2 = st.tabs(["个税测算", "企业税测算"])
+
+        with calc_tab1:
+            col1, col2 = st.columns(2)
+            with col1:
+                monthly_salary = st.number_input("税前月薪（元）", min_value=0, value=15000, step=500, key="tax_salary")
+                annual_bonus = st.number_input("年终奖（元）", min_value=0, value=30000, step=1000, key="tax_bonus")
+            with col2:
+                social_insurance = st.number_input("五险一金/月（元）", min_value=0, value=3000, step=100, key="tax_si")
+                special_deduction = st.number_input("专项附加扣除/月（元）", min_value=0, value=2000, step=100, key="tax_sd")
+
+            if st.button("计算个税", type="primary", use_container_width=True, key="calc_pit"):
+                # 个税计算（综合所得）
+                annual_income = monthly_salary * 12
+                annual_deduction = 60000 + social_insurance * 12 + special_deduction * 12
+                taxable_income = max(0, annual_income - annual_deduction)
+
+                # 税率表
+                brackets = [
+                    (0, 36000, 0.03, 0),
+                    (36000, 144000, 0.10, 2520),
+                    (144000, 300000, 0.20, 16920),
+                    (300000, 420000, 0.25, 31920),
+                    (420000, 660000, 0.30, 52920),
+                    (660000, 960000, 0.35, 85920),
+                    (960000, float('inf'), 0.45, 181920),
+                ]
+
+                tax = 0
+                rate = 0
+                quick_deduction = 0
+                for low, high, r, qd in brackets:
+                    if taxable_income > low:
+                        rate = r
+                        quick_deduction = qd
+
+                if taxable_income > 0:
+                    tax = taxable_income * rate - quick_deduction
+
+                after_tax = annual_income - tax
+
+                # 年终奖单独计税
+                if annual_bonus > 0:
+                    monthly_bonus = annual_bonus / 12
+                    bonus_rate = 0
+                    bonus_qd = 0
+                    for low, high, r, qd in brackets:
+                        if monthly_bonus > low:
+                            bonus_rate = r
+                            bonus_qd = qd
+                    bonus_tax = annual_bonus * bonus_rate - bonus_qd
+                else:
+                    bonus_tax = 0
+
+                # 年终奖合并计税
+                combined_taxable = taxable_income + annual_bonus
+                combined_rate = 0
+                combined_qd = 0
+                for low, high, r, qd in brackets:
+                    if combined_taxable > low:
+                        combined_rate = r
+                        combined_qd = qd
+                combined_bonus_tax = combined_taxable * combined_rate - combined_qd - tax
+
+                best_option = "单独计税" if bonus_tax <= combined_bonus_tax else "合并计税"
+                saving = abs(bonus_tax - combined_bonus_tax)
+
+                # 结果展示
+                st.markdown("""
+                <div style="border-radius: 16px; padding: 24px; background: linear-gradient(135deg, #EFF6FF, #DBEAFE); margin: 16px 0;">
+                    <h4 style="margin: 0 0 12px 0; color: #1E40AF;">计算结果</h4>
+                </div>
+                """, unsafe_allow_html=True)
+
+                r1, r2, r3 = st.columns(3)
+                with r1:
+                    st.metric("年应纳税所得额", f"¥{taxable_income:,.0f}")
+                with r2:
+                    st.metric("适用税率", f"{rate*100:.0f}%")
+                with r3:
+                    st.metric("年个税总额", f"¥{tax:,.0f}")
+
+                st.metric("税后年收入（不含年终奖）", f"¥{after_tax:,.0f}")
+
+                st.divider()
+                st.subheader("年终奖最优方案对比")
+
+                c1, c2 = st.columns(2)
+                with c1:
+                    st.markdown(f"""
+                    <div style="border-radius: 12px; padding: 16px; background: {'#DCFCE7' if best_option == '单独计税' else '#F1F5F9'}; border: 2px solid {'#22C55E' if best_option == '单独计税' else '#E2E8F0'};">
+                        <h4 style="margin: 0 0 8px 0; color: #0F172A;">单独计税 {'推荐' if best_option == '单独计税' else ''}</h4>
+                        <p style="margin: 0; color: #475569; font-size: 0.9rem;">年终奖个税: <strong>¥{bonus_tax:,.0f}</strong></p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                with c2:
+                    st.markdown(f"""
+                    <div style="border-radius: 12px; padding: 16px; background: {'#DCFCE7' if best_option == '合并计税' else '#F1F5F9'}; border: 2px solid {'#22C55E' if best_option == '合并计税' else '#E2E8F0'};">
+                        <h4 style="margin: 0 0 8px 0; color: #0F172A;">合并计税 {'推荐' if best_option == '合并计税' else ''}</h4>
+                        <p style="margin: 0; color: #475569; font-size: 0.9rem;">年终奖个税: <strong>¥{combined_bonus_tax:,.0f}</strong></p>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                st.success(f"最优方案: **{best_option}**，可节省 ¥{saving:,.0f}")
+
+        with calc_tab2:
+            col1, col2 = st.columns(2)
+            with col1:
+                revenue = st.number_input("营业收入（元/年）", min_value=0, value=500000, step=10000, key="biz_revenue")
+                cost = st.number_input("营业成本（元/年）", min_value=0, value=300000, step=10000, key="biz_cost")
+            with col2:
+                taxpayer_type = st.selectbox("纳税人类型", ["小规模纳税人", "一般纳税人"], key="biz_type")
+                industry = st.selectbox("行业类型", ["服务业（6%）", "交通运输/建筑（9%）", "货物销售（13%）"], key="biz_industry")
+
+            if st.button("计算企业税", type="primary", use_container_width=True, key="calc_biz"):
+                profit = revenue - cost
+
+                # 增值税
+                if taxpayer_type == "小规模纳税人":
+                    vat_rate = 0.03
+                    vat = revenue * vat_rate
+                else:
+                    vat_rates = {"服务业（6%）": 0.06, "交通运输/建筑（9%）": 0.09, "货物销售（13%）": 0.13}
+                    vat_rate = vat_rates.get(industry, 0.06)
+                    vat = revenue * vat_rate
+
+                # 企业所得税
+                if profit <= 0:
+                    income_tax = 0
+                elif profit <= 3000000:
+                    income_tax = profit * 0.05
+                else:
+                    income_tax = profit * 0.25
+
+                # 附加税
+                surcharge = vat * 0.12
+                if taxpayer_type == "小规模纳税人":
+                    surcharge = vat * 0.06
+
+                total_tax = vat + income_tax + surcharge
+                net_profit = profit - total_tax
+
+                st.markdown("""
+                <div style="border-radius: 16px; padding: 24px; background: linear-gradient(135deg, #EFF6FF, #DBEAFE); margin: 16px 0;">
+                    <h4 style="margin: 0 0 12px 0; color: #1E40AF;">企业税计算结果</h4>
+                </div>
+                """, unsafe_allow_html=True)
+
+                c1, c2, c3 = st.columns(3)
+                with c1:
+                    st.metric("增值税", f"¥{vat:,.0f}")
+                with c2:
+                    st.metric("企业所得税", f"¥{income_tax:,.0f}")
+                with c3:
+                    st.metric("附加税", f"¥{surcharge:,.0f}")
+
+                st.metric("合计应缴税额", f"¥{total_tax:,.0f}")
+                st.metric("税后净利润", f"¥{net_profit:,.0f}", delta=f"利润率 {net_profit/revenue*100:.1f}%" if revenue > 0 else "")
+
+    # ========== 子 Tab 2: 简易报税 ==========
+    with sub_tab2:
+        st.markdown("""
+        <div style="text-align:center; padding: 12px 0 16px 0;">
+            <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 4px; color: #0F172A;">
+                简易报税辅助
+            </h3>
+            <p style="color: #64748B; font-size: 0.85rem; margin: 0;">
+                上传票据/流水/工资表，AI 自动识别并生成申报表
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        step = st.session_state.get("tax_filing_step", 1)
+
+        if step == 1:
+            st.subheader("第一步：上传单据")
+            uploaded_files = st.file_uploader(
+                "支持发票、银行流水、工资表等（JPG/PNG/PDF）",
+                type=["jpg", "jpeg", "png", "pdf"],
+                accept_multiple_files=True,
+                key="tax_files"
+            )
+
+            if uploaded_files:
+                st.success(f"已上传 {len(uploaded_files)} 个文件")
+                for f in uploaded_files:
+                    st.write(f"- {f.name} ({f.size/1024:.1f} KB)")
+
+                if st.button("开始识别", type="primary", use_container_width=True, key="start_recognize"):
+                    st.session_state.tax_filing_step = 2
+                    st.session_state.tax_uploaded_files = uploaded_files
+                    st.rerun()
+
+        elif step == 2:
+            st.subheader("第二步：识别结果")
+
+            # 模拟识别结果（实际应调用 LLM 视觉能力）
+            demo_results = [
+                {"类型": "增值税发票", "金额": 12000, "税率": "13%", "税额": 1380.53, "分类": "收入"},
+                {"类型": "银行流水", "金额": 50000, "税率": "-", "税额": 0, "分类": "收入"},
+                {"类型": "工资表", "金额": 25000, "税率": "-", "税额": 0, "分类": "成本"},
+                {"类型": "费用报销单", "金额": 3500, "税率": "-", "税额": 0, "分类": "成本"},
+            ]
+
+            st.dataframe(demo_results, use_container_width=True, hide_index=True)
+            st.info("以上为演示数据。实际功能需接入 LLM 视觉识别 API。")
+
+            if st.button("确认并生成申报表", type="primary", use_container_width=True, key="gen_report"):
+                st.session_state.tax_filing_step = 3
+                st.rerun()
+
+            if st.button("返回重新上传", use_container_width=True, key="back_step1"):
+                st.session_state.tax_filing_step = 1
+                st.rerun()
+
+        elif step == 3:
+            st.subheader("第三步：简易申报表")
+
+            total_income = 62000
+            total_cost = 28500
+            taxable_profit = total_income - total_cost
+            vat = taxable_profit * 0.03
+            income_tax = taxable_profit * 0.05
+            surcharge = vat * 0.06
+            total = vat + income_tax + surcharge
+
+            report_data = [
+                {"项目": "营业收入", "金额": f"¥{total_income:,.2f}"},
+                {"项目": "营业成本", "金额": f"¥{total_cost:,.2f}"},
+                {"项目": "应纳税所得额", "金额": f"¥{taxable_profit:,.2f}"},
+                {"项目": "增值税（3%）", "金额": f"¥{vat:,.2f}"},
+                {"项目": "企业所得税（5%）", "金额": f"¥{income_tax:,.2f}"},
+                {"项目": "附加税（6%）", "金额": f"¥{surcharge:,.2f}"},
+                {"项目": "合计应缴税额", "金额": f"¥{total:,.2f}"},
+            ]
+
+            st.dataframe(report_data, use_container_width=True, hide_index=True)
+            st.info("以上为基于识别结果的演示申报表。实际功能需接入 LLM 视觉识别 API 获取真实数据。")
+
+            if st.button("完成", type="primary", use_container_width=True, key="finish_filing"):
+                st.session_state.tax_filing_step = 1
+                st.success("申报表已生成！")
+                st.rerun()
+
+    # ========== 子 Tab 3: 财税咨询 ==========
+    with sub_tab3:
+        st.markdown("""
+        <div style="text-align:center; padding: 12px 0 16px 0;">
+            <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 4px; color: #0F172A;">
+                财税政策咨询
+            </h3>
+            <p style="color: #64748B; font-size: 0.85rem; margin: 0;">
+                AI 财税专家，解答个税、企业税、社保公积金等政策问题
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        if not st.session_state.logged_in:
+            st.info("财税咨询功能仅对登录用户开放")
+            render_login_register()
+        else:
+            # 预设财税问题
+            tax_questions = [
+                "年终奖单独计税和合并计税哪个更划算？",
+                "小规模纳税人和一般纳税人有什么区别？",
+                "专项附加扣除包括哪些项目？",
+                "个体户需要交哪些税？",
+                "最新的个税起征点和税率表是什么？",
+            ]
+
+            st.subheader("常见问题")
+            q_cols = st.columns(len(tax_questions))
+            for i, q in enumerate(tax_questions):
+                with q_cols[i]:
+                    if st.button(q, use_container_width=True, key=f"tax_q_{i}"):
+                        st.session_state.tax_chat_input = q
+
+            # 聊天输入
+            chat_input = st.chat_input("请输入您的财税问题...", key="tax_chat")
+            if chat_input or st.session_state.get("tax_chat_input"):
+                prompt = chat_input or st.session_state.get("tax_chat_input", "")
+                st.session_state.tax_chat_input = None
+
+                with st.chat_message("user"):
+                    st.markdown(prompt)
+
+                with st.chat_message("assistant"):
+                    try:
+                        # 复用现有 QA API，切换财税专用提示词
+                        url = f"{API_BASE_URL}/qa/ask-stream"
+                        req_headers = {
+                            "Authorization": f"Bearer {st.session_state.token}",
+                            "Content-Type": "application/json"
+                        }
+                        req_data = {
+                            "question": prompt,
+                            "context": "你是一位中国财税政策专家，熟悉个人所得税、企业所得税、增值税、社保公积金等法规。请用通俗易懂的语言解答，涉及计算时请给出具体公式和数字示例。"
+                        }
+
+                        response = requests.post(url, json=req_data, headers=req_headers, stream=True, timeout=120)
+
+                        if response.status_code == 200:
+                            def _tax_stream():
+                                for line in response.iter_lines(decode_unicode=True):
+                                    if not line:
+                                        continue
+                                    if line.startswith("data: "):
+                                        data_str = line[6:]
+                                        if data_str == "[DONE]":
+                                            break
+                                        try:
+                                            event_data = json.loads(data_str)
+                                            content = event_data.get("content")
+                                            if content and isinstance(content, str):
+                                                yield content
+                                        except json.JSONDecodeError:
+                                            continue
+
+                            st.write_stream(_tax_stream)
+                        else:
+                            fallback = make_api_request("/qa/ask", method="POST", data={"question": prompt, "context": "财税专家"})
+                            if fallback and "answer" in fallback:
+                                st.markdown(fallback["answer"])
+                            else:
+                                st.error("咨询失败，请稍后重试")
+                    except Exception as e:
+                        st.error(f"咨询失败: {str(e)[:100]}")
 
 
 def _render_statement_list_v2():
