@@ -1675,7 +1675,7 @@ def render_tax_module():
                         <h4 style="margin: 0 0 8px 0; color: #0F172A;">合并计税 {'推荐' if best_option == '合并计税' else ''}</h4>
                         <p style="margin: 0; color: #475569; font-size: 0.9rem;">年终奖个税: <strong>¥{combined_bonus_tax:,.0f}</strong></p>
                     </div>
-                    """, unsafe_add_html=True)
+                    """, unsafe_allow_html=True)
 
                 st.success(f"最优方案: **{best_option}**，可节省 ¥{saving:,.0f}")
 
