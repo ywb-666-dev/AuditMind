@@ -1970,30 +1970,28 @@ def render_tax_module():
                 </div>
                 ''', unsafe_allow_html=True)
 
+            # 侧边栏快捷问题
+            with st.sidebar:
+                st.subheader("财税快捷提问")
+                tax_questions = [
+                    "年终奖单独计税和合并计税哪个更划算？",
+                    "小规模纳税人和一般纳税人有什么区别？",
+                    "专项附加扣除包括哪些项目？",
+                    "个体户需要交哪些税？",
+                    "最新的个税起征点和税率表是什么？",
+                ]
+                for q in tax_questions:
+                    if st.button(q, key=f"tax_q_{q[:20]}", use_container_width=True):
+                        st.session_state.tax_chat_input = q
+                        st.rerun()
+                st.divider()
+
             # 显示历史消息
             for msg in st.session_state.tax_chat_history:
                 with st.chat_message(msg["role"]):
                     st.markdown(msg["content"])
 
-            # 预设财税问题
-            tax_questions = [
-                "年终奖单独计税和合并计税哪个更划算？",
-                "小规模纳税人和一般纳税人有什么区别？",
-                "专项附加扣除包括哪些项目？",
-                "个体户需要交哪些税？",
-                "最新的个税起征点和税率表是什么？",
-            ]
-
-            # 快捷问题按钮
-            st.markdown("<p style='color:#94A3B8;font-size:0.8rem;margin-bottom:8px;'>&#x2728; 快捷提问</p>", unsafe_allow_html=True)
-            q_cols = st.columns(len(tax_questions))
-            for i, q in enumerate(tax_questions):
-                with q_cols[i]:
-                    if st.button(q, use_container_width=True, key=f"tax_q_{i}"):
-                        st.session_state.tax_chat_input = q
-                        st.rerun()
-
-            # 聊天输入
+            # 聊天输入（固定在底部）
             chat_input = st.chat_input("请输入您的财税问题...", key="tax_chat")
             prompt = chat_input or st.session_state.get("tax_chat_input", "")
             if prompt:
