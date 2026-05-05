@@ -239,6 +239,12 @@ p, li, td, th, label, .stMarkdown { line-height: 1.65 !important; color: var(--t
 .animate-pulse { animation: pulse 2s infinite; }
 .animate-float { animation: float 3s ease-in-out infinite; }
 
+/* Thinking dots animation */
+@keyframes thinkingBounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+}
+
 /* ===== Enhanced Interactions ===== */
 .hover-lift { transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease; }
 .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(15,23,42,0.1); }
@@ -523,6 +529,8 @@ if "current_detection" not in st.session_state:
     st.session_state.current_detection = None
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
+if "tax_chat_history" not in st.session_state:
+    st.session_state.tax_chat_history = []
 if "auth_initialized" not in st.session_state:
     st.session_state.auth_initialized = False
 
@@ -1422,7 +1430,7 @@ def render_financial_assistant():
     <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; border-radius: 20px; position: relative; overflow: hidden;">
         <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(37,99,235,0.08); border-radius: 50%; "></div>
         <div style="position: relative; z-index: 1;">
-            <h2 style="color: #0F172A; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 财务助手</h2>
+            <h2 style="color: #0F172A; font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem;"> 财务助手</h2>
             <p style="color: #475569; font-size: 1rem; margin: 0;">智能财务与税务助手：财务报表 · 税务测算 · 报税辅助 · 财税咨询</p>
         </div>
     </div>
@@ -1930,13 +1938,17 @@ def render_tax_module():
 
     # ========== 子 Tab 3: 财税咨询 ==========
     with sub_tab3:
+        # 头部标题
         st.markdown("""
-        <div style="text-align:center; padding: 12px 0 16px 0;">
-            <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 4px; color: #0F172A;">
+        <div style="text-align:center; padding: 24px 0 20px 0;">
+            <div style="display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#EFF6FF,#DBEAFE);margin-bottom:12px;box-shadow:0 4px 12px rgba(37,99,235,0.1);">
+                <span style="font-size:1.6rem;">&#x1F4AC;</span>
+            </div>
+            <h2 style="font-size: 1.6rem; font-weight: 700; margin-bottom: 6px; color: #0F172A; letter-spacing: -0.5px;">
                 财税政策咨询
-            </h3>
-            <p style="color: #64748B; font-size: 0.85rem; margin: 0;">
-                AI 财税专家，解答个税、企业税、社保公积金等政策问题
+            </h2>
+            <p style="color: #64748B; font-size: 0.95rem; margin: 0; max-width: 480px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+                AI 财税专家，解答个税、企业税、社保公积金等政策问题<br>支持流式输出，即问即答
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -1945,6 +1957,24 @@ def render_tax_module():
             st.info("财税咨询功能仅对登录用户开放")
             render_login_register()
         else:
+            # 欢迎卡片（无历史消息时显示）
+            if not st.session_state.tax_chat_history:
+                st.markdown('''
+                <div class="glass-card" style="text-align: center; padding: 2.5rem 2rem; margin-bottom: 1.5rem;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">&#x1F3DB;</div>
+                    <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; color: #0F172A;">智能财税问答助手</h3>
+                    <p style="font-size: 0.9rem; color: #64748B; line-height: 1.6; max-width: 460px; margin: 0 auto;">
+                        我可以帮您解答个人所得税、企业所得税、增值税、社保公积金等财税政策问题。
+                        <br>涉及计算时会给出具体公式和数字示例。
+                    </p>
+                </div>
+                ''', unsafe_allow_html=True)
+
+            # 显示历史消息
+            for msg in st.session_state.tax_chat_history:
+                with st.chat_message(msg["role"]):
+                    st.markdown(msg["content"])
+
             # 预设财税问题
             tax_questions = [
                 "年终奖单独计税和合并计税哪个更划算？",
@@ -1954,25 +1984,41 @@ def render_tax_module():
                 "最新的个税起征点和税率表是什么？",
             ]
 
-            st.subheader("常见问题")
+            # 快捷问题按钮
+            st.markdown("<p style='color:#94A3B8;font-size:0.8rem;margin-bottom:8px;'>&#x2728; 快捷提问</p>", unsafe_allow_html=True)
             q_cols = st.columns(len(tax_questions))
             for i, q in enumerate(tax_questions):
                 with q_cols[i]:
                     if st.button(q, use_container_width=True, key=f"tax_q_{i}"):
                         st.session_state.tax_chat_input = q
+                        st.rerun()
 
             # 聊天输入
             chat_input = st.chat_input("请输入您的财税问题...", key="tax_chat")
-            if chat_input or st.session_state.get("tax_chat_input"):
-                prompt = chat_input or st.session_state.get("tax_chat_input", "")
+            prompt = chat_input or st.session_state.get("tax_chat_input", "")
+            if prompt:
                 st.session_state.tax_chat_input = None
 
+                # 添加用户消息到历史
+                st.session_state.tax_chat_history.append({"role": "user", "content": prompt})
                 with st.chat_message("user"):
                     st.markdown(prompt)
 
+                # AI 回复
                 with st.chat_message("assistant"):
+                    thinking_placeholder = st.empty()
+                    thinking_placeholder.markdown("""
+                    <div style="display:flex;align-items:center;gap:10px;padding:4px 0;">
+                        <div style="display:flex;gap:4px;align-items:center;">
+                            <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#3B82F6;animation:thinkingBounce 1.4s infinite ease-in-out both;animation-delay:0s;"></span>
+                            <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#3B82F6;animation:thinkingBounce 1.4s infinite ease-in-out both;animation-delay:0.16s;"></span>
+                            <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#3B82F6;animation:thinkingBounce 1.4s infinite ease-in-out both;animation-delay:0.32s;"></span>
+                        </div>
+                        <span style="font-size:0.85rem;color:#64748B;">AI 正在思考中...</span>
+                    </div>
+                    """, unsafe_allow_html=True)
+
                     try:
-                        # 复用现有 QA API，切换财税专用提示词
                         url = f"{API_BASE_URL}/qa/ask-stream"
                         req_headers = {
                             "Authorization": f"Bearer {st.session_state.token}",
@@ -2002,14 +2048,20 @@ def render_tax_module():
                                         except json.JSONDecodeError:
                                             continue
 
-                            st.write_stream(_tax_stream)
+                            full_answer = st.write_stream(_tax_stream)
+                            thinking_placeholder.empty()
+                            st.session_state.tax_chat_history.append({"role": "assistant", "content": full_answer})
                         else:
+                            thinking_placeholder.empty()
                             fallback = make_api_request("/qa/ask", method="POST", data={"question": prompt, "context": "财税专家"})
                             if fallback and "answer" in fallback:
-                                st.markdown(fallback["answer"])
+                                answer = fallback["answer"]
+                                st.markdown(answer)
+                                st.session_state.tax_chat_history.append({"role": "assistant", "content": answer})
                             else:
                                 st.error("咨询失败，请稍后重试")
                     except Exception as e:
+                        thinking_placeholder.empty()
                         st.error(f"咨询失败: {str(e)[:100]}")
 
 
@@ -3986,6 +4038,18 @@ def render_qa():
 
         # 流式输出回答
         with st.chat_message("assistant"):
+            thinking_placeholder = st.empty()
+            thinking_placeholder.markdown("""
+            <div style="display:flex;align-items:center;gap:10px;padding:4px 0;">
+                <div style="display:flex;gap:4px;align-items:center;">
+                    <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#3B82F6;animation:thinkingBounce 1.4s infinite ease-in-out both;animation-delay:0s;"></span>
+                    <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#3B82F6;animation:thinkingBounce 1.4s infinite ease-in-out both;animation-delay:0.16s;"></span>
+                    <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#3B82F6;animation:thinkingBounce 1.4s infinite ease-in-out both;animation-delay:0.32s;"></span>
+                </div>
+                <span style="font-size:0.85rem;color:#64748B;">AI 正在思考中...</span>
+            </div>
+            """, unsafe_allow_html=True)
+
             try:
                 import requests
 
@@ -4018,8 +4082,10 @@ def render_qa():
                                     continue
 
                     full_answer = st.write_stream(_stream_generator)
+                    thinking_placeholder.empty()
                     st.session_state.chat_history.append({"role": "assistant", "content": full_answer})
                 else:
+                    thinking_placeholder.empty()
                     result = make_api_request("/qa/ask", method="POST", data={"question": prompt})
                     if result and "answer" in result:
                         answer = result["answer"]
@@ -4029,6 +4095,7 @@ def render_qa():
                         st.error("回答失败，请稍后重试")
 
             except Exception as e:
+                thinking_placeholder.empty()
                 result = make_api_request("/qa/ask", method="POST", data={"question": prompt})
                 if result and "answer" in result:
                     answer = result["answer"]
