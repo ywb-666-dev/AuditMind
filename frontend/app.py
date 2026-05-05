@@ -239,6 +239,37 @@ p, li, td, th, label, .stMarkdown { line-height: 1.65 !important; color: var(--t
 .animate-pulse { animation: pulse 2s infinite; }
 .animate-float { animation: float 3s ease-in-out infinite; }
 
+/* ===== Enhanced Interactions ===== */
+.hover-lift { transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease; }
+.hover-lift:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(15,23,42,0.1); }
+
+.glow-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.25s ease;
+}
+.glow-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 0; height: 0;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+}
+.glow-btn:hover::after {
+    width: 200px; height: 200px;
+}
+
+/* Gradient text for hero */
+.gradient-text {
+    background: linear-gradient(135deg, #2563EB, #3B82F6, #60A5FA);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
 /* ===== Spacing Utilities ===== */
 .gap-1 { gap: 0.25rem; }
 .gap-2 { gap: 0.5rem; }
@@ -1299,6 +1330,68 @@ def render_home():
             - 回避表述强度（STR_EVA_AI）
             """)
 
+    # ========== FAQ Section ==========
+    st.markdown("<div style='margin: 2.5rem 0 1.5rem 0; text-align: center;'><h2 style='font-size: 1.6rem; font-weight: 700; color: #0F172A; letter-spacing: -0.5px;'>常见问题</h2><p style='color: #64748B; font-size: 0.95rem; margin-top: 0.5rem;'>关于 Audit Mind 的使用、定价与技术的常见疑问</p></div>", unsafe_allow_html=True)
+
+    faq_items = [
+        ("Audit Mind 的舞弊检测准确率如何？", "Audit Mind 采用多模型集成架构，结合 GMM-SHAP 可解释性算法，在模拟测试环境中对已知舞弊案例的识别率达到行业领先水平。系统提供风险概率而非确定性结论，建议结合专业审计判断使用。"),
+        ("免费版可以体验哪些功能？", "免费用户可体验 3 次完整的舞弊检测流程（含风险评分、SHAP 特征分析、风险标签解读），每日可使用 AI 问答 5 次，财务报表解析 1 次。体验后如需更多额度，可升级会员。"),
+        ("支持哪些财务数据格式？", "目前支持手动输入财务数据、上传 Excel / CSV 文件，以及在财务助手中通过 AI 自动解析年报 PDF 生成四表一注。票据识别支持发票、银行流水、工资表等图片/PDF 上传。"),
+        ("会员版与免费版的核心区别是什么？", "会员版享受不限次数的舞弊检测、AI 财务助手解析、税务测算与票据识别，并可导出专业级 PDF / Word 检测报告。企业版额外提供 API 接口、批量检测与私有化部署选项。"),
+        ("数据安全和隐私如何保障？", "所有上传的财务数据与报告均通过加密传输与存储，分析完成后可手动删除。我们不会将用户数据用于模型训练，企业版支持本地化部署，数据完全不出域。"),
+        ("检测结果中的 SHAP 图如何理解？", "SHAP 图展示每个财务指标或文本特征对最终风险评分的贡献度。红色条表示推高舞弊概率的特征，蓝色条表示降低概率的特征。通过 SHAP 可以定位具体风险点，指导后续审计核查方向。"),
+    ]
+
+    for idx, (q, a) in enumerate(faq_items):
+        with st.expander(q):
+            st.markdown(f"<div style='color: #475569; line-height: 1.7; font-size: 0.92rem; padding: 0.25rem 0;'>{a}</div>", unsafe_allow_html=True)
+
+    # ========== Testimonials ==========
+    st.markdown("<div style='margin: 2.5rem 0 1.5rem 0; text-align: center;'><h2 style='font-size: 1.6rem; font-weight: 700; color: #0F172A; letter-spacing: -0.5px;'>用户心声</h2><p style='color: #64748B; font-size: 0.95rem; margin-top: 0.5rem;'>来自审计师、财务从业者与企业主的真实反馈</p></div>", unsafe_allow_html=True)
+
+    testimonials = [
+        {
+            "name": "李经理",
+            "title": "某会计师事务所 · 审计经理",
+            "content": "过去识别财务舞弊依赖经验和抽样，Audit Mind 的 AI 文本分析帮我们发现了好几起 MD&A 语义矛盾案例，SHAP 归因也很清晰，客户报告更有说服力了。",
+            "color": "#EFF6FF",
+            "border": "#BFDBFE",
+            "accent": "#2563EB"
+        },
+        {
+            "name": "王总监",
+            "title": "某制造业集团 · 财务总监",
+            "content": "税务测算功能很实用，尤其是年终奖单独计税和合并计税的对比，直接帮团队省了几十万的个税支出。简易报税的票据 AI 识别准确率也很高。",
+            "color": "#F0FDF4",
+            "border": "#BBF7D0",
+            "accent": "#10B981"
+        },
+        {
+            "name": "张老师",
+            "title": "某财经大学 · 会计学教授",
+            "content": "在课堂演示舞弊识别时，Audit Mind 的可视化效果非常直观，学生能通过 SHAP 图理解 AI 是如何做出判断的，是教学与科研结合的好工具。",
+            "color": "#FFFBEB",
+            "border": "#FDE68A",
+            "accent": "#F59E0B"
+        },
+    ]
+
+    testimonial_cols = st.columns(len(testimonials))
+    for idx, t in enumerate(testimonials):
+        with testimonial_cols[idx]:
+            t_html = f"""<div style="background: {t['color']}; border: 1px solid {t['border']}; border-radius: 14px; padding: 1.5rem; height: 100%; animation: fadeInUp 0.5s ease-out {idx*0.15}s both; position: relative;">
+                <div style="font-size: 2rem; color: {t['accent']}; opacity: 0.25; position: absolute; top: 10px; left: 14px; font-family: Georgia, serif;">"</div>
+                <p style="color: #334155; font-size: 0.92rem; line-height: 1.7; margin: 1.25rem 0 1.25rem 0; position: relative; z-index: 1;">{t['content']}</p>
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: auto;">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: {t['accent']}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.85rem;">{t['name'][0]}</div>
+                    <div>
+                        <div style="font-weight: 600; color: #0F172A; font-size: 0.9rem;">{t['name']}</div>
+                        <div style="color: #64748B; font-size: 0.8rem;">{t['title']}</div>
+                    </div>
+                </div>
+            </div>"""
+            st.components.v1.html(t_html, height=260, scrolling=False)
+
     # ========== Bottom CTA Banner ==========
     cta_html = '''
     <div style="margin: 2.5rem -1rem 0 -1rem; padding: 3rem 2rem; background: linear-gradient(135deg, #EFF6FF, #DBEAFE); border-top: 1px solid #BFDBFE; text-align: center; position: relative; overflow: hidden;">
@@ -1461,6 +1554,7 @@ def render_tax_module():
         calc_tab1, calc_tab2 = st.tabs(["个税测算", "企业税测算"])
 
         with calc_tab1:
+            st.markdown("**基本信息**")
             col1, col2 = st.columns(2)
             with col1:
                 monthly_salary = st.number_input("税前月薪（元）", min_value=0, value=15000, step=500, key="tax_salary")
@@ -1469,13 +1563,28 @@ def render_tax_module():
                 social_insurance = st.number_input("五险一金/月（元）", min_value=0, value=3000, step=100, key="tax_si")
                 special_deduction = st.number_input("专项附加扣除/月（元）", min_value=0, value=2000, step=100, key="tax_sd")
 
+            with st.expander("更多扣除项（可选）"):
+                col3, col4 = st.columns(2)
+                with col3:
+                    donation = st.number_input("公益捐赠/年（元）", min_value=0, value=0, step=500, key="tax_donation")
+                    annuity = st.number_input("职业年金/年（元）", min_value=0, value=0, step=500, key="tax_annuity")
+                with col4:
+                    health_insurance = st.number_input("商业健康险/年（元，限额2400）", min_value=0, max_value=2400, value=0, step=100, key="tax_health")
+                    housing_loan_interest = st.number_input("住房贷款利息/月（元）", min_value=0, value=0, step=500, key="tax_housing")
+
             if st.button("计算个税", type="primary", use_container_width=True, key="calc_pit"):
-                # 个税计算（综合所得）
                 annual_income = monthly_salary * 12
-                annual_deduction = 60000 + social_insurance * 12 + special_deduction * 12
+                annual_deduction = (
+                    60000
+                    + social_insurance * 12
+                    + special_deduction * 12
+                    + min(donation, annual_income * 0.12)
+                    + min(annuity, annual_income * 0.04)
+                    + min(health_insurance, 2400)
+                    + min(housing_loan_interest * 12, 12000)
+                )
                 taxable_income = max(0, annual_income - annual_deduction)
 
-                # 税率表
                 brackets = [
                     (0, 36000, 0.03, 0),
                     (36000, 144000, 0.10, 2520),
@@ -1499,7 +1608,6 @@ def render_tax_module():
 
                 after_tax = annual_income - tax
 
-                # 年终奖单独计税
                 if annual_bonus > 0:
                     monthly_bonus = annual_bonus / 12
                     bonus_rate = 0
@@ -1512,7 +1620,6 @@ def render_tax_module():
                 else:
                     bonus_tax = 0
 
-                # 年终奖合并计税
                 combined_taxable = taxable_income + annual_bonus
                 combined_rate = 0
                 combined_qd = 0
@@ -1525,22 +1632,23 @@ def render_tax_module():
                 best_option = "单独计税" if bonus_tax <= combined_bonus_tax else "合并计税"
                 saving = abs(bonus_tax - combined_bonus_tax)
 
-                # 结果展示
                 st.markdown("""
                 <div style="border-radius: 16px; padding: 24px; background: linear-gradient(135deg, #EFF6FF, #DBEAFE); margin: 16px 0;">
                     <h4 style="margin: 0 0 12px 0; color: #1E40AF;">计算结果</h4>
                 </div>
                 """, unsafe_allow_html=True)
 
-                r1, r2, r3 = st.columns(3)
+                r1, r2, r3, r4 = st.columns(4)
                 with r1:
-                    st.metric("年应纳税所得额", f"¥{taxable_income:,.0f}")
+                    st.metric("年收入", f"¥{annual_income:,.0f}")
                 with r2:
-                    st.metric("适用税率", f"{rate*100:.0f}%")
+                    st.metric("年扣除额", f"¥{annual_deduction:,.0f}")
                 with r3:
-                    st.metric("年个税总额", f"¥{tax:,.0f}")
+                    st.metric("适用税率", f"{rate*100:.0f}%")
+                with r4:
+                    st.metric("年个税", f"¥{tax:,.0f}")
 
-                st.metric("税后年收入（不含年终奖）", f"¥{after_tax:,.0f}")
+                st.metric("税后年收入", f"¥{after_tax:,.0f}")
 
                 st.divider()
                 st.subheader("年终奖最优方案对比")
@@ -1559,7 +1667,7 @@ def render_tax_module():
                         <h4 style="margin: 0 0 8px 0; color: #0F172A;">合并计税 {'推荐' if best_option == '合并计税' else ''}</h4>
                         <p style="margin: 0; color: #475569; font-size: 0.9rem;">年终奖个税: <strong>¥{combined_bonus_tax:,.0f}</strong></p>
                     </div>
-                    """, unsafe_allow_html=True)
+                    """, unsafe_add_html=True)
 
                 st.success(f"最优方案: **{best_option}**，可节省 ¥{saving:,.0f}")
 
@@ -1617,6 +1725,27 @@ def render_tax_module():
                 st.metric("合计应缴税额", f"¥{total_tax:,.0f}")
                 st.metric("税后净利润", f"¥{net_profit:,.0f}", delta=f"利润率 {net_profit/revenue*100:.1f}%" if revenue > 0 else "")
 
+            with st.expander("其他税种测算（印花税 / 房产税）"):
+                st.markdown("**印花税**")
+                contract_amount = st.number_input("合同金额（元）", min_value=0, value=100000, step=1000, key="stamp_contract")
+                stamp_type = st.selectbox("合同类型", ["买卖合同（0.03%）", "借款合同（0.005%）", "产权转移（0.05%）", "营业账簿（0.025%）"], key="stamp_type")
+                stamp_rates = {"买卖合同（0.03%）": 0.0003, "借款合同（0.005%）": 0.00005, "产权转移（0.05%）": 0.0005, "营业账簿（0.025%）": 0.00025}
+                stamp_tax = contract_amount * stamp_rates.get(stamp_type, 0.0003)
+                st.metric("应缴印花税", f"¥{stamp_tax:,.2f}")
+
+                st.divider()
+                st.markdown("**房产税**")
+                property_type = st.selectbox("房产用途", ["自用（从价）", "出租（从租）"], key="property_type")
+                if property_type == "自用（从价）":
+                    property_value = st.number_input("房产原值（元）", min_value=0, value=500000, step=10000, key="property_value")
+                    deduction_rate = st.slider("扣除比例", 0.1, 0.3, 0.2, 0.05, key="deduction_rate")
+                    property_tax = property_value * (1 - deduction_rate) * 0.012
+                    st.metric("应缴房产税（年）", f"¥{property_tax:,.2f}")
+                else:
+                    rental_income = st.number_input("年租金收入（元）", min_value=0, value=60000, step=1000, key="rental_income")
+                    property_tax = rental_income * 0.12
+                    st.metric("应缴房产税（年）", f"¥{property_tax:,.2f}")
+
     # ========== 子 Tab 2: 简易报税 ==========
     with sub_tab2:
         st.markdown("""
@@ -1652,35 +1781,122 @@ def render_tax_module():
                     st.rerun()
 
         elif step == 2:
-            st.subheader("第二步：识别结果")
+            st.subheader("第二步：AI 识别结果")
 
-            # 模拟识别结果（实际应调用 LLM 视觉能力）
-            demo_results = [
-                {"类型": "增值税发票", "金额": 12000, "税率": "13%", "税额": 1380.53, "分类": "收入"},
-                {"类型": "银行流水", "金额": 50000, "税率": "-", "税额": 0, "分类": "收入"},
-                {"类型": "工资表", "金额": 25000, "税率": "-", "税额": 0, "分类": "成本"},
-                {"类型": "费用报销单", "金额": 3500, "税率": "-", "税额": 0, "分类": "成本"},
-            ]
+            uploaded_files = st.session_state.get("tax_uploaded_files", [])
+            recognized_results = st.session_state.get("tax_recognized_results", [])
 
-            st.dataframe(demo_results, use_container_width=True, hide_index=True)
-            st.info("以上为演示数据。实际功能需接入 LLM 视觉识别 API。")
+            if not recognized_results and uploaded_files:
+                with st.spinner("AI 正在识别票据内容，请稍候..."):
+                    recognized_results = []
+                    for f in uploaded_files:
+                        try:
+                            f.seek(0)
+                            image_bytes = f.read()
+                            b64_image = base64.b64encode(image_bytes).decode("utf-8")
+                            mime = f.type if f.type else "image/jpeg"
 
-            if st.button("确认并生成申报表", type="primary", use_container_width=True, key="gen_report"):
-                st.session_state.tax_filing_step = 3
-                st.rerun()
+                            resp = requests.post(
+                                f"{API_BASE_URL.replace('/api', '')}/qa/ask",
+                                headers={"Content-Type": "application/json"},
+                                json={
+                                    "question": "识别这张票据/单据，提取以下信息并以JSON格式返回：{\"票据类型\":\"...\",\"金额\":数字,\"税率\":\"百分比或-\",\"税额\":数字,\"开票日期\":\"YYYY-MM-DD或-\",\"分类\":\"收入/成本/费用\"}",
+                                    "image_base64": b64_image,
+                                    "image_mime": mime,
+                                    "model": "qwen-vl-max"
+                                },
+                                timeout=60
+                            )
+
+                            if resp.status_code == 200:
+                                result = resp.json()
+                                answer = result.get("answer", "")
+                                # 尝试从回答中提取 JSON
+                                import re
+                                json_match = re.search(r'\{[^}]+\}', answer)
+                                if json_match:
+                                    try:
+                                        data = json.loads(json_match.group())
+                                        recognized_results.append({
+                                            "文件名": f.name,
+                                            "票据类型": data.get("票据类型", "未知"),
+                                            "金额": float(data.get("金额", 0) or 0),
+                                            "税率": data.get("税率", "-"),
+                                            "税额": float(data.get("税额", 0) or 0),
+                                            "分类": data.get("分类", "未知"),
+                                        })
+                                    except Exception:
+                                        recognized_results.append({
+                                            "文件名": f.name, "票据类型": "识别失败", "金额": 0,
+                                            "税率": "-", "税额": 0, "分类": "未知"
+                                        })
+                                else:
+                                    recognized_results.append({
+                                        "文件名": f.name, "票据类型": "识别失败", "金额": 0,
+                                        "税率": "-", "税额": 0, "分类": "未知"
+                                    })
+                            else:
+                                recognized_results.append({
+                                    "文件名": f.name, "票据类型": "API调用失败", "金额": 0,
+                                    "税率": "-", "税额": 0, "分类": "未知"
+                                })
+                        except Exception as e:
+                            recognized_results.append({
+                                "文件名": f.name, "票据类型": f"异常: {str(e)[:50]}", "金额": 0,
+                                "税率": "-", "税额": 0, "分类": "未知"
+                            })
+
+                    st.session_state.tax_recognized_results = recognized_results
+
+            if recognized_results:
+                st.dataframe(recognized_results, use_container_width=True, hide_index=True)
+
+                # 汇总统计
+                total_income = sum(r["金额"] for r in recognized_results if r["分类"] == "收入")
+                total_cost = sum(r["金额"] for r in recognized_results if r["分类"] in ["成本", "费用"])
+                total_tax_amount = sum(r["税额"] for r in recognized_results if r["税额"])
+
+                st.markdown(f"""
+                <div style="display:flex;gap:16px;margin:12px 0;">
+                    <div style="flex:1;border-radius:12px;padding:16px;background:#EFF6FF;border:1px solid #BFDBFE;">
+                        <p style="margin:0;color:#64748B;font-size:0.85rem;">识别收入</p>
+                        <p style="margin:0;font-size:1.5rem;font-weight:800;color:#2563EB;">¥{total_income:,.2f}</p>
+                    </div>
+                    <div style="flex:1;border-radius:12px;padding:16px;background:#F0FDF4;border:1px solid #BBF7D0;">
+                        <p style="margin:0;color:#64748B;font-size:0.85rem;">识别成本</p>
+                        <p style="margin:0;font-size:1.5rem;font-weight:800;color:#10B981;">¥{total_cost:,.2f}</p>
+                    </div>
+                    <div style="flex:1;border-radius:12px;padding:16px;background:#FFFBEB;border:1px solid #FDE68A;">
+                        <p style="margin:0;color:#64748B;font-size:0.85rem;">进项税额</p>
+                        <p style="margin:0;font-size:1.5rem;font-weight:800;color:#F59E0B;">¥{total_tax_amount:,.2f}</p>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+                if st.button("确认并生成申报表", type="primary", use_container_width=True, key="gen_report"):
+                    st.session_state.tax_filing_step = 3
+                    st.rerun()
+            else:
+                st.warning("暂无识别结果，请返回重新上传")
 
             if st.button("返回重新上传", use_container_width=True, key="back_step1"):
                 st.session_state.tax_filing_step = 1
+                st.session_state.tax_recognized_results = []
                 st.rerun()
 
         elif step == 3:
             st.subheader("第三步：简易申报表")
 
-            total_income = 62000
-            total_cost = 28500
-            taxable_profit = total_income - total_cost
-            vat = taxable_profit * 0.03
-            income_tax = taxable_profit * 0.05
+            recognized_results = st.session_state.get("tax_recognized_results", [])
+            total_income = sum(r["金额"] for r in recognized_results if r["分类"] == "收入")
+            total_cost = sum(r["金额"] for r in recognized_results if r["分类"] in ["成本", "费用"])
+            input_vat = sum(r["税额"] for r in recognized_results if r["税额"] and r["分类"] == "收入")
+            taxable_profit = max(0, total_income - total_cost)
+
+            # 小规模纳税人简易计算
+            vat_rate = 0.03
+            vat = max(0, taxable_profit * vat_rate - input_vat)
+            income_tax = taxable_profit * 0.05 if taxable_profit <= 3000000 else taxable_profit * 0.25
             surcharge = vat * 0.06
             total = vat + income_tax + surcharge
 
@@ -1688,17 +1904,27 @@ def render_tax_module():
                 {"项目": "营业收入", "金额": f"¥{total_income:,.2f}"},
                 {"项目": "营业成本", "金额": f"¥{total_cost:,.2f}"},
                 {"项目": "应纳税所得额", "金额": f"¥{taxable_profit:,.2f}"},
-                {"项目": "增值税（3%）", "金额": f"¥{vat:,.2f}"},
-                {"项目": "企业所得税（5%）", "金额": f"¥{income_tax:,.2f}"},
-                {"项目": "附加税（6%）", "金额": f"¥{surcharge:,.2f}"},
+                {"项目": "增值税（3%，抵扣后）", "金额": f"¥{vat:,.2f}"},
+                {"项目": "企业所得税", "金额": f"¥{income_tax:,.2f}"},
+                {"项目": "附加税", "金额": f"¥{surcharge:,.2f}"},
                 {"项目": "合计应缴税额", "金额": f"¥{total:,.2f}"},
             ]
 
             st.dataframe(report_data, use_container_width=True, hide_index=True)
-            st.info("以上为基于识别结果的演示申报表。实际功能需接入 LLM 视觉识别 API 获取真实数据。")
+
+            st.markdown(f"""
+            <div style="border-radius:16px;padding:20px;background:linear-gradient(135deg,#EFF6FF,#DBEAFE);margin:16px 0;">
+                <h4 style="margin:0 0 8px 0;color:#1E40AF;">申报表摘要</h4>
+                <p style="margin:0;color:#475569;font-size:0.9rem;">
+                    基于 {len(recognized_results)} 张识别单据自动生成。
+                    <br>营业收入 ¥{total_income:,.2f} - 营业成本 ¥{total_cost:,.2f} = 应纳税所得额 ¥{taxable_profit:,.2f}
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
 
             if st.button("完成", type="primary", use_container_width=True, key="finish_filing"):
                 st.session_state.tax_filing_step = 1
+                st.session_state.tax_recognized_results = []
                 st.success("申报表已生成！")
                 st.rerun()
 

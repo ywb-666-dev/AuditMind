@@ -1,0 +1,26 @@
+# Koyeb部署配置文件
+# 访问 https://app.koyeb.com 并导入此配置
+
+name: fraud-detection-backend
+
+# 构建配置
+build:
+  dockerfile: ./backend/Dockerfile
+  context: ./backend
+
+# 服务配置
+ports:
+  - port: 8000
+    protocol: http
+
+# 环境变量（需要在Koyeb控制台设置）
+# DATABASE_URL: 你的数据库连接字符串
+# SECRET_KEY: 随机生成的密钥
+# DASHSCOPE_API_KEY: 阿里云API密钥
+# BYPASS_DETECTION_QUOTA: false
+
+# 健康检查
+healthcheck:
+  http:
+    path: /docs
+    port: 8000

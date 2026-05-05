@@ -1,0 +1,29 @@
+# Docker构建时忽略的文件
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.git/
+.gitignore
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.idea/
+.vscode/
+
+# 上传的文件和生成的报告（容器中不需要）
+data/uploads/*.pdf
+data/uploads/*.xlsx
+data/uploads/*.csv
+result/reports/*.pdf
+
+# 模型文件如果太大可以从外部挂载，或单独处理
+# result/models/*.pkl

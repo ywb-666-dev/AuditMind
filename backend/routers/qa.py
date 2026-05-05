@@ -165,11 +165,32 @@ SYSTEM_PROMPT = """你是一位财务舞弊识别领域的专家助手。请用�
 4. 对于不确定的内容要诚实说明"""
 
 
-async def call_llm_api(question: str, context: str = "") -> str:
+async def call_llm_api(question: str, context: str = "", image_base64: str = None, image_mime: str = None) -> str:
     """
     调用 LLM API 获取回答（同步版本 - 用于非流式）
+    支持多模态图片识别（当提供 image_base64 时使用 qwen-vl-max）
     """
     user_prompt = f"{context}\n\n问题：{question}" if context else question
+    is_multimodal = image_base64 is not None and image_mime is not None
+    model = settings.MODEL_QWEN_VL if is_multimodal else settings.MODEL_QWEN_FS
+
+    # 构造 messages
+    if is_multimodal:
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": user_prompt},
+                    {"type": "image_url", "image_url": {"url": f"data:{image_mime};base64,{image_base64}"}}
+                ]
+            }
+        ]
+    else:
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_prompt}
+        ]
 
     # 调用 阿里云DashScope API
     try:
@@ -181,11 +202,8 @@ async def call_llm_api(question: str, context: str = "") -> str:
                     "Content-Type": "application/json"
                 },
                 json={
-                    "model": settings.MODEL_QWEN_FS,
-                    "messages": [
-                        {"role": "system", "content": SYSTEM_PROMPT},
-                        {"role": "user", "content": user_prompt}
-                    ],
+                    "model": model,
+                    "messages": messages,
                     "temperature": 0.7,
                     "max_tokens": 1500
                 }
@@ -281,7 +299,12 @@ async def ask_question(
     else:
         context = ""
 
-    answer = await call_llm_api(question_data.question, context)
+    answer = await call_llm_api(
+        question_data.question,
+        context,
+        image_base64=question_data.image_base64,
+        image_mime=question_data.image_mime
+    )
 
     # 保存问答历史
     db_qa = QAHistory(

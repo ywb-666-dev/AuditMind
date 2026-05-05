@@ -229,6 +229,8 @@ class QAAskRequest(BaseModel):
     """问答请求"""
     question: str
     category: Optional[str] = None
+    image_base64: Optional[str] = None
+    image_mime: Optional[str] = None
 
 
 class QAResponse(BaseModel):
