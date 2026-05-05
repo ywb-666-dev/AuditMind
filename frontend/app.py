@@ -1659,7 +1659,37 @@ def render_tax_module():
                 st.metric("税后年收入", f"¥{after_tax:,.0f}")
 
                 st.divider()
+                with st.expander("查看应纳税所得额计算明细", expanded=True):
+                    detail_data = [
+                        {"项目": "税前年收入（月薪×12）", "金额": f"¥{annual_income:,.0f}", "说明": f"{monthly_salary:,.0f} × 12"},
+                        {"项目": "减：基本减除费用", "金额": f"-¥60,000", "说明": "个税法规定，每年固定扣除 6 万元"},
+                        {"项目": "减：五险一金（年）", "金额": f"-¥{social_insurance*12:,.0f}", "说明": f"{social_insurance:,.0f} × 12"},
+                        {"项目": "减：专项附加扣除（年）", "金额": f"-¥{special_deduction*12:,.0f}", "说明": f"{special_deduction:,.0f} × 12"},
+                    ]
+                    if donation > 0:
+                        detail_data.append({"项目": "减：公益捐赠", "金额": f"-¥{min(donation, annual_income*0.12):,.0f}", "说明": f"不超过年收入 12% 可全额扣除（您填写 {donation:,.0f}）"})
+                    if annuity > 0:
+                        detail_data.append({"项目": "减：职业年金", "金额": f"-¥{min(annuity, annual_income*0.04):,.0f}", "说明": f"不超过年收入 4% 可扣除（您填写 {annuity:,.0f}）"})
+                    if health_insurance > 0:
+                        detail_data.append({"项目": "减：商业健康险", "金额": f"-¥{min(health_insurance, 2400):,.0f}", "说明": f"限额 2,400 元/年（您填写 {health_insurance:,.0f}）"})
+                    if housing_loan_interest > 0:
+                        detail_data.append({"项目": "减：住房贷款利息", "金额": f"-¥{min(housing_loan_interest*12, 12000):,.0f}", "说明": f"限额 12,000 元/年（您填写 {housing_loan_interest:,.0f}/月）"})
+                    detail_data.append({"项目": "= 应纳税所得额", "金额": f"¥{taxable_income:,.0f}", "说明": "以上为七级超额累进税率计税基础"})
+                    st.dataframe(pd.DataFrame(detail_data), use_container_width=True, hide_index=True)
+
+                    st.caption("**税率说明**：全年应纳税所得额不超过 3.6 万部分 3%，3.6–14.4 万部分 10%，14.4–30 万部分 20%，30–42 万部分 25%，42–66 万部分 30%，66–96 万部分 35%，超过 96 万部分 45%。")
+
+                st.divider()
                 st.subheader("年终奖最优方案对比")
+
+                bonus_detail = [
+                    {"对比项": "计税方式", "单独计税": "年终奖除以 12 后按月度税率表单独计算", "合并计税": "年终奖并入当年综合所得统一计算"},
+                    {"对比项": "月均奖金", "单独计税": f"¥{annual_bonus/12:,.0f}", "合并计税": "—"},
+                    {"对比项": "适用税率", "单独计税": f"{bonus_rate*100:.0f}%", "合并计税": f"{combined_rate*100:.0f}%"},
+                    {"对比项": "速算扣除数", "单独计税": f"¥{bonus_qd:,.0f}", "合并计税": f"¥{combined_qd:,.0f}"},
+                    {"对比项": "年终奖个税", "单独计税": f"¥{bonus_tax:,.0f}", "合并计税": f"¥{combined_bonus_tax:,.0f}"},
+                ]
+                st.dataframe(pd.DataFrame(bonus_detail), use_container_width=True, hide_index=True)
 
                 c1, c2 = st.columns(2)
                 with c1:
@@ -1732,6 +1762,35 @@ def render_tax_module():
 
                 st.metric("合计应缴税额", f"¥{total_tax:,.0f}")
                 st.metric("税后净利润", f"¥{net_profit:,.0f}", delta=f"利润率 {net_profit/revenue*100:.1f}%" if revenue > 0 else "")
+
+                st.divider()
+                with st.expander("查看利润与税费计算明细", expanded=True):
+                    profit_data = [
+                        {"项目": "营业收入", "金额": f"¥{revenue:,.0f}", "计算过程": "您填写的年度营业收入"},
+                        {"项目": "减：营业成本", "金额": f"-¥{cost:,.0f}", "计算过程": "您填写的年度营业成本"},
+                        {"项目": "= 利润总额", "金额": f"¥{profit:,.0f}", "计算过程": "收入 - 成本"},
+                    ]
+                    st.dataframe(pd.DataFrame(profit_data), use_container_width=True, hide_index=True)
+
+                    st.markdown("**税费明细**")
+                    tax_detail = []
+                    if taxpayer_type == "小规模纳税人":
+                        tax_detail.append({"税种": "增值税", "税率/依据": "征收率 3%", "计算过程": f"¥{revenue:,.0f} × 3% = ¥{vat:,.0f}", "应缴金额": f"¥{vat:,.0f}"})
+                        tax_detail.append({"税种": "附加税", "税率/依据": "增值税 × 6%（减半征收）", "计算过程": f"¥{vat:,.0f} × 6% = ¥{surcharge:,.0f}", "应缴金额": f"¥{surcharge:,.0f}"})
+                    else:
+                        tax_detail.append({"税种": "增值税", "税率/依据": f"{industry}", "计算过程": f"¥{revenue:,.0f} × {vat_rate*100:.0f}% = ¥{vat:,.0f}", "应缴金额": f"¥{vat:,.0f}"})
+                        tax_detail.append({"税种": "附加税", "税率/依据": "增值税 × 12%", "计算过程": f"¥{vat:,.0f} × 12% = ¥{surcharge:,.0f}", "应缴金额": f"¥{surcharge:,.0f}"})
+
+                    if profit <= 0:
+                        tax_detail.append({"税种": "企业所得税", "税率/依据": "利润 ≤ 0，无需缴纳", "计算过程": "无", "应缴金额": "¥0"})
+                    elif profit <= 3000000:
+                        tax_detail.append({"税种": "企业所得税", "税率/依据": "小微优惠税率 5%", "计算过程": f"¥{profit:,.0f} × 5% = ¥{income_tax:,.0f}", "应缴金额": f"¥{income_tax:,.0f}"})
+                    else:
+                        tax_detail.append({"税种": "企业所得税", "税率/依据": "一般税率 25%", "计算过程": f"¥{profit:,.0f} × 25% = ¥{income_tax:,.0f}", "应缴金额": f"¥{income_tax:,.0f}"})
+
+                    st.dataframe(pd.DataFrame(tax_detail), use_container_width=True, hide_index=True)
+
+                    st.caption("**政策说明**：增值税是对商品/服务增值部分征收的流转税；企业所得税是对企业利润征收的所得税；附加税包括城建税、教育费附加、地方教育附加，以增值税为计税基础。小规模纳税人季度销售额 ≤ 30 万元可免征增值税。")
 
             with st.expander("其他税种测算（印花税 / 房产税）"):
                 st.markdown("**印花税**")
