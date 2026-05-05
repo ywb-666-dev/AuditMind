@@ -1948,7 +1948,7 @@ def render_tax_module():
                 财税政策咨询
             </h2>
             <p style="color: #64748B; font-size: 0.95rem; margin: 0; max-width: 480px; margin-left: auto; margin-right: auto; line-height: 1.6;">
-                AI 财税专家，解答个税、企业税、社保公积金等政策问题<br>支持流式输出，即问即答
+                AI 财税专家，解答个税、企业税、社保公积金等政策问题
             </p>
         </div>
         """, unsafe_allow_html=True)
