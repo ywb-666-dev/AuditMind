@@ -2,6 +2,7 @@
 Audit Mind - Financial Fraud Detection SaaS
 """
 import streamlit as st
+import streamlit.components.v1 as components
 import requests
 import pandas as pd
 import io
@@ -3346,26 +3347,29 @@ def render_qa():
     for idx, plan in enumerate(fs_plans):
         with fs_cols[idx]:
             card_border = "2px solid #2563EB" if plan["highlight"] else "1px solid #E2E8F0"
-            badge = '<div style="background: linear-gradient(135deg, #2563EB, #1D4ED8); color: #FFFFFF; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; margin-bottom: 10px;">推荐</div>' if plan["highlight"] else '<div style="height: 26px;"></div>'
+            badge = '<div style="background: linear-gradient(135deg, #2563EB, #1D4ED8); color: #FFFFFF; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; margin-bottom: 10px;">推荐</div>' if plan["highlight"] else ''
 
-            st.markdown(f"""
-            <div style="border-radius: 16px; padding: 20px; height: 100%; border: {card_border}; background: #FFFFFF; box-shadow: 0 2px 12px rgba(0,0,0,0.04);">
+            features_html = "\n".join([
+                f'<p style="margin: 5px 0; font-size: 0.8rem; color: {"#0F172A" if included else "#94A3B8"};">{"✓" if included else "—"} {feat}</p>'
+                for feat, included in plan["features"]
+            ])
+
+            card_html = f"""
+            <div style="border-radius: 16px; padding: 20px; height: 100%; border: {card_border}; background: #FFFFFF; box-shadow: 0 2px 12px rgba(0,0,0,0.04); font-family: sans-serif;">
                 {badge}
-                <h4 style="font-size: 1.15rem; margin-bottom: 4px; color: #0F172A;">{plan['name']}</h4>
-                <p style="color: #64748B; font-size: 0.8rem; margin-bottom: 12px;">{plan['target']}</p>
+                <h4 style="font-size: 1.15rem; margin: 0 0 4px 0; color: #0F172A;">{plan['name']}</h4>
+                <p style="color: #64748B; font-size: 0.8rem; margin: 0 0 12px 0;">{plan['target']}</p>
                 <div style="margin: 12px 0;">
                     <span style="font-size: 2.2rem; font-weight: 800; color: #2563EB;">¥{plan['price']}</span>
                     <span style="color: #94A3B8; font-size: 0.85rem;">/{plan['unit']}</span>
                 </div>
                 <div style="border-top: 1px solid #E2E8F0; padding-top: 12px;">
-            """, unsafe_allow_html=True)
+                    {features_html}
+                </div>
+            </div>
+            """
 
-            for feat, included in plan["features"]:
-                icon = "✓" if included else "—"
-                color = "#0F172A" if included else "#94A3B8"
-                st.markdown(f"<p style='margin: 5px 0; font-size: 0.8rem; color: {color};'>{icon} {feat}</p>", unsafe_allow_html=True)
-
-            st.markdown("</div></div>", unsafe_allow_html=True)
+            components.html(card_html, height=360, scrolling=False)
 
             if st.button("选择方案", use_container_width=True, key=f"fs_plan_cta_{idx}", type="primary" if plan["highlight"] else "secondary"):
                 st.info("""
@@ -3770,7 +3774,6 @@ def render_membership():
     </div>
     """
 
-    import streamlit.components.v1 as components
     components.html(enterprise_html, height=420, scrolling=False)
 
     if st.button("预约演示", use_container_width=True, key="biz_plan_cta_enterprise", type="primary"):
