@@ -3278,6 +3278,108 @@ def render_qa():
     </div>
     """, unsafe_allow_html=True)
 
+    # ========== AI 问答会员定价（所有用户可见）==========
+    st.markdown("<div style='margin: 1.5rem 0;'></div>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style="text-align:center; padding: 8px 0 12px 0;">
+        <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 4px; color: #0F172A;">
+            解锁更强大的 AI 问答能力
+        </h3>
+        <p style="color: #64748B; font-size: 0.85rem; margin: 0;">
+            会员独享更高问答额度与专业深度
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    fs_plans = [
+        {
+            "name": "个人/个体版",
+            "price": "99",
+            "unit": "元/年",
+            "target": "独立审计师 · 个人投资者",
+            "highlight": False,
+            "features": [
+                ("每日 20 次 AI 问答", True),
+                ("基础财务知识库", True),
+                ("标准回复速度", True),
+                ("历史记录保存 7 天", True),
+                ("优先响应通道", False),
+                ("高级分析模型", False),
+                ("API 调用接口", False),
+            ],
+        },
+        {
+            "name": "小微企业版",
+            "price": "298",
+            "unit": "元/年",
+            "target": "小型企业 · 创业团队",
+            "highlight": True,
+            "features": [
+                ("每日 100 次 AI 问答", True),
+                ("专业财务知识库", True),
+                ("优先回复速度", True),
+                ("历史记录保存 90 天", True),
+                ("优先响应通道", True),
+                ("高级分析模型", False),
+                ("API 调用接口", False),
+            ],
+        },
+        {
+            "name": "企业分析版",
+            "price": "698",
+            "unit": "元/年",
+            "target": "中型企业 · 投资机构",
+            "highlight": False,
+            "features": [
+                ("不限次数 AI 问答", True),
+                ("全量财务知识库", True),
+                ("极速回复通道", True),
+                ("历史记录永久保存", True),
+                ("优先响应通道", True),
+                ("高级分析模型", True),
+                ("API 调用接口", True),
+            ],
+        },
+    ]
+
+    fs_cols = st.columns(3)
+    for idx, plan in enumerate(fs_plans):
+        with fs_cols[idx]:
+            card_border = "2px solid #2563EB" if plan["highlight"] else "1px solid #E2E8F0"
+            badge = '<div style="background: linear-gradient(135deg, #2563EB, #1D4ED8); color: #FFFFFF; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; margin-bottom: 10px;">推荐</div>' if plan["highlight"] else '<div style="height: 26px;"></div>'
+
+            st.markdown(f"""
+            <div style="border-radius: 16px; padding: 20px; height: 100%; border: {card_border}; background: #FFFFFF; box-shadow: 0 2px 12px rgba(0,0,0,0.04);">
+                {badge}
+                <h4 style="font-size: 1.15rem; margin-bottom: 4px; color: #0F172A;">{plan['name']}</h4>
+                <p style="color: #64748B; font-size: 0.8rem; margin-bottom: 12px;">{plan['target']}</p>
+                <div style="margin: 12px 0;">
+                    <span style="font-size: 2.2rem; font-weight: 800; color: #2563EB;">¥{plan['price']}</span>
+                    <span style="color: #94A3B8; font-size: 0.85rem;">/{plan['unit']}</span>
+                </div>
+                <div style="border-top: 1px solid #E2E8F0; padding-top: 12px;">
+            """, unsafe_allow_html=True)
+
+            for feat, included in plan["features"]:
+                icon = "✓" if included else "—"
+                color = "#0F172A" if included else "#94A3B8"
+                st.markdown(f"<p style='margin: 5px 0; font-size: 0.8rem; color: {color};'>{icon} {feat}</p>", unsafe_allow_html=True)
+
+            st.markdown("</div></div>", unsafe_allow_html=True)
+
+            if st.button("选择方案", use_container_width=True, key=f"fs_plan_cta_{idx}", type="primary" if plan["highlight"] else "secondary"):
+                st.info("""
+                 **开通 AI 问答会员**
+
+                1. 确认套餐版本
+                2. 在线支付或联系商务
+                3. 即刻开通会员
+
+                如有疑问请联系：sales@auditmind.com
+                """)
+
+    st.divider()
+
     # 检查登录状态
     if not st.session_state.logged_in:
         st.info("AI 问答功能仅对登录用户开放")
@@ -3381,107 +3483,6 @@ def render_qa():
                     st.session_state.chat_history.append({"role": "assistant", "content": answer})
                 else:
                     st.error(f"回答失败: {str(e)}")
-
-    # ========== 财务助手会员定价（嵌入在助手页面）==========
-    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-    with st.expander("查看 AI 问答会员方案"):
-        st.markdown("""
-        <div style="text-align:center; padding: 12px 0 16px 0;">
-            <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; color: #0F172A;">
-                解锁更强大的 AI 问答能力
-            </h3>
-            <p style="color: #64748B; font-size: 0.9rem; margin: 0;">
-                财务助手会员独享更高问答额度与专业深度
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-
-        fs_plans = [
-            {
-                "name": "个人/个体版",
-                "price": "99",
-                "unit": "元/年",
-                "target": "独立审计师 · 个人投资者",
-                "highlight": False,
-                "features": [
-                    ("每日 20 次 AI 问答", True),
-                    ("基础财务知识库", True),
-                    ("标准回复速度", True),
-                    ("历史记录保存 7 天", True),
-                    ("优先响应通道", False),
-                    ("高级分析模型", False),
-                    ("API 调用接口", False),
-                ],
-            },
-            {
-                "name": "小微企业版",
-                "price": "298",
-                "unit": "元/年",
-                "target": "小型企业 · 创业团队",
-                "highlight": True,
-                "features": [
-                    ("每日 100 次 AI 问答", True),
-                    ("专业财务知识库", True),
-                    ("优先回复速度", True),
-                    ("历史记录保存 90 天", True),
-                    ("优先响应通道", True),
-                    ("高级分析模型", False),
-                    ("API 调用接口", False),
-                ],
-            },
-            {
-                "name": "企业分析版",
-                "price": "698",
-                "unit": "元/年",
-                "target": "中型企业 · 投资机构",
-                "highlight": False,
-                "features": [
-                    ("不限次数 AI 问答", True),
-                    ("全量财务知识库", True),
-                    ("极速回复通道", True),
-                    ("历史记录永久保存", True),
-                    ("优先响应通道", True),
-                    ("高级分析模型", True),
-                    ("API 调用接口", True),
-                ],
-            },
-        ]
-
-        fs_cols = st.columns(3)
-        for idx, plan in enumerate(fs_plans):
-            with fs_cols[idx]:
-                card_border = "2px solid #2563EB" if plan["highlight"] else "1px solid #E2E8F0"
-                badge = '<div style="background: linear-gradient(135deg, #2563EB, #1D4ED8); color: #FFFFFF; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; margin-bottom: 10px;">推荐</div>' if plan["highlight"] else '<div style="height: 26px;"></div>'
-
-                st.markdown(f"""
-                <div style="border-radius: 16px; padding: 20px; height: 100%; border: {card_border}; background: #FFFFFF; box-shadow: 0 2px 12px rgba(0,0,0,0.04); transition: transform 0.2s, box-shadow 0.2s;">
-                    {badge}
-                    <h4 style="font-size: 1.15rem; margin-bottom: 4px; color: #0F172A;">{plan['name']}</h4>
-                    <p style="color: #64748B; font-size: 0.8rem; margin-bottom: 12px;">{plan['target']}</p>
-                    <div style="margin: 12px 0;">
-                        <span style="font-size: 2.2rem; font-weight: 800; color: #2563EB;">¥{plan['price']}</span>
-                        <span style="color: #94A3B8; font-size: 0.85rem;">/{plan['unit']}</span>
-                    </div>
-                    <div style="border-top: 1px solid #E2E8F0; padding-top: 12px;">
-                """, unsafe_allow_html=True)
-
-                for feat, included in plan["features"]:
-                    icon = "✓" if included else "—"
-                    color = "#0F172A" if included else "#94A3B8"
-                    st.markdown(f"<p style='margin: 5px 0; font-size: 0.8rem; color: {color};'>{icon} {feat}</p>", unsafe_allow_html=True)
-
-                st.markdown("</div></div>", unsafe_allow_html=True)
-
-                if st.button("选择方案", use_container_width=True, key=f"fs_plan_cta_{idx}", type="primary" if plan["highlight"] else "secondary"):
-                    st.info("""
-                     **开通 AI 问答会员**
-
-                    1. 确认套餐版本
-                    2. 在线支付或联系商务
-                    3. 即刻开通会员
-
-                    如有疑问请联系：sales@auditmind.com
-                    """)
 
 
 # ================= 我的检测页面 =================
@@ -3727,50 +3728,50 @@ def render_membership():
         "target": "大型/全国性会计师事务所（团队 > 150人）",
         "value": "战略级审计数字化解决方案，全面对接客户生态，实现审计流程的深度定制与系统集成",
         "features": [
-            ("不限项目数量", True),
-            ("不限财报分析年限", True),
-            ("风险评分底稿高亮", True),
-            ("高级建议报告", True),
-            ("可视化雷达图", True),
-            ("同业案例对标", True),
-            ("整改跟踪引擎", True),
-            ("原文溯源", True),
-            ("深度API集成与开发支持", True),
-            ("定制化工作流", True),
-            ("专属客户成功团队", True),
-            ("高级安全与合规保障", True),
-            ("私有化部署", True),
+            "不限项目数量",
+            "不限财报分析年限",
+            "风险评分底稿高亮",
+            "高级建议报告",
+            "可视化雷达图",
+            "同业案例对标",
+            "整改跟踪引擎",
+            "原文溯源",
+            "深度API集成与开发支持",
+            "定制化工作流",
+            "专属客户成功团队",
+            "高级安全与合规保障",
+            "私有化部署",
         ],
     }
 
-    st.markdown(f"""
-    <div style="border-radius: 20px; padding: 32px; animation: fadeInUp 0.5s ease-out 0.4s both; background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); color: #FFFFFF;">
+    # 构建完整的 feature HTML 列表
+    features_html = "\n".join([f'<p style="margin: 6px 0; font-size: 0.9rem; color: #E2E8F0;">✓ {feat}</p>' for feat in enterprise_plan["features"]])
+
+    enterprise_html = f"""
+    <div style="border-radius: 20px; padding: 32px; background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); color: #FFFFFF; font-family: sans-serif;">
         <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 24px;">
             <div style="flex: 1; min-width: 280px;">
-                <div style="background: linear-gradient(135deg, #F59E0B, #D97706); color: #FFFFFF; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(245,158,11,0.3);">战略级方案</div>
-                <h3 style="font-size: 1.6rem; margin-bottom: 4px; color: #FFFFFF;">{enterprise_plan['name']}</h3>
-                <p style="color: #94A3B8; font-size: 0.9rem; margin-bottom: 16px;">{enterprise_plan['target']}</p>
+                <div style="background: linear-gradient(135deg, #F59E0B, #D97706); color: #FFFFFF; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 12px;">战略级方案</div>
+                <h3 style="font-size: 1.6rem; margin: 0 0 4px 0; color: #FFFFFF;">{enterprise_plan['name']}</h3>
+                <p style="color: #94A3B8; font-size: 0.9rem; margin: 0 0 16px 0;">{enterprise_plan['target']}</p>
                 <div style="margin: 16px 0;">
                     <span style="font-size: 3rem; font-weight: 800; color: #FFFFFF;">¥{enterprise_plan['price']}</span>
                     <span style="color: #CBD5E1; font-size: 1rem; font-weight: 600;">{enterprise_plan['price_unit']}</span>
                 </div>
                 <p style="color: #94A3B8; font-size: 0.85rem; margin: -8px 0 16px 0;">{enterprise_plan['price_note']}</p>
-                <p style="color: #CBD5E1; font-size: 1rem; line-height: 1.6;">{enterprise_plan['value']}</p>
+                <p style="color: #CBD5E1; font-size: 1rem; line-height: 1.6; margin: 0;">{enterprise_plan['value']}</p>
             </div>
             <div style="min-width: 280px; flex: 1;">
                 <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px; margin-top: 8px;">
-    """, unsafe_allow_html=True)
-
-    for feat, included in enterprise_plan["features"]:
-        icon = "✓" if included else "—"
-        st.markdown(f"<p style='margin: 6px 0; font-size: 0.9rem; color: #E2E8F0;'>✓ {feat}</p>", unsafe_allow_html=True)
-
-    st.markdown("""
+                    {features_html}
                 </div>
             </div>
         </div>
     </div>
-    """, unsafe_allow_html=True)
+    """
+
+    import streamlit.components.v1 as components
+    components.html(enterprise_html, height=420, scrolling=False)
 
     if st.button("预约演示", use_container_width=True, key="biz_plan_cta_enterprise", type="primary"):
         st.info("""
