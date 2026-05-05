@@ -3382,6 +3382,107 @@ def render_qa():
                 else:
                     st.error(f"回答失败: {str(e)}")
 
+    # ========== 财务助手会员定价（嵌入在助手页面）==========
+    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+    with st.expander("查看 AI 问答会员方案"):
+        st.markdown("""
+        <div style="text-align:center; padding: 12px 0 16px 0;">
+            <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 4px; color: #0F172A;">
+                解锁更强大的 AI 问答能力
+            </h3>
+            <p style="color: #64748B; font-size: 0.9rem; margin: 0;">
+                财务助手会员独享更高问答额度与专业深度
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        fs_plans = [
+            {
+                "name": "个人/个体版",
+                "price": "99",
+                "unit": "元/年",
+                "target": "独立审计师 · 个人投资者",
+                "highlight": False,
+                "features": [
+                    ("每日 20 次 AI 问答", True),
+                    ("基础财务知识库", True),
+                    ("标准回复速度", True),
+                    ("历史记录保存 7 天", True),
+                    ("优先响应通道", False),
+                    ("高级分析模型", False),
+                    ("API 调用接口", False),
+                ],
+            },
+            {
+                "name": "小微企业版",
+                "price": "298",
+                "unit": "元/年",
+                "target": "小型企业 · 创业团队",
+                "highlight": True,
+                "features": [
+                    ("每日 100 次 AI 问答", True),
+                    ("专业财务知识库", True),
+                    ("优先回复速度", True),
+                    ("历史记录保存 90 天", True),
+                    ("优先响应通道", True),
+                    ("高级分析模型", False),
+                    ("API 调用接口", False),
+                ],
+            },
+            {
+                "name": "企业分析版",
+                "price": "698",
+                "unit": "元/年",
+                "target": "中型企业 · 投资机构",
+                "highlight": False,
+                "features": [
+                    ("不限次数 AI 问答", True),
+                    ("全量财务知识库", True),
+                    ("极速回复通道", True),
+                    ("历史记录永久保存", True),
+                    ("优先响应通道", True),
+                    ("高级分析模型", True),
+                    ("API 调用接口", True),
+                ],
+            },
+        ]
+
+        fs_cols = st.columns(3)
+        for idx, plan in enumerate(fs_plans):
+            with fs_cols[idx]:
+                card_border = "2px solid #2563EB" if plan["highlight"] else "1px solid #E2E8F0"
+                badge = '<div style="background: linear-gradient(135deg, #2563EB, #1D4ED8); color: #FFFFFF; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; margin-bottom: 10px;">推荐</div>' if plan["highlight"] else '<div style="height: 26px;"></div>'
+
+                st.markdown(f"""
+                <div style="border-radius: 16px; padding: 20px; height: 100%; border: {card_border}; background: #FFFFFF; box-shadow: 0 2px 12px rgba(0,0,0,0.04); transition: transform 0.2s, box-shadow 0.2s;">
+                    {badge}
+                    <h4 style="font-size: 1.15rem; margin-bottom: 4px; color: #0F172A;">{plan['name']}</h4>
+                    <p style="color: #64748B; font-size: 0.8rem; margin-bottom: 12px;">{plan['target']}</p>
+                    <div style="margin: 12px 0;">
+                        <span style="font-size: 2.2rem; font-weight: 800; color: #2563EB;">¥{plan['price']}</span>
+                        <span style="color: #94A3B8; font-size: 0.85rem;">/{plan['unit']}</span>
+                    </div>
+                    <div style="border-top: 1px solid #E2E8F0; padding-top: 12px;">
+                """, unsafe_allow_html=True)
+
+                for feat, included in plan["features"]:
+                    icon = "✓" if included else "—"
+                    color = "#0F172A" if included else "#94A3B8"
+                    st.markdown(f"<p style='margin: 5px 0; font-size: 0.8rem; color: {color};'>{icon} {feat}</p>", unsafe_allow_html=True)
+
+                st.markdown("</div></div>", unsafe_allow_html=True)
+
+                if st.button("选择方案", use_container_width=True, key=f"fs_plan_cta_{idx}", type="primary" if plan["highlight"] else "secondary"):
+                    st.info("""
+                     **开通 AI 问答会员**
+
+                    1. 确认套餐版本
+                    2. 在线支付或联系商务
+                    3. 即刻开通会员
+
+                    如有疑问请联系：sales@auditmind.com
+                    """)
+
 
 # ================= 我的检测页面 =================
 def render_my_detections():
@@ -3483,92 +3584,102 @@ def render_my_detections():
 
 # ================= 会员中心页面 =================
 def render_membership():
-    """渲染会员中心/价格中心页面 - 三版本定价方案"""
+    """渲染会员中心/价格中心页面 - 审计平台四版本B端定价"""
     st.markdown("""
     <div style="text-align:center; padding: 40px 0 20px 0;">
         <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 8px;">
             <span style="background: linear-gradient(135deg, #2563EB, #1D4ED8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-                选择适合您的方案
+                选择适合事务所的方案
             </span>
         </h1>
         <p style="color: #64748B; font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
-            灵活的定价，专业的服务，助力每一位财务工作者高效识别风险
+            面向会计师事务所的专业级审计数字化解决方案，按团队规模灵活选择
         </p>
     </div>
     """, unsafe_allow_html=True)
 
-    plans = [
+    # ========== 上排：基础版 / 专业版 / 高级版 ==========
+    plans_top = [
         {
-            "name": "个人/个体版",
-            "price": "99",
-            "original_price": "199",
-            "unit": "元/年",
-            "target": "独立审计师 · 个人投资者 · 财务分析师",
+            "name": "基础版",
+            "price": "1.98",
+            "price_unit": "万/年",
+            "price_note": "固定年费",
+            "target": "初创/小型事务所（团队 < 10人）",
             "highlight": False,
-            "value": "个人效率工具，快速识别企业财务风险，支持单项目深度分析",
+            "value": "入门级效率工具，以极低成本启用数字化审计，规范单个项目流程",
             "features": [
-                ("单项目深度分析", True),
-                ("3年财报数据对比", True),
-                ("风险评分与底稿高亮", True),
-                ("AI风险建议报告", True),
-                ("标准案例库查询", True),
+                ("单项目审计", True),
+                ("3年财报分析", True),
+                ("风险评分底稿高亮", True),
+                ("基础建议报告", True),
                 ("多项目并行管理", False),
-                ("可视化风险雷达图", False),
+                ("可视化雷达图", False),
+                ("同业案例对标", False),
+                ("整改跟踪引擎", False),
+                ("原文溯源", False),
                 ("Open API接口", False),
-                ("私有化部署支持", False),
+                ("团队权限管理", False),
+                ("私有化部署", False),
             ],
-            "cta": "立即开通",
+            "cta": "立即咨询",
             "cta_type": "secondary",
         },
         {
-            "name": "小微企业版",
-            "price": "298",
-            "original_price": "598",
-            "unit": "元/年",
-            "target": "小型企业 · 创业团队 · 工作室",
+            "name": "专业版",
+            "price": "3.98",
+            "price_unit": "万起/年",
+            "price_note": "5项目版 3.98万 / 10项目版 5.98万",
+            "target": "成长型/标准中型所（团队 10-50人）",
             "highlight": True,
-            "value": "团队级分析平台，支持多项目并行管理与质量把控，提升协作效率",
+            "value": "多项目协同管理平台，实现多个项目并行管理与质量把控，提升团队标准化水平",
             "features": [
-                ("单项目深度分析", True),
-                ("3年财报数据对比", True),
-                ("风险评分与底稿高亮", True),
-                ("AI风险建议报告", True),
-                ("标准案例库查询", True),
-                ("多项目并行（≤5个）", True),
-                ("可视化风险雷达图", True),
+                ("单项目审计", True),
+                ("3年财报分析", True),
+                ("风险评分底稿高亮", True),
+                ("基础建议报告", True),
+                ("多项目并行（≤10个/年）", True),
+                ("可视化雷达图", True),
+                ("同业案例对标", True),
+                ("整改跟踪引擎", True),
+                ("原文溯源", True),
                 ("Open API接口", False),
-                ("私有化部署支持", False),
+                ("团队权限管理", False),
+                ("私有化部署", False),
             ],
-            "cta": "立即开通",
+            "cta": "立即咨询",
             "cta_type": "primary",
         },
         {
-            "name": "企业分析版",
-            "price": "698",
-            "original_price": "1298",
-            "unit": "元/年",
-            "target": "中型企业 · 投资机构 · 咨询公司",
+            "name": "高级版",
+            "price": "8.8",
+            "price_unit": "万起/年",
+            "price_note": "基础平台费 + 项目增量包 + 高级模块",
+            "target": "成熟型中型所/区域领先所（团队 50-150人）",
             "highlight": False,
-            "value": "全功能开放，深度数据分析与系统集成，满足企业级审计数字化需求",
+            "value": "一体化协同与集成平台，支撑跨部门复杂协作，具备与企业或内部系统集成的能力",
             "features": [
-                ("单项目深度分析", True),
-                ("3年财报数据对比", True),
-                ("风险评分与底稿高亮", True),
-                ("AI风险建议报告", True),
-                ("标准案例库查询", True),
-                ("不限项目数量", True),
-                ("可视化风险雷达图", True),
+                ("含20个基础项目", True),
+                ("3年财报分析", True),
+                ("风险评分底稿高亮", True),
+                ("高级建议报告", True),
+                ("多项目并行", True),
+                ("可视化雷达图", True),
+                ("同业案例对标", True),
+                ("整改跟踪引擎", True),
+                ("原文溯源", True),
                 ("Open API接口", True),
-                ("私有化部署支持", True),
+                ("团队与角色权限管理", True),
+                ("高级数据分析模块", True),
+                ("私有化部署", False),
             ],
-            "cta": "联系咨询",
+            "cta": "立即咨询",
             "cta_type": "secondary",
         },
     ]
 
-    # 三列卡片布局
     cols = st.columns(3)
-    for idx, plan in enumerate(plans):
+    for idx, plan in enumerate(plans_top):
         with cols[idx]:
             card_cls = "pricing-card pricing-highlight" if plan["highlight"] else "pricing-card"
             badge = '<div style="background: linear-gradient(135deg, #2563EB, #1D4ED8); color: #FFFFFF; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(37,99,235,0.25);">最受欢迎</div>' if plan["highlight"] else '<div style="height: 32px;"></div>'
@@ -3579,10 +3690,10 @@ def render_membership():
                 <h3 style="font-size: 1.4rem; margin-bottom: 4px; color: #0F172A;">{plan['name']}</h3>
                 <p style="color: #64748B; font-size: 0.85rem; margin-bottom: 16px;">{plan['target']}</p>
                 <div style="margin: 20px 0;">
-                    <span class="price-text" style="font-size: 2.8rem; font-weight: 800; background: linear-gradient(135deg, #2563EB, #1D4ED8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">¥{plan['price']}</span>
-                    <span style="color: #94A3B8; font-size: 0.9rem;">/{plan['unit']}</span>
-                    <span style="color: #94A3B8; font-size: 0.9rem; text-decoration: line-through; margin-left: 8px;">¥{plan.get('original_price', '')}</span>
+                    <span class="price-text" style="font-size: 2.4rem; font-weight: 800; background: linear-gradient(135deg, #2563EB, #1D4ED8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">¥{plan['price']}</span>
+                    <span style="color: #64748B; font-size: 0.95rem; font-weight: 600;">{plan['price_unit']}</span>
                 </div>
+                <p style="color: #94A3B8; font-size: 0.8rem; margin: -12px 0 16px 0;">{plan['price_note']}</p>
                 <p style="color: #475569; font-size: 0.9rem; line-height: 1.6; min-height: 48px; margin-bottom: 20px;">{plan['value']}</p>
                 <div style="border-top: 1px solid #E2E8F0; padding-top: 16px;">
             """, unsafe_allow_html=True)
@@ -3594,49 +3705,103 @@ def render_membership():
 
             st.markdown("</div></div>", unsafe_allow_html=True)
 
-            # CTA按钮
             btn_type = plan.get("cta_type", "secondary")
-            if st.button(plan["cta"], use_container_width=True, key=f"v3_plan_cta_{idx}", type=btn_type):
-                if plan["cta"] == "联系咨询":
-                    st.info("""
-                     **商务咨询**
+            if st.button(plan["cta"], use_container_width=True, key=f"biz_plan_cta_{idx}", type=btn_type):
+                st.info("""
+                 **商务咨询**
 
-                    电话：400-888-8888
-                    邮箱：sales@auditmind.com
-                    微信：AuditMind_Sales
+                电话：400-888-8888
+                邮箱：sales@auditmind.com
+                微信：AuditMind_Sales
 
-                    工作时间：周一至周五 9:00-18:00
-                    """)
-                else:
-                    st.info("""
-                     **开通流程**
+                工作时间：周一至周五 9:00-18:00
+                """)
 
-                    1. 确认套餐版本
-                    2. 在线支付或联系商务
-                    3. 即刻开通账户
+    # ========== 下排：企业版（全宽突出） ==========
+    st.markdown("<div style='margin: 24px 0;'></div>", unsafe_allow_html=True)
+    enterprise_plan = {
+        "name": "企业版",
+        "price": "25",
+        "price_unit": "万起/年",
+        "price_note": "根据集成深度、定制范围、服务等级确定",
+        "target": "大型/全国性会计师事务所（团队 > 150人）",
+        "value": "战略级审计数字化解决方案，全面对接客户生态，实现审计流程的深度定制与系统集成",
+        "features": [
+            ("不限项目数量", True),
+            ("不限财报分析年限", True),
+            ("风险评分底稿高亮", True),
+            ("高级建议报告", True),
+            ("可视化雷达图", True),
+            ("同业案例对标", True),
+            ("整改跟踪引擎", True),
+            ("原文溯源", True),
+            ("深度API集成与开发支持", True),
+            ("定制化工作流", True),
+            ("专属客户成功团队", True),
+            ("高级安全与合规保障", True),
+            ("私有化部署", True),
+        ],
+    }
 
-                    如有疑问请联系：sales@auditmind.com
-                    """)
-                    st.balloons()
+    st.markdown(f"""
+    <div style="border-radius: 20px; padding: 32px; animation: fadeInUp 0.5s ease-out 0.4s both; background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); color: #FFFFFF;">
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 24px;">
+            <div style="flex: 1; min-width: 280px;">
+                <div style="background: linear-gradient(135deg, #F59E0B, #D97706); color: #FFFFFF; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(245,158,11,0.3);">战略级方案</div>
+                <h3 style="font-size: 1.6rem; margin-bottom: 4px; color: #FFFFFF;">{enterprise_plan['name']}</h3>
+                <p style="color: #94A3B8; font-size: 0.9rem; margin-bottom: 16px;">{enterprise_plan['target']}</p>
+                <div style="margin: 16px 0;">
+                    <span style="font-size: 3rem; font-weight: 800; color: #FFFFFF;">¥{enterprise_plan['price']}</span>
+                    <span style="color: #CBD5E1; font-size: 1rem; font-weight: 600;">{enterprise_plan['price_unit']}</span>
+                </div>
+                <p style="color: #94A3B8; font-size: 0.85rem; margin: -8px 0 16px 0;">{enterprise_plan['price_note']}</p>
+                <p style="color: #CBD5E1; font-size: 1rem; line-height: 1.6;">{enterprise_plan['value']}</p>
+            </div>
+            <div style="min-width: 280px; flex: 1;">
+                <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px; margin-top: 8px;">
+    """, unsafe_allow_html=True)
+
+    for feat, included in enterprise_plan["features"]:
+        icon = "✓" if included else "—"
+        st.markdown(f"<p style='margin: 6px 0; font-size: 0.9rem; color: #E2E8F0;'>✓ {feat}</p>", unsafe_allow_html=True)
+
+    st.markdown("""
+                </div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    if st.button("预约演示", use_container_width=True, key="biz_plan_cta_enterprise", type="primary"):
+        st.info("""
+         **企业版商务咨询**
+
+        电话：400-888-8888
+        邮箱：enterprise@auditmind.com
+        微信：AuditMind_Enterprise
+
+        我们将安排专属客户成功经理与您对接，根据您的团队规模、业务场景和集成需求提供定制化方案与报价。
+        """)
 
     # ========== 功能对比表 ==========
     st.divider()
     st.markdown("<h3 style='text-align:center; margin-bottom: 24px;'> 功能对比详情</h3>", unsafe_allow_html=True)
 
     comparison_data = [
-        {"功能模块": "项目数量", "个人/个体版": "1个", "小微企业版": "≤5个", "企业分析版": "不限"},
-        {"功能模块": "财报分析年限", "个人/个体版": "3年", "小微企业版": "5年", "企业分析版": "不限"},
-        {"功能模块": "风险评分底稿", "个人/个体版": "包含", "小微企业版": "包含", "企业分析版": "包含"},
-        {"功能模块": "可视化雷达图", "个人/个体版": "—", "小微企业版": "包含", "企业分析版": "包含"},
-        {"功能模块": "同业案例对标", "个人/个体版": "—", "小微企业版": "包含", "企业分析版": "包含"},
-        {"功能模块": "整改跟踪引擎", "个人/个体版": "—", "小微企业版": "包含", "企业分析版": "包含"},
-        {"功能模块": "原文溯源", "个人/个体版": "—", "小微企业版": "包含", "企业分析版": "包含"},
-        {"功能模块": "Open API接口", "个人/个体版": "—", "小微企业版": "—", "企业分析版": "包含"},
-        {"功能模块": "团队权限管理", "个人/个体版": "—", "小微企业版": "—", "企业分析版": "包含"},
-        {"功能模块": "批量检测", "个人/个体版": "—", "小微企业版": "—", "企业分析版": "100家/次"},
-        {"功能模块": "私有化部署", "个人/个体版": "—", "小微企业版": "—", "企业分析版": "包含"},
-        {"功能模块": "专属客户经理", "个人/个体版": "—", "小微企业版": "—", "企业分析版": "包含"},
-        {"功能模块": "7×24小时支持", "个人/个体版": "—", "小微企业版": "—", "企业分析版": "包含"},
+        {"功能模块": "项目数量", "基础版": "1个", "专业版": "≤10个/年", "高级版": "20个基础", "企业版": "不限"},
+        {"功能模块": "财报分析年限", "基础版": "3年", "专业版": "5年", "高级版": "不限", "企业版": "不限"},
+        {"功能模块": "风险评分底稿", "基础版": "包含", "专业版": "包含", "高级版": "包含", "企业版": "包含"},
+        {"功能模块": "可视化雷达图", "基础版": "—", "专业版": "包含", "高级版": "包含", "企业版": "包含"},
+        {"功能模块": "同业案例对标", "基础版": "—", "专业版": "包含", "高级版": "包含", "企业版": "包含"},
+        {"功能模块": "整改跟踪引擎", "基础版": "—", "专业版": "包含", "高级版": "包含", "企业版": "包含"},
+        {"功能模块": "原文溯源", "基础版": "—", "专业版": "包含", "高级版": "包含", "企业版": "包含"},
+        {"功能模块": "Open API接口", "基础版": "—", "专业版": "—", "高级版": "包含", "企业版": "深度集成"},
+        {"功能模块": "团队权限管理", "基础版": "—", "专业版": "—", "高级版": "包含", "企业版": "包含"},
+        {"功能模块": "批量检测", "基础版": "—", "专业版": "—", "高级版": "包含", "企业版": "不限"},
+        {"功能模块": "私有化部署", "基础版": "—", "专业版": "—", "高级版": "—", "企业版": "包含"},
+        {"功能模块": "专属客户成功团队", "基础版": "—", "专业版": "—", "高级版": "—", "企业版": "包含"},
+        {"功能模块": "高级安全与合规", "基础版": "—", "专业版": "—", "高级版": "—", "企业版": "包含"},
+        {"功能模块": "定制化工作流", "基础版": "—", "专业版": "—", "高级版": "—", "企业版": "包含"},
     ]
 
     st.dataframe(comparison_data, use_container_width=True, hide_index=True)
