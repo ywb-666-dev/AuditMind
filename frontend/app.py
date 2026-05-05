@@ -70,10 +70,10 @@ st.markdown("""
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-h1 { font-weight: 700 !important; letter-spacing: -0.03em !important; font-size: 2rem !important; color: var(--text-primary) !important; }
-h2 { font-weight: 600 !important; letter-spacing: -0.02em !important; font-size: 1.5rem !important; color: var(--text-primary) !important; }
-h3 { font-weight: 600 !important; font-size: 1.15rem !important; color: var(--text-primary) !important; }
-p, li, td, th, label, .stMarkdown { line-height: 1.65 !important; color: var(--text-secondary) !important; }
+h1 { font-weight: 700 !important; letter-spacing: -0.03em !important; font-size: 2.2rem !important; color: var(--text-primary) !important; }
+h2 { font-weight: 600 !important; letter-spacing: -0.02em !important; font-size: 1.7rem !important; color: var(--text-primary) !important; }
+h3 { font-weight: 600 !important; font-size: 1.25rem !important; color: var(--text-primary) !important; }
+p, li, td, th, label, .stMarkdown { font-size: 0.95rem !important; line-height: 1.65 !important; color: var(--text-secondary) !important; }
 
 /* ===== Buttons ===== */
 .stButton > button {
@@ -1957,52 +1957,13 @@ def render_tax_module():
             st.info("财税咨询功能仅对登录用户开放")
             render_login_register()
         else:
-            # 欢迎卡片（无历史消息时显示）
-            if not st.session_state.tax_chat_history:
-                st.markdown('''
-                <div class="glass-card" style="text-align: center; padding: 2.5rem 2rem; margin-bottom: 1.5rem;">
-                    <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">&#x1F3DB;</div>
-                    <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; color: #0F172A;">智能财税问答助手</h3>
-                    <p style="font-size: 0.9rem; color: #64748B; line-height: 1.6; max-width: 460px; margin: 0 auto;">
-                        我可以帮您解答个人所得税、企业所得税、增值税、社保公积金等财税政策问题。
-                        <br>涉及计算时会给出具体公式和数字示例。
-                    </p>
-                </div>
-                ''', unsafe_allow_html=True)
+            # 处理待发送的消息（来自快捷问题或输入框）
+            pending_prompt = st.session_state.get("tax_pending_prompt", "")
+            if pending_prompt:
+                st.session_state.tax_pending_prompt = None
+                st.session_state.tax_chat_history.append({"role": "user", "content": pending_prompt})
 
-            # 侧边栏快捷问题
-            with st.sidebar:
-                st.subheader("财税快捷提问")
-                tax_questions = [
-                    "年终奖单独计税和合并计税哪个更划算？",
-                    "小规模纳税人和一般纳税人有什么区别？",
-                    "专项附加扣除包括哪些项目？",
-                    "个体户需要交哪些税？",
-                    "最新的个税起征点和税率表是什么？",
-                ]
-                for q in tax_questions:
-                    if st.button(q, key=f"tax_q_{q[:20]}", use_container_width=True):
-                        st.session_state.tax_chat_input = q
-                        st.rerun()
-                st.divider()
-
-            # 显示历史消息
-            for msg in st.session_state.tax_chat_history:
-                with st.chat_message(msg["role"]):
-                    st.markdown(msg["content"])
-
-            # 聊天输入（固定在底部）
-            chat_input = st.chat_input("请输入您的财税问题...", key="tax_chat")
-            prompt = chat_input or st.session_state.get("tax_chat_input", "")
-            if prompt:
-                st.session_state.tax_chat_input = None
-
-                # 添加用户消息到历史
-                st.session_state.tax_chat_history.append({"role": "user", "content": prompt})
-                with st.chat_message("user"):
-                    st.markdown(prompt)
-
-                # AI 回复
+                # 调用 API 获取回答
                 with st.chat_message("assistant"):
                     thinking_placeholder = st.empty()
                     thinking_placeholder.markdown("""
@@ -2023,7 +1984,7 @@ def render_tax_module():
                             "Content-Type": "application/json"
                         }
                         req_data = {
-                            "question": prompt,
+                            "question": pending_prompt,
                             "context": "你是一位中国财税政策专家，熟悉个人所得税、企业所得税、增值税、社保公积金等法规。请用通俗易懂的语言解答，涉及计算时请给出具体公式和数字示例。"
                         }
 
@@ -2051,7 +2012,7 @@ def render_tax_module():
                             st.session_state.tax_chat_history.append({"role": "assistant", "content": full_answer})
                         else:
                             thinking_placeholder.empty()
-                            fallback = make_api_request("/qa/ask", method="POST", data={"question": prompt, "context": "财税专家"})
+                            fallback = make_api_request("/qa/ask", method="POST", data={"question": pending_prompt, "context": "财税专家"})
                             if fallback and "answer" in fallback:
                                 answer = fallback["answer"]
                                 st.markdown(answer)
@@ -2061,6 +2022,45 @@ def render_tax_module():
                     except Exception as e:
                         thinking_placeholder.empty()
                         st.error(f"咨询失败: {str(e)[:100]}")
+
+            # 欢迎卡片（无历史消息时显示）
+            if not st.session_state.tax_chat_history:
+                st.markdown('''
+                <div class="glass-card" style="text-align: center; padding: 2.5rem 2rem; margin-bottom: 1.5rem;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">&#x1F3DB;</div>
+                    <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; color: #0F172A;">智能财税问答助手</h3>
+                    <p style="font-size: 0.9rem; color: #64748B; line-height: 1.6; max-width: 460px; margin: 0 auto;">
+                        我可以帮您解答个人所得税、企业所得税、增值税、社保公积金等财税政策问题。
+                        <br>涉及计算时会给出具体公式和数字示例。
+                    </p>
+                </div>
+                ''', unsafe_allow_html=True)
+
+            # 显示所有历史消息
+            for msg in st.session_state.tax_chat_history:
+                with st.chat_message(msg["role"]):
+                    st.markdown(msg["content"])
+
+            # 侧边栏快捷问题
+            with st.sidebar:
+                st.subheader("财税快捷提问")
+                tax_questions = [
+                    "年终奖单独计税和合并计税哪个更划算？",
+                    "小规模纳税人和一般纳税人有什么区别？",
+                    "专项附加扣除包括哪些项目？",
+                    "个体户需要交哪些税？",
+                    "最新的个税起征点和税率表是什么？",
+                ]
+                for q in tax_questions:
+                    if st.button(q, key=f"tax_q_{q[:20]}", use_container_width=True):
+                        st.session_state.tax_pending_prompt = q
+                        st.rerun()
+                st.divider()
+
+            # 聊天输入（始终放在最后，确保在所有消息下方）
+            if prompt := st.chat_input("请输入您的财税问题...", key="tax_chat"):
+                st.session_state.tax_pending_prompt = prompt
+                st.rerun()
 
 
 def _render_statement_list_v2():
