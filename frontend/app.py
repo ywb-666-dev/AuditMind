@@ -4395,90 +4395,22 @@ def render_membership():
                 工作时间：周一至周五 9:00-18:00
                 """)
 
-    # ========== 下排：企业版（全宽突出） ==========
-    st.markdown("<div style='margin: 24px 0;'></div>", unsafe_allow_html=True)
-    enterprise_plan = {
-        "name": "企业版",
-        "price": "25",
-        "price_unit": "万起/年",
-        "price_note": "根据集成深度、定制范围、服务等级确定",
-        "target": "大型/全国性会计师事务所（团队 > 150人）",
-        "value": "战略级审计数字化解决方案，全面对接客户生态，实现审计流程的深度定制与系统集成",
-        "features": [
-            "不限项目数量",
-            "不限财报分析年限",
-            "风险评分底稿高亮",
-            "高级建议报告",
-            "可视化雷达图",
-            "同业案例对标",
-            "整改跟踪引擎",
-            "原文溯源",
-            "深度API集成与开发支持",
-            "定制化工作流",
-            "专属客户成功团队",
-            "高级安全与合规保障",
-            "私有化部署",
-        ],
-    }
-
-    # 构建完整的 feature HTML 列表
-    features_html = "\n".join([f'<p style="margin: 6px 0; font-size: 0.9rem; color: #E2E8F0;">✓ {feat}</p>' for feat in enterprise_plan["features"]])
-
-    enterprise_html = f"""
-    <div style="border-radius: 20px; padding: 32px; background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); color: #FFFFFF; font-family: sans-serif;">
-        <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 24px;">
-            <div style="flex: 1; min-width: 280px;">
-                <div style="background: linear-gradient(135deg, #F59E0B, #D97706); color: #FFFFFF; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; margin-bottom: 12px;">战略级方案</div>
-                <h3 style="font-size: 1.6rem; margin: 0 0 4px 0; color: #FFFFFF;">{enterprise_plan['name']}</h3>
-                <p style="color: #94A3B8; font-size: 0.9rem; margin: 0 0 16px 0;">{enterprise_plan['target']}</p>
-                <div style="margin: 16px 0;">
-                    <span style="font-size: 3rem; font-weight: 800; color: #FFFFFF;">¥{enterprise_plan['price']}</span>
-                    <span style="color: #CBD5E1; font-size: 1rem; font-weight: 600;">{enterprise_plan['price_unit']}</span>
-                </div>
-                <p style="color: #94A3B8; font-size: 0.85rem; margin: -8px 0 16px 0;">{enterprise_plan['price_note']}</p>
-                <p style="color: #CBD5E1; font-size: 1rem; line-height: 1.6; margin: 0;">{enterprise_plan['value']}</p>
-            </div>
-            <div style="min-width: 280px; flex: 1;">
-                <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 16px; margin-top: 8px;">
-                    {features_html}
-                </div>
-            </div>
-        </div>
-    </div>
-    """
-
-    components.html(enterprise_html, height=420, scrolling=False)
-
-    if st.button("预约演示", use_container_width=True, key="biz_plan_cta_enterprise", type="primary"):
-        st.info("""
-         **企业版商务咨询**
-
-        电话：400-888-8888
-        邮箱：enterprise@auditmind.com
-        微信：AuditMind_Enterprise
-
-        我们将安排专属客户成功经理与您对接，根据您的团队规模、业务场景和集成需求提供定制化方案与报价。
-        """)
 
     # ========== 功能对比表 ==========
     st.divider()
     st.markdown("<h3 style='text-align:center; margin-bottom: 24px;'> 功能对比详情</h3>", unsafe_allow_html=True)
 
     comparison_data = [
-        {"功能模块": "项目数量", "基础版": "1个", "专业版": "≤10个/年", "高级版": "20个基础", "企业版": "不限"},
-        {"功能模块": "财报分析年限", "基础版": "3年", "专业版": "5年", "高级版": "不限", "企业版": "不限"},
-        {"功能模块": "风险评分底稿", "基础版": "包含", "专业版": "包含", "高级版": "包含", "企业版": "包含"},
-        {"功能模块": "可视化雷达图", "基础版": "—", "专业版": "包含", "高级版": "包含", "企业版": "包含"},
-        {"功能模块": "同业案例对标", "基础版": "—", "专业版": "包含", "高级版": "包含", "企业版": "包含"},
-        {"功能模块": "整改跟踪引擎", "基础版": "—", "专业版": "包含", "高级版": "包含", "企业版": "包含"},
-        {"功能模块": "原文溯源", "基础版": "—", "专业版": "包含", "高级版": "包含", "企业版": "包含"},
-        {"功能模块": "Open API接口", "基础版": "—", "专业版": "—", "高级版": "包含", "企业版": "深度集成"},
-        {"功能模块": "团队权限管理", "基础版": "—", "专业版": "—", "高级版": "包含", "企业版": "包含"},
-        {"功能模块": "批量检测", "基础版": "—", "专业版": "—", "高级版": "包含", "企业版": "不限"},
-        {"功能模块": "私有化部署", "基础版": "—", "专业版": "—", "高级版": "—", "企业版": "包含"},
-        {"功能模块": "专属客户成功团队", "基础版": "—", "专业版": "—", "高级版": "—", "企业版": "包含"},
-        {"功能模块": "高级安全与合规", "基础版": "—", "专业版": "—", "高级版": "—", "企业版": "包含"},
-        {"功能模块": "定制化工作流", "基础版": "—", "专业版": "—", "高级版": "—", "企业版": "包含"},
+        {"功能模块": "项目数量", "基础版": "1个", "专业版": "≤10个/年", "高级版": "20个基础"},
+        {"功能模块": "财报分析年限", "基础版": "3年", "专业版": "5年", "高级版": "不限"},
+        {"功能模块": "风险评分底稿", "基础版": "包含", "专业版": "包含", "高级版": "包含"},
+        {"功能模块": "可视化雷达图", "基础版": "—", "专业版": "包含", "高级版": "包含"},
+        {"功能模块": "同业案例对标", "基础版": "—", "专业版": "包含", "高级版": "包含"},
+        {"功能模块": "整改跟踪引擎", "基础版": "—", "专业版": "包含", "高级版": "包含"},
+        {"功能模块": "原文溯源", "基础版": "—", "专业版": "包含", "高级版": "包含"},
+        {"功能模块": "Open API接口", "基础版": "—", "专业版": "—", "高级版": "包含"},
+        {"功能模块": "团队权限管理", "基础版": "—", "专业版": "—", "高级版": "包含"},
+        {"功能模块": "批量检测", "基础版": "—", "专业版": "—", "高级版": "包含"},
     ]
 
     st.dataframe(comparison_data, use_container_width=True, hide_index=True)
