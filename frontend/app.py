@@ -31,26 +31,28 @@ st.set_page_config(
 # 仅注入轻量增强样式，不强制主题色，跟随浏览器/系统 light/dark 偏好
 st.markdown("""
 <style>
-/* ===== Design Tokens - Minimal Professional ===== */
+/* ===== Design Tokens - Cinematic Professional ===== */
 :root {
     --bg: #FFFFFF;
-    --bg-soft: #F8F9FA;
-    --bg-muted: #F1F3F5;
-    --text: #111827;
-    --text-secondary: #4B5563;
-    --text-muted: #9CA3AF;
+    --bg-soft: #F8FAFC;
+    --bg-muted: #F1F5F9;
+    --bg-dark: #0F172A;
+    --text: #0F172A;
+    --text-secondary: #475569;
+    --text-muted: #94A3B8;
     --accent: #2563EB;
     --accent-hover: #1D4ED8;
     --accent-light: #EFF6FF;
-    --border: #E5E7EB;
-    --border-light: #F3F4F6;
+    --accent-glow: rgba(37,99,235,0.15);
+    --border: #E2E8F0;
+    --border-light: #F1F5F9;
     --success: #10B981;
     --warning: #F59E0B;
     --danger: #EF4444;
     --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
     --shadow-md: 0 4px 12px rgba(0,0,0,0.05);
     --shadow-lg: 0 12px 32px rgba(0,0,0,0.08);
-    --shadow-glow: 0 0 24px rgba(37,99,235,0.12);
+    --shadow-glow: 0 0 40px rgba(37,99,235,0.12);
     --radius-sm: 8px;
     --radius-md: 12px;
     --radius-lg: 16px;
@@ -61,43 +63,55 @@ st.markdown("""
 [data-testid="stSidebar"] { display: none !important; }
 [data-testid="stSidebarNav"] { display: none !important; }
 
-/* ===== Reset & Base ===== */
+/* ===== FULL WIDTH Layout ===== */
 .main .block-container {
-    padding-top: 5rem;
-    padding-bottom: 3rem;
-    max-width: 1100px;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+}
+.stApp {
+    background: #FFFFFF !important;
 }
 .stApp, .stApp * {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif !important;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-h1 { font-weight: 800 !important; letter-spacing: -0.04em !important; font-size: 2.5rem !important; color: var(--text) !important; line-height: 1.15 !important; }
-h2 { font-weight: 700 !important; letter-spacing: -0.03em !important; font-size: 1.75rem !important; color: var(--text) !important; }
-h3 { font-weight: 600 !important; font-size: 1.2rem !important; color: var(--text) !important; }
-p, li, td, th, label, .stMarkdown { font-size: 0.95rem !important; line-height: 1.7 !important; color: var(--text-secondary) !important; }
+
+/* ===== Typography Scale - Larger & Bolder ===== */
+h1 { font-weight: 800 !important; letter-spacing: -0.03em !important; font-size: 3rem !important; color: var(--text) !important; line-height: 1.1 !important; }
+h2 { font-weight: 700 !important; letter-spacing: -0.02em !important; font-size: 2.2rem !important; color: var(--text) !important; }
+h3 { font-weight: 600 !important; font-size: 1.4rem !important; color: var(--text) !important; }
+p, li, td, th, label, .stMarkdown { font-size: 1rem !important; line-height: 1.7 !important; color: var(--text-secondary) !important; }
+
+/* Content width constraints inside full-width sections */
+.content-wrap { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
+.content-wrap-wide { max-width: 1400px; margin: 0 auto; padding: 0 2rem; }
 
 /* ===== Buttons ===== */
 .stButton > button {
     border-radius: var(--radius-sm) !important;
-    font-weight: 500 !important;
-    padding: 0.6rem 1.5rem !important;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    font-weight: 600 !important;
+    padding: 0.75rem 2rem !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
     letter-spacing: 0.01em;
     border: 1px solid transparent !important;
-    font-size: 0.9rem !important;
+    font-size: 0.95rem !important;
 }
 .stButton > button:hover { transform: translateY(-2px); }
-.stButton > button:active { transform: translateY(0) scale(0.98); }
+.stButton > button:active { transform: translateY(0) scale(0.97); }
 .stButton > button[kind="primary"] {
     background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
     color: #FFFFFF !important;
-    box-shadow: 0 4px 12px rgba(37,99,235,0.25) !important;
+    box-shadow: 0 4px 16px rgba(37,99,235,0.3) !important;
 }
 .stButton > button[kind="primary"] p, .stButton > button[kind="primary"] div { color: #FFFFFF !important; }
 .stButton > button[kind="primary"]:hover {
     background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%) !important;
-    box-shadow: 0 6px 20px rgba(37,99,235,0.35) !important;
+    box-shadow: 0 8px 28px rgba(37,99,235,0.4) !important;
 }
 .stButton > button[kind="secondary"] {
     background: #FFFFFF !important;
@@ -107,7 +121,7 @@ p, li, td, th, label, .stMarkdown { font-size: 0.95rem !important; line-height: 
 .stButton > button[kind="secondary"]:hover {
     border-color: var(--accent) !important;
     color: var(--accent) !important;
-    box-shadow: 0 2px 8px rgba(37,99,235,0.08) !important;
+    box-shadow: 0 2px 12px rgba(37,99,235,0.1) !important;
 }
 
 /* ===== Inputs ===== */
@@ -117,8 +131,8 @@ p, li, td, th, label, .stMarkdown { font-size: 0.95rem !important; line-height: 
     border: 1px solid var(--border) !important;
     background: #FFFFFF !important;
     color: var(--text) !important;
-    padding: 0.65rem 1rem !important;
-    font-size: 0.9rem !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.95rem !important;
     transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
 .stTextInput > div > div > input:focus, .stTextArea > div > div > textarea:focus,
@@ -132,20 +146,21 @@ p, li, td, th, label, .stMarkdown { font-size: 0.95rem !important; line-height: 
     background: #FFFFFF !important;
     border: 1px solid var(--border) !important;
     border-radius: var(--radius-lg) !important;
-    padding: 1.75rem !important;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease !important;
+    padding: 2rem !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03) !important;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease, border-color 0.35s ease !important;
 }
 .glass-card:hover, .feature-card:hover, .stat-card:hover, .pricing-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg) !important;
+    transform: translateY(-8px);
+    box-shadow: 0 20px 48px rgba(37,99,235,0.12), 0 8px 24px rgba(0,0,0,0.06) !important;
     border-color: #BFDBFE !important;
 }
 
 /* ===== Badge System ===== */
 .badge {
     display: inline-flex; align-items: center; gap: 6px;
-    padding: 4px 12px; border-radius: 100px;
-    font-size: 0.8rem; font-weight: 600; letter-spacing: 0.3px;
+    padding: 5px 14px; border-radius: 100px;
+    font-size: 0.85rem; font-weight: 600; letter-spacing: 0.3px;
 }
 .badge-primary { background: var(--accent-light); color: var(--accent); border: 1px solid #BFDBFE; }
 .badge-success { background: #F0FDF4; color: var(--success); border: 1px solid #BBF7D0; }
@@ -159,8 +174,8 @@ p, li, td, th, label, .stMarkdown { font-size: 0.95rem !important; line-height: 
 
 /* ===== Tabs ===== */
 .stTabs [data-baseweb="tab-list"] { border-bottom: 1px solid var(--border) !important; gap: 8px !important; }
-.stTabs [data-baseweb="tab"] { color: var(--text-muted) !important; font-weight: 500 !important; padding: 0.7rem 1.25rem !important; border-radius: var(--radius-sm) var(--radius-sm) 0 0 !important; }
-.stTabs [data-baseweb="tab-highlight"] { background: var(--accent) !important; height: 2px !important; }
+.stTabs [data-baseweb="tab"] { color: var(--text-muted) !important; font-weight: 500 !important; padding: 0.8rem 1.5rem !important; border-radius: var(--radius-sm) var(--radius-sm) 0 0 !important; font-size: 0.95rem !important; }
+.stTabs [data-baseweb="tab-highlight"] { background: var(--accent) !important; height: 2.5px !important; }
 .stTabs [aria-selected="true"] { color: var(--accent) !important; }
 
 /* ===== Expanders ===== */
@@ -176,7 +191,7 @@ p, li, td, th, label, .stMarkdown { font-size: 0.95rem !important; line-height: 
 
 /* ===== Animations ===== */
 @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(24px); }
+    from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
 }
 @keyframes fadeIn {
@@ -184,26 +199,31 @@ p, li, td, th, label, .stMarkdown { font-size: 0.95rem !important; line-height: 
     to { opacity: 1; }
 }
 @keyframes slideInLeft {
-    from { opacity: 0; transform: translateX(-20px); }
+    from { opacity: 0; transform: translateX(-30px); }
     to { opacity: 1; transform: translateX(0); }
 }
 @keyframes pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0.15); }
-    50% { box-shadow: 0 0 0 10px rgba(37,99,235,0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0.2); }
+    50% { box-shadow: 0 0 0 16px rgba(37,99,235,0); }
 }
 @keyframes float {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
+    50% { transform: translateY(-10px); }
 }
 @keyframes shimmer {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
 }
-.animate-fadeInUp { animation: fadeInUp 0.6s ease-out both; }
-.animate-fadeIn { animation: fadeIn 0.4s ease-out both; }
-.animate-slideInLeft { animation: slideInLeft 0.5s ease-out both; }
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+.animate-fadeInUp { animation: fadeInUp 0.7s ease-out both; }
+.animate-fadeIn { animation: fadeIn 0.5s ease-out both; }
+.animate-slideInLeft { animation: slideInLeft 0.6s ease-out both; }
 .animate-pulse { animation: pulse 2.5s infinite; }
-.animate-float { animation: float 3s ease-in-out infinite; }
+.animate-float { animation: float 4s ease-in-out infinite; }
 
 /* Thinking dots animation */
 @keyframes thinkingBounce {
@@ -212,8 +232,8 @@ p, li, td, th, label, .stMarkdown { font-size: 0.95rem !important; line-height: 
 }
 
 /* ===== Enhanced Interactions ===== */
-.hover-lift { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease; }
-.hover-lift:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.1); }
+.hover-lift { transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease; }
+.hover-lift:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(0,0,0,0.1); }
 
 /* Gradient text for hero */
 .gradient-text {
@@ -222,21 +242,29 @@ p, li, td, th, label, .stMarkdown { font-size: 0.95rem !important; line-height: 
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
+.gradient-text-animated {
+    background: linear-gradient(90deg, #2563EB, #60A5FA, #3B82F6, #2563EB);
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: gradientShift 4s ease infinite;
+}
 
 /* ===== Top Header Bar ===== */
 .top-nav-bar {
     position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-    background: rgba(255,255,255,0.92); backdrop-filter: blur(12px);
+    background: rgba(255,255,255,0.95); backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--border-light);
     padding: 0 2rem;
-    height: 64px;
+    height: 68px;
     display: flex; align-items: center; justify-content: space-between;
 }
-.top-nav-logo { font-size: 1.25rem; font-weight: 800; color: var(--text); letter-spacing: -0.5px; text-decoration: none; }
-.top-nav-link { font-size: 0.9rem; font-weight: 500; color: var(--text-secondary); text-decoration: none; padding: 6px 12px; border-radius: 6px; transition: all 0.2s ease; }
+.top-nav-logo { font-size: 1.35rem; font-weight: 800; color: var(--text); letter-spacing: -0.5px; text-decoration: none; }
+.top-nav-link { font-size: 0.95rem; font-weight: 500; color: var(--text-secondary); text-decoration: none; padding: 8px 14px; border-radius: 8px; transition: all 0.2s ease; }
 .top-nav-link:hover { color: var(--accent); background: var(--accent-light); }
 .top-nav-link.active { color: var(--accent); font-weight: 600; }
-.top-nav-link.active::after { content: ''; display: block; width: 100%; height: 2px; background: var(--accent); border-radius: 2px; margin-top: 2px; }
+.top-nav-link.active::after { content: ''; display: block; width: 100%; height: 2.5px; background: var(--accent); border-radius: 2px; margin-top: 2px; }
 
 /* ===== Spacing Utilities ===== */
 .gap-1 { gap: 0.25rem; }
@@ -284,8 +312,8 @@ p, li, td, th, label, .stMarkdown { font-size: 0.95rem !important; line-height: 
     position: absolute;
     top: 0; left: -100%;
     width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(37,99,235,0.03), transparent);
-    transition: left 0.5s ease;
+    background: linear-gradient(90deg, transparent, rgba(37,99,235,0.04), transparent);
+    transition: left 0.6s ease;
 }
 .glass-card:hover::before, .feature-card:hover::before, .stat-card:hover::before, .pricing-card:hover::before {
     left: 100%;
@@ -313,11 +341,11 @@ p, li, td, th, label, .stMarkdown { font-size: 0.95rem !important; line-height: 
 
 /* ===== Glow Effect ===== */
 .glow-blue {
-    box-shadow: 0 0 20px rgba(37,99,235,0.1);
+    box-shadow: 0 0 24px rgba(37,99,235,0.12);
     transition: box-shadow 0.3s ease;
 }
 .glow-blue:hover {
-    box-shadow: 0 0 30px rgba(37,99,235,0.2);
+    box-shadow: 0 0 40px rgba(37,99,235,0.2);
 }
 
 /* ===== Scrollbar ===== */
@@ -345,6 +373,24 @@ p, li, td, th, label, .stMarkdown { font-size: 0.95rem !important; line-height: 
     .stButton > button[kind="primary"] {
         background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%) !important;
     }
+}
+
+/* ===== Section Backgrounds ===== */
+.section-gradient-blue {
+    background: linear-gradient(180deg, #FFFFFF 0%, #EFF6FF 50%, #DBEAFE 100%);
+}
+.section-gradient-dark {
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+    color: #FFFFFF;
+}
+.section-gradient-dark h1, .section-gradient-dark h2, .section-gradient-dark h3 { color: #FFFFFF !important; }
+.section-gradient-dark p { color: #94A3B8 !important; }
+.section-soft {
+    background: linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%);
+}
+.section-grid {
+    background-image: radial-gradient(circle, #E2E8F0 1px, transparent 1px);
+    background-size: 48px 48px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -547,12 +593,16 @@ def make_api_request(endpoint, method="GET", data=None, headers=None, timeout=60
 
 
 def _render_page_header(title: str, subtitle: str = ""):
-    """渲染简洁统一的页面标题区"""
-    subtitle_html = f'<p style="color: #6B7280; font-size: 0.95rem; margin: 0;">{subtitle}</p>' if subtitle else ""
+    """渲染全宽页面标题区 - 大气简洁"""
+    subtitle_html = f'<p style="color: #64748B; font-size: 1.05rem; margin: 0.5rem 0 0 0; line-height: 1.6;">{subtitle}</p>' if subtitle else ""
     st.markdown(f"""
-    <div style="margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #F3F4F6;">
-        <h1 style="font-size: 1.75rem; font-weight: 700; color: #111827; margin-bottom: 0.25rem; letter-spacing: -0.5px;">{title}</h1>
-        {subtitle_html}
+    <div style="margin: -2rem -2rem 2.5rem -2rem; padding: 2.5rem 2rem; background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%); border-bottom: 1px solid #E2E8F0; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: -40px; right: 5%; width: 180px; height: 180px; background: rgba(37,99,235,0.08); border-radius: 50%;"></div>
+        <div style="position: absolute; bottom: -30px; left: 10%; width: 120px; height: 120px; background: rgba(96,165,250,0.06); border-radius: 50%;"></div>
+        <div style="position: relative; z-index: 1;">
+            <h1 style="font-size: 2.2rem; font-weight: 800; color: #0F172A; margin: 0; letter-spacing: -1px; line-height: 1.2;">{title}</h1>
+            {subtitle_html}
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -789,13 +839,13 @@ def render_header():
         st.session_state.current_page = "home"
 
     # 品牌 + 导航 + 用户操作
-    col_logo, col_nav, col_user = st.columns([1.5, 5, 1.5])
+    col_logo, col_nav, col_user = st.columns([1.2, 5, 1.3])
 
     with col_logo:
         st.markdown("""
-        <div style="display:flex;align-items:center;gap:8px;">
-            <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#2563EB,#1D4ED8);display:flex;align-items:center;justify-content:center;color:#FFFFFF;font-weight:700;font-size:0.9rem;">A</div>
-            <span style="font-size:1.15rem;font-weight:800;color:#111827;letter-spacing:-0.5px;">Audit Mind</span>
+        <div style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="window.parent.postMessage({type:'streamlit:setComponentValue',value:'home'},'*');">
+            <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#2563EB,#1D4ED8);display:flex;align-items:center;justify-content:center;color:#FFFFFF;font-weight:800;font-size:1rem;box-shadow:0 4px 12px rgba(37,99,235,0.25);">A</div>
+            <span style="font-size:1.25rem;font-weight:800;color:#0F172A;letter-spacing:-0.5px;">Audit Mind</span>
         </div>
         """, unsafe_allow_html=True)
 
@@ -823,17 +873,29 @@ def render_header():
         for i, (label, key) in enumerate(pages):
             with nav_cols[i]:
                 active = current == key
-                btn_type = "primary" if active else "secondary"
-                if st.button(label, key=f"nav_{key}", use_container_width=True, type=btn_type):
-                    st.session_state.current_page = key
-                    st.rerun()
+                if active:
+                    st.markdown(f"""
+                    <div style="text-align:center;padding:6px 2px;">
+                        <span style="font-size:0.95rem;font-weight:700;color:#2563EB;cursor:default;">{label}</span>
+                        <div style="width:20px;height:3px;background:linear-gradient(90deg,#2563EB,#3B82F6);border-radius:2px;margin:4px auto 0;"></div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    if st.button(label, key=f"nav_{key}", use_container_width=True):
+                        st.session_state.current_page = key
+                        st.rerun()
 
     with col_user:
         if st.session_state.logged_in:
-            user_cols = st.columns([3, 1])
+            user_cols = st.columns([2, 1])
             with user_cols[0]:
                 username = st.session_state.user_info.get('username', '用户')
-                st.caption(f"{username}")
+                st.markdown(f"""
+                <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;padding-top:4px;">
+                    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#2563EB,#3B82F6);display:flex;align-items:center;justify-content:center;color:#FFFFFF;font-weight:700;font-size:0.85rem;">{username[0].upper()}</div>
+                    <span style="font-size:0.9rem;font-weight:600;color:#0F172A;">{username}</span>
+                </div>
+                """, unsafe_allow_html=True)
             with user_cols[1]:
                 if st.button("退出", key="header_logout", use_container_width=True):
                     AuthManager.clear_auth()
@@ -846,7 +908,7 @@ def render_header():
                 st.session_state.show_login_modal = True
                 st.rerun()
 
-    st.markdown("<hr style='border: none; border-top: 1px solid #F3F4F6; margin: 0.5rem 0 1.5rem 0;'/>", unsafe_allow_html=True)
+    st.markdown("<div style='border:none;border-top:1px solid #E2E8F0;margin:0.25rem 0 0 0;'></div>", unsafe_allow_html=True)
 
 
 # ================= 登录弹窗 =================
@@ -952,27 +1014,109 @@ def render_login_modal():
 
 # ================= 首页 =================
 def render_home():
-    """渲染首页 - Premium Design"""
-    # ========== Hero Section ==========
+    """渲染首页 - Cinematic Full-Width Design"""
+
+    # ========== HERO SECTION (Full Width with Dynamic Background) ==========
     hero_html = '''
-    <div style="margin: -1.5rem -1rem 2rem; padding: 80px 24px 64px; text-align: center; position: relative; overflow: hidden;">
-        <div style="max-width: 800px; margin: 0 auto; position: relative; z-index: 1;">
-            <div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; border-radius: 100px; font-size: 0.85rem; font-weight: 600; background: linear-gradient(135deg, #EFF6FF, #DBEAFE); border: 1px solid #BFDBFE; color: #2563EB; margin-bottom: 1.5rem; letter-spacing: 0.02em; animation: fadeInUp 0.6s ease-out both;">
+    <div style="width: 100%; min-height: 580px; position: relative; overflow: hidden; background: linear-gradient(135deg, #0F172A 0%, #1E293B 40%, #0F172A 100%); display: flex; align-items: center; justify-content: center;">
+        <!-- Animated grid background -->
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.15; background-image: linear-gradient(rgba(59,130,246,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.3) 1px, transparent 1px); background-size: 60px 60px;"></div>
+        <!-- Floating orbs -->
+        <div style="position: absolute; top: 10%; left: 15%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(37,99,235,0.25) 0%, transparent 70%); border-radius: 50%; animation: float 6s ease-in-out infinite;"></div>
+        <div style="position: absolute; bottom: 15%; right: 10%; width: 250px; height: 250px; background: radial-gradient(circle, rgba(96,165,250,0.2) 0%, transparent 70%); border-radius: 50%; animation: float 8s ease-in-out infinite 2s;"></div>
+        <div style="position: absolute; top: 40%; right: 25%; width: 150px; height: 150px; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%); border-radius: 50%; animation: float 5s ease-in-out infinite 1s;"></div>
+
+        <div style="position: relative; z-index: 2; text-align: center; max-width: 900px; padding: 0 2rem;">
+            <div style="display: inline-flex; align-items: center; gap: 10px; padding: 10px 24px; border-radius: 100px; font-size: 0.9rem; font-weight: 600; background: rgba(37,99,235,0.15); border: 1px solid rgba(96,165,250,0.3); color: #60A5FA; margin-bottom: 2rem; letter-spacing: 0.03em; animation: fadeInUp 0.8s ease-out both;">
+                <span style="width: 8px; height: 8px; background: #3B82F6; border-radius: 50%; display: inline-block; animation: pulse 2s infinite;"></span>
                 AI-Powered Financial Audit Intelligence
             </div>
-            <h1 style="font-size: 3.2rem; font-weight: 800; letter-spacing: -2px; line-height: 1.1; margin-bottom: 1rem; color: #111827; animation: fadeInUp 0.7s ease-out 0.1s both;">
-                智能识别财务舞弊<br><span style="font-size: 2rem; font-weight: 600; color: #4B5563; letter-spacing: -1px;">守护每一笔资金的安全</span>
+            <h1 style="font-size: 4rem; font-weight: 800; letter-spacing: -3px; line-height: 1.05; margin-bottom: 1.25rem; color: #FFFFFF; animation: fadeInUp 0.8s ease-out 0.15s both;">
+                智能识别财务舞弊
             </h1>
-            <p style="font-size: 1.1rem; color: #6B7280; line-height: 1.7; max-width: 520px; margin: 0 auto 2rem; font-weight: 400; animation: fadeInUp 0.7s ease-out 0.2s both;">
-                基于生成式 AI 的上市公司财务舞弊识别系统，双模分析 + SHAP 可解释 + 风险标签可视化
+            <h2 style="font-size: 2.2rem; font-weight: 500; color: #94A3B8; letter-spacing: -1px; margin-bottom: 1.5rem; animation: fadeInUp 0.8s ease-out 0.3s both;">
+                守护每一笔资金的安全
+            </h2>
+            <p style="font-size: 1.15rem; color: #64748B; line-height: 1.8; max-width: 560px; margin: 0 auto 2.5rem; font-weight: 400; animation: fadeInUp 0.8s ease-out 0.45s both;">
+                基于生成式 AI 的上市公司财务舞弊识别系统<br>双模分析 · SHAP 可解释 · 风险标签可视化
             </p>
+            <div style="animation: fadeInUp 0.8s ease-out 0.6s both;">
+                <a href="#stats" style="display:inline-block;padding:14px 40px;border-radius:12px;font-size:1.05rem;font-weight:600;color:#FFFFFF;background:linear-gradient(135deg, #2563EB, #1D4ED8);text-decoration:none;transition:all 0.3s ease;box-shadow:0 8px 32px rgba(37,99,235,0.35);margin-right:12px;"
+                   onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 40px rgba(37,99,235,0.5)';"
+                   onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 8px 32px rgba(37,99,235,0.35)';">
+                    立即开始检测
+                </a>
+                <a href="#features" style="display:inline-block;padding:14px 40px;border-radius:12px;font-size:1.05rem;font-weight:600;color:#94A3B8;background:transparent;border:1.5px solid #334155;text-decoration:none;transition:all 0.3s ease;"
+                   onmouseover="this.style.borderColor='#3B82F6';this.style.color='#3B82F6';"
+                   onmouseout="this.style.borderColor='#334155';this.style.color='#94A3B8';">
+                    了解更多
+                </a>
+            </div>
         </div>
     </div>
     '''
-    st.components.v1.html(hero_html, height=380, scrolling=False)
+    st.components.v1.html(hero_html, height=580, scrolling=False)
 
-    # CTA Buttons row
-    c1, c2, c3 = st.columns([1, 1, 2])
+    # ========== ANIMATED STATS BAR (Full Width Blue Gradient) ==========
+    stats_html = '''
+    <div id="stats" style="width: 100%; padding: 48px 0; background: linear-gradient(90deg, #2563EB, #3B82F6, #1D4ED8); position: relative; overflow: hidden;">
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.1; background-image: radial-gradient(circle, #FFFFFF 1px, transparent 1px); background-size: 30px 30px;"></div>
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; position: relative; z-index: 1;">
+            <div style="text-align: center;">
+                <div class="count-up" data-target="92" style="font-size: 3rem; font-weight: 800; color: #FFFFFF; line-height: 1;">0</div>
+                <div style="font-size: 1.1rem; color: #FFFFFF; font-weight: 700; margin-top: 4px;">%</div>
+                <div style="font-size: 0.95rem; color: rgba(255,255,255,0.75); margin-top: 8px; font-weight: 500;">AI 识别准确率</div>
+            </div>
+            <div style="text-align: center;">
+                <div class="count-up" data-target="12847" style="font-size: 3rem; font-weight: 800; color: #FFFFFF; line-height: 1;">0</div>
+                <div style="font-size: 0.95rem; color: rgba(255,255,255,0.75); margin-top: 8px; font-weight: 500;">已分析财报</div>
+            </div>
+            <div style="text-align: center;">
+                <div class="count-up" data-target="4562" style="font-size: 3rem; font-weight: 800; color: #FFFFFF; line-height: 1;">0</div>
+                <div style="font-size: 0.95rem; color: rgba(255,255,255,0.75); margin-top: 8px; font-weight: 500;">覆盖 A 股企业</div>
+            </div>
+            <div style="text-align: center;">
+                <div class="count-up" data-target="7" style="font-size: 3rem; font-weight: 800; color: #FFFFFF; line-height: 1;">0</div>
+                <div style="font-size: 0.95rem; color: rgba(255,255,255,0.75); margin-top: 8px; font-weight: 500;">风险分析维度</div>
+            </div>
+        </div>
+    </div>
+    <script>
+    (function() {
+        const counters = document.querySelectorAll('.count-up');
+        const animate = (el) => {
+            const target = parseInt(el.getAttribute('data-target'));
+            const duration = 2000;
+            const start = performance.now();
+            const easeOutQuart = t => 1 - Math.pow(1 - t, 4);
+            const step = (now) => {
+                const progress = Math.min((now - start) / duration, 1);
+                const eased = easeOutQuart(progress);
+                el.textContent = Math.floor(eased * target).toLocaleString();
+                if (progress < 1) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+        };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animate(entry.target);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        counters.forEach(c => observer.observe(c));
+    })();
+    </script>
+    '''
+    st.components.v1.html(stats_html, height=200, scrolling=False)
+
+    # Demo hint
+    if not st.session_state.logged_in:
+        st.info("**快速体验** — 点击右上角登录/注册，选择「一键登录演示账号」即可体验全部功能（AuditMind / 123）")
+
+    # CTA Buttons (functional Streamlit buttons below hero)
+    c1, c2, c3 = st.columns([1, 1, 4])
     with c1:
         if st.button("开始检测", type="primary", use_container_width=True, key="hero_cta_detect"):
             if st.session_state.logged_in:
@@ -982,37 +1126,14 @@ def render_home():
                 st.session_state.show_login_modal = True
                 st.rerun()
     with c2:
-        if st.button("了解更多", use_container_width=True, key="hero_cta_more"):
+        if st.button("查看价格", use_container_width=True, key="hero_cta_more"):
             st.session_state.current_page = "pricing"
             st.rerun()
 
-    # Demo hint
-    if not st.session_state.logged_in:
-        st.info("**🚀 快速体验** — 点击右上角登录/注册，选择「一键登录演示账号」即可体验全部功能（AuditMind / 123）")
-
-    # ========== Stats Bar ==========
-    st.markdown("<div style='margin: 2.5rem 0 1.5rem;'></div>", unsafe_allow_html=True)
-    stat_cols = st.columns(4)
-    stats = [
-        ("92%+", "AI 识别准确率", "0s"),
-        ("1000+", "已检测企业", "0.1s"),
-        ("96%", "用户满意度", "0.2s"),
-        ("7", "风险分析维度", "0.3s"),
-    ]
-    for i, (value, label, delay) in enumerate(stats):
-        with stat_cols[i]:
-            st.markdown(f"""
-            <div class="stat-card" style="animation: fadeInUp 0.5s ease-out {delay} both; text-align: center;">
-                <div style="font-size: 2.2rem; font-weight: 700; background: linear-gradient(135deg, #2563EB, #1D4ED8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 4px;">{value}</div>
-                <div style="font-size: 0.85rem; color: #64748B; font-weight: 500;">{label}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-
-    # ========== Quick Start Guide ==========
-    st.markdown("<h2 style='font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px;'>🚀 快速上手指南</h2>", unsafe_allow_html=True)
-    st.caption("新用户？跟着下面三步，3 分钟完成第一次财务舞弊检测")
+    # ========== QUICK START GUIDE ==========
+    st.markdown('<div class="content-wrap" style="padding-top: 3rem; padding-bottom: 3rem;">', unsafe_allow_html=True)
+    st.markdown("<h2 style='font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0F172A; letter-spacing: -1px;'>快速上手指南</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #64748B; font-size: 1.05rem; margin-bottom: 2rem;'>新用户？跟着下面三步，3 分钟完成第一次财务舞弊检测</p>", unsafe_allow_html=True)
 
     guide_cols = st.columns(3)
     guides = [
@@ -1022,325 +1143,254 @@ def render_home():
     ]
     for i, (num, title, desc, bg, color) in enumerate(guides):
         with guide_cols[i]:
-            st.markdown(f"""
-            <div style="background: {bg}; border: 1px solid {color}22; border-radius: 14px; padding: 1.25rem; height: 100%; animation: fadeInUp 0.5s ease-out {i*0.1}s both;">
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.5rem;">
-                    <div style="width: 28px; height: 28px; border-radius: 50%; background: {color}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700;">{num}</div>
-                    <h4 style="font-size: 1rem; font-weight: 700; color: #0F172A; margin: 0;">{title}</h4>
+            st.markdown(f'''
+            <div style="background: {bg}; border: 1px solid {color}33; border-radius: 16px; padding: 1.75rem; height: 100%; animation: fadeInUp 0.6s ease-out {i*0.12}s both;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 0.75rem;">
+                    <div style="width: 36px; height: 36px; border-radius: 50%; background: {color}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; font-weight: 700;">{num}</div>
+                    <h4 style="font-size: 1.15rem; font-weight: 700; color: #0F172A; margin: 0;">{title}</h4>
                 </div>
-                <p style="font-size: 0.85rem; color: #475569; line-height: 1.6; margin: 0;">{desc}</p>
+                <p style="font-size: 0.95rem; color: #475569; line-height: 1.7; margin: 0;">{desc}</p>
             </div>
-            """, unsafe_allow_html=True)
+            ''', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-
-    # ========== Features Grid ==========
-    st.markdown("<h2 style='font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px;'> 核心能力</h2>", unsafe_allow_html=True)
-
-    features = [
-        ("&#x1F4C8;", "双模输入分析", "结构化财务数据 + MD&A 非结构化文本，全方位透视企业风险"),
-        ("&#x1F50E;", "AI 可解释性", "SHAP 特征重要性分析，每个预测都有明确依据，告别黑箱"),
-        ("&#x1F6A8;", "风险标签可视化", "自动生成「存贷双高」等可读性强的风险标签，一目了然"),
-        ("&#x1F916;", "AI 智能问答", "财务舞弊理论、案例解析、实操指导，7×24 随时解答"),
-    ]
-
-    feat_cols = st.columns(2)
-    for i, (icon, title, desc) in enumerate(features):
-        with feat_cols[i % 2]:
-            st.markdown(f"""
-            <div class="feature-card" style="margin-bottom: 1rem; animation: fadeInUp 0.5s ease-out {i*0.1}s both;">
-                <div style="font-size: 1.4rem; margin-bottom: 0.5rem;">{icon}</div>
-                <h4 style="font-size: 1.05rem; font-weight: 600; margin-bottom: 0.4rem; color: #0F172A;">{title}</h4>
-                <p style="font-size: 0.9rem; color: #475569; line-height: 1.6;">{desc}</p>
+    # ========== FEATURES SECTION (With Blue Gradient Background) ==========
+    features_section_html = '''
+    <div id="features" style="width: 100%; padding: 80px 0; background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 50%, #EFF6FF 100%); position: relative;">
+        <div style="position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, #BFDBFE, transparent);"></div>
+        <div class="content-wrap" style="max-width: 1280px; margin: 0 auto; padding: 0 2rem;">
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <h2 style="font-size: 2.2rem; font-weight: 700; color: #0F172A; letter-spacing: -1px; margin-bottom: 0.5rem;">核心能力</h2>
+                <p style="color: #64748B; font-size: 1.05rem;">四大核心模块，覆盖财务舞弊识别全链路</p>
             </div>
-            """, unsafe_allow_html=True)
-
-    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-
-    # ========== How It Works ==========
-    how_it_works_html = '''
-    <div style="margin: 2.5rem 0; padding: 2rem 1.5rem; background: linear-gradient(135deg, #F8FAFC, #EFF6FF); border-radius: 14px; border: 1px solid #BFDBFE;">
-        <div style="text-align: center; margin-bottom: 2rem;">
-            <h2 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.4rem; color: #0F172A;">&#x1F680; 三步完成智能检测</h2>
-            <p style="color: #475569; font-size: 0.95rem;">上传财务报告 &#x2192; AI深度解析 &#x2192; 获取风险报告</p>
-        </div>
-        <div style="display: flex; align-items: flex-start; justify-content: center; gap: 0; max-width: 900px; margin: 0 auto;">
-            <div style="flex: 1; text-align: center; position: relative; animation: fadeInUp 0.5s ease-out 0.1s both;">
-                <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #EFF6FF, #DBEAFE); border: 2px solid #BFDBFE; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
-                    <span style="font-size: 1rem; font-weight: 700; color: #2563EB;">1</span>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+                <div class="feature-card" style="padding: 2rem; animation: fadeInUp 0.6s ease-out 0.1s both;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #EFF6FF, #DBEAFE); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1rem;">📈</div>
+                    <h4 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0F172A;">双模输入分析</h4>
+                    <p style="font-size: 0.95rem; color: #475569; line-height: 1.7;">结构化财务数据 + MD&A 非结构化文本，全方位透视企业风险，不留死角。</p>
                 </div>
-                <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; color: #0F172A;">&#x1F4C4; 上传报告</h4>
-                <p style="font-size: 0.8rem; color: #475569; line-height: 1.5; padding: 0 0.5rem;">支持 PDF 年报、Excel 财务表、Word 文档等多格式上传</p>
-            </div>
-            <div style="flex: 0.4; height: 1px; background: linear-gradient(90deg, #BFDBFE, #3B82F6, #BFDBFE); margin-top: 24px;"></div>
-            <div style="flex: 1; text-align: center; position: relative; animation: fadeInUp 0.5s ease-out 0.2s both;">
-                <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #EFF6FF, #DBEAFE); border: 2px solid #BFDBFE; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
-                    <span style="font-size: 1rem; font-weight: 700; color: #2563EB;">2</span>
+                <div class="feature-card" style="padding: 2rem; animation: fadeInUp 0.6s ease-out 0.2s both;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #F0FDF4, #DCFCE7); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1rem;">🔍</div>
+                    <h4 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0F172A;">AI 可解释性</h4>
+                    <p style="font-size: 0.95rem; color: #475569; line-height: 1.7;">SHAP 特征重要性分析，每个预测都有明确依据，告别黑箱，审计师也能看懂 AI。</p>
                 </div>
-                <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; color: #0F172A;">&#x1F916; AI 深度解析</h4>
-                <p style="font-size: 0.8rem; color: #475569; line-height: 1.5; padding: 0 0.5rem;">7 维风险特征提取 + SHAP 可解释性分析 + IPO 对标</p>
-            </div>
-            <div style="flex: 0.4; height: 1px; background: linear-gradient(90deg, #BFDBFE, #3B82F6, #BFDBFE); margin-top: 24px;"></div>
-            <div style="flex: 1; text-align: center; position: relative; animation: fadeInUp 0.5s ease-out 0.3s both;">
-                <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #EFF6FF, #DBEAFE); border: 2px solid #BFDBFE; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">
-                    <span style="font-size: 1rem; font-weight: 700; color: #2563EB;">3</span>
+                <div class="feature-card" style="padding: 2rem; animation: fadeInUp 0.6s ease-out 0.3s both;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #FFFBEB, #FEF3C7); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1rem;">🚨</div>
+                    <h4 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0F172A;">风险标签可视化</h4>
+                    <p style="font-size: 0.95rem; color: #475569; line-height: 1.7;">自动生成「存贷双高」「现金流背离」等可读性强的风险标签，一目了然。</p>
                 </div>
-                <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; color: #0F172A;">&#x1F4CA; 获取报告</h4>
-                <p style="font-size: 0.8rem; color: #475569; line-height: 1.5; padding: 0 0.5rem;">可视化风险标签、整改建议、完整证据链下载</p>
+                <div class="feature-card" style="padding: 2rem; animation: fadeInUp 0.6s ease-out 0.4s both;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #F3E8FF, #E9D5FF); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1rem;">🤖</div>
+                    <h4 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0F172A;">AI 智能问答</h4>
+                    <p style="font-size: 0.95rem; color: #475569; line-height: 1.7;">财务舞弊理论、案例解析、实操指导、税务咨询，7×24 随时解答。</p>
+                </div>
             </div>
         </div>
     </div>
     '''
-    st.components.v1.html(how_it_works_html, height=320, scrolling=False)
+    st.components.v1.html(features_section_html, height=700, scrolling=False)
 
-    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+    # ========== HOW IT WORKS (Dark Section for Contrast) ==========
+    how_it_works_html = '''
+    <div style="width: 100%; padding: 80px 0; background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); position: relative; overflow: hidden;">
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.08; background-image: radial-gradient(circle, #3B82F6 1px, transparent 1px); background-size: 48px 48px;"></div>
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1;">
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <h2 style="font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #FFFFFF; letter-spacing: -1px;">三步完成智能检测</h2>
+                <p style="color: #94A3B8; font-size: 1.05rem;">上传财务报告 → AI 深度解析 → 获取风险报告</p>
+            </div>
+            <div style="display: flex; align-items: flex-start; justify-content: center; gap: 0;">
+                <div style="flex: 1; text-align: center; position: relative; animation: fadeInUp 0.6s ease-out 0.1s both;">
+                    <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #2563EB, #1D4ED8); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; box-shadow: 0 0 30px rgba(37,99,235,0.4);">
+                        <span style="font-size: 1.25rem; font-weight: 700; color: #FFFFFF;">1</span>
+                    </div>
+                    <h4 style="font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem; color: #FFFFFF;">📄 上传报告</h4>
+                    <p style="font-size: 0.9rem; color: #94A3B8; line-height: 1.6; padding: 0 1rem;">支持 PDF 年报、Excel 财务表、Word 文档等多格式上传</p>
+                </div>
+                <div style="flex: 0.5; height: 2px; background: linear-gradient(90deg, #2563EB, #3B82F6); margin-top: 32px; opacity: 0.5;"></div>
+                <div style="flex: 1; text-align: center; position: relative; animation: fadeInUp 0.6s ease-out 0.25s both;">
+                    <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #2563EB, #1D4ED8); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; box-shadow: 0 0 30px rgba(37,99,235,0.4);">
+                        <span style="font-size: 1.25rem; font-weight: 700; color: #FFFFFF;">2</span>
+                    </div>
+                    <h4 style="font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem; color: #FFFFFF;">🤖 AI 深度解析</h4>
+                    <p style="font-size: 0.9rem; color: #94A3B8; line-height: 1.6; padding: 0 1rem;">7 维风险特征提取 + SHAP 可解释性分析 + IPO 对标</p>
+                </div>
+                <div style="flex: 0.5; height: 2px; background: linear-gradient(90deg, #3B82F6, #2563EB); margin-top: 32px; opacity: 0.5;"></div>
+                <div style="flex: 1; text-align: center; position: relative; animation: fadeInUp 0.6s ease-out 0.4s both;">
+                    <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #2563EB, #1D4ED8); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; box-shadow: 0 0 30px rgba(37,99,235,0.4);">
+                        <span style="font-size: 1.25rem; font-weight: 700; color: #FFFFFF;">3</span>
+                    </div>
+                    <h4 style="font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem; color: #FFFFFF;">📊 获取报告</h4>
+                    <p style="font-size: 0.9rem; color: #94A3B8; line-height: 1.6; padding: 0 1rem;">可视化风险标签、整改建议、完整证据链下载</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    '''
+    st.components.v1.html(how_it_works_html, height=400, scrolling=False)
 
-    # ========== Use Cases ==========
-    st.markdown("<h2 style='font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px;'> 适用场景</h2>", unsafe_allow_html=True)
+    # ========== USE CASES ==========
+    st.markdown('<div class="content-wrap" style="padding-top: 4rem; padding-bottom: 3rem;">', unsafe_allow_html=True)
+    st.markdown("<h2 style='font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0F172A; letter-spacing: -1px;'>适用场景</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #64748B; font-size: 1.05rem; margin-bottom: 2rem;'>多行业多角色，满足各类审计与风控需求</p>", unsafe_allow_html=True)
+
     uc_cols = st.columns(4)
     use_cases = [
-        ("&#x1F3DB;", "监管机构", "非现场监管、风险预警"),
-        ("&#x1F4C4;", "会计师事务所", "审计辅助分析、底稿复核"),
-        ("&#x1F4B0;", "投资者", "个股风险检测、标的筛查"),
-        ("&#x1F3E2;", "上市公司", "财务舞弊自查、信披优化"),
+        ("🏛️", "监管机构", "非现场监管、风险预警、合规审查"),
+        ("📋", "会计师事务所", "审计辅助分析、底稿复核、质量把控"),
+        ("💰", "投资者", "个股风险检测、标的筛查、投前尽调"),
+        ("🏢", "上市公司", "财务舞弊自查、信披优化、内控建设"),
     ]
     for i, (icon, title, desc) in enumerate(use_cases):
         with uc_cols[i]:
-            st.markdown(f"""
-            <div class="glass-card" style="text-align: center; padding: 1.5rem 1rem; animation: fadeInUp 0.5s ease-out {i*0.1}s both;">
-                <div style="font-size: 1.6rem; margin-bottom: 0.5rem;">{icon}</div>
-                <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; color: #0F172A;">{title}</h4>
-                <p style="font-size: 0.8rem; color: #475569;">{desc}</p>
+            st.markdown(f'''
+            <div class="glass-card" style="text-align: center; padding: 2rem 1.25rem; animation: fadeInUp 0.5s ease-out {i*0.1}s both;">
+                <div style="font-size: 2rem; margin-bottom: 0.75rem;">{icon}</div>
+                <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.4rem; color: #0F172A;">{title}</h4>
+                <p style="font-size: 0.9rem; color: #475569; line-height: 1.6;">{desc}</p>
             </div>
-            """, unsafe_allow_html=True)
+            ''', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-
-    # ========== Cases Showcase ==========
-    st.markdown("<h2 style='font-size: 1.75rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px;'> 经典案例库</h2>", unsafe_allow_html=True)
+    # ========== CASES SHOWCASE ==========
+    st.markdown('<div class="content-wrap" style="padding-top: 2rem; padding-bottom: 3rem;">', unsafe_allow_html=True)
+    st.markdown("<h2 style='font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0F172A; letter-spacing: -1px;'>经典案例库</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #64748B; font-size: 1.05rem; margin-bottom: 2rem;'>基于真实历史案例构建的检测基准</p>", unsafe_allow_html=True)
 
     cases = get_cached_demo_cases(featured_only=True, _token=st.session_state.token)
     if cases:
         case_cols = st.columns(min(len(cases), 4))
         for idx, case in enumerate(cases[:4]):
             with case_cols[idx]:
-                badge = '<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.7rem;font-weight:700;background:rgba(239,68,68,0.1);color:#EF4444;">舞弊案例</span>' if case["case_type"] == "fraud" else '<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.7rem;font-weight:700;background:rgba(16,185,129,0.1);color:#10B981;">正常案例</span>'
-                st.markdown(f"""
-                <div class="glass-card" style="padding: 1.5rem; animation-delay: {idx * 0.1}s;">
-                    <div style="margin-bottom: 0.75rem;">{badge}</div>
-                    <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.3;">{case['case_name']}</h4>
-                    <p style="font-size: 0.85rem; opacity: 0.7; line-height: 1.5;">{case.get('description', '')[:55]}...</p>
+                badge_bg = "rgba(239,68,68,0.1)" if case["case_type"] == "fraud" else "rgba(16,185,129,0.1)"
+                badge_color = "#EF4444" if case["case_type"] == "fraud" else "#10B981"
+                badge_text = "舞弊案例" if case["case_type"] == "fraud" else "正常案例"
+                st.markdown(f'''
+                <div class="glass-card" style="padding: 1.75rem; animation: fadeInUp 0.5s ease-out {idx*0.1}s both;">
+                    <div style="display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; background: {badge_bg}; color: {badge_color}; margin-bottom: 0.75rem;">{badge_text}</div>
+                    <h4 style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.3; color: #0F172A;">{case['case_name']}</h4>
+                    <p style="font-size: 0.85rem; color: #64748B; line-height: 1.6;">{case.get('description', '')[:60]}...</p>
                 </div>
-                """, unsafe_allow_html=True)
+                ''', unsafe_allow_html=True)
     else:
-        _render_empty_state("📚", "案例库加载中", "经典案例库正在准备中，您可以先上传企业年报体验实时检测功能。", "💡 前往「舞弊检测」开始分析")
+        _render_empty_state("📚", "案例库加载中", "经典案例库正在准备中，您可以先上传企业年报体验实时检测功能。", "前往「舞弊检测」开始分析")
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
-
-    # ========== Trust Badges ==========
+    # ========== TRUST BADGES (Full Width Light Blue) ==========
     trust_html = '''
-    <div style="margin: 2.5rem 0; padding: 2rem 1.5rem; background: linear-gradient(135deg, #F8FAFC, #EFF6FF); border-radius: 14px; border: 1px solid #BFDBFE;">
-        <div style="text-align: center; margin-bottom: 2rem;">
-            <h2 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.4rem; color: #0F172A;">&#x1F393; 技术信任背书</h2>
-            <p style="color: #475569; font-size: 0.95rem;">源自顶尖学术成果，服务专业审计场景</p>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; max-width: 1000px; margin: 0 auto;">
-            <div style="text-align: center; padding: 1.25rem; animation: fadeInUp 0.5s ease-out 0.1s both;">
-                <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">&#x1F4DA;</div>
-                <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; color: #0F172A;">学术认可</h4>
-                <p style="font-size: 0.8rem; color: #475569; line-height: 1.5;">基于前沿财务舞弊识别研究成果</p>
+    <div style="width: 100%; padding: 64px 0; background: linear-gradient(180deg, #F8FAFC 0%, #EFF6FF 100%); position: relative;">
+        <div style="position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, #BFDBFE, transparent);"></div>
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+            <div style="text-align: center; margin-bottom: 2.5rem;">
+                <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0F172A; letter-spacing: -0.5px;">技术信任背书</h2>
+                <p style="color: #64748B; font-size: 1rem;">源自顶尖学术成果，服务专业审计场景</p>
             </div>
-            <div style="text-align: center; padding: 1.25rem; animation: fadeInUp 0.5s ease-out 0.2s both;">
-                <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">&#x1F512;</div>
-                <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; color: #0F172A;">数据安全</h4>
-                <p style="font-size: 0.8rem; color: #475569; line-height: 1.5;">企业级加密存储，报告阅后即焚</p>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+                <div style="text-align: center; padding: 1.5rem; animation: fadeInUp 0.5s ease-out 0.1s both;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📚</div>
+                    <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; color: #0F172A;">学术认可</h4>
+                    <p style="font-size: 0.9rem; color: #64748B; line-height: 1.6;">基于前沿财务舞弊识别研究成果</p>
+                </div>
+                <div style="text-align: center; padding: 1.5rem; animation: fadeInUp 0.5s ease-out 0.2s both;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔒</div>
+                    <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; color: #0F172A;">数据安全</h4>
+                    <p style="font-size: 0.9rem; color: #64748B; line-height: 1.6;">企业级加密存储，报告阅后即焚</p>
+                </div>
+                <div style="text-align: center; padding: 1.5rem; animation: fadeInUp 0.5s ease-out 0.3s both;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">⚡</div>
+                    <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; color: #0F172A;">高效处理</h4>
+                    <p style="font-size: 0.9rem; color: #64748B; line-height: 1.6;">单次检测仅需 30-60 秒</p>
+                </div>
+                <div style="text-align: center; padding: 1.5rem; animation: fadeInUp 0.5s ease-out 0.4s both;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🎯</div>
+                    <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; color: #0F172A;">精准识别</h4>
+                    <p style="font-size: 0.9rem; color: #64748B; line-height: 1.6;">92%+ AI 识别准确率，可解释</p>
+                </div>
             </div>
-            <div style="text-align: center; padding: 1.25rem; animation: fadeInUp 0.5s ease-out 0.3s both;">
-                <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">&#x26A1;</div>
-                <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; color: #0F172A;">高效处理</h4>
-                <p style="font-size: 0.8rem; color: #475569; line-height: 1.5;">单次检测仅需 30-60 秒</p>
-            </div>
-            <div style="text-align: center; padding: 1.25rem; animation: fadeInUp 0.5s ease-out 0.4s both;">
-                <div style="font-size: 1.5rem; margin-bottom: 0.3rem;">&#x1F3AF;</div>
-                <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; color: #0F172A;">精准识别</h4>
-                <p style="font-size: 0.8rem; color: #475569; line-height: 1.5;">92%+ AI 识别准确率，可解释</p>
-            </div>
-        </div>
-        <div style="text-align: center; margin-top: 1.5rem;">
-            <p style="font-size: 0.75rem; color: #64748B; margin-bottom: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Powered By</p>
-            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;">
-                <span style="display:inline-block;padding:5px 12px;border-radius:100px;font-size:0.75rem;font-weight:600;background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE;">Qwen-Plus</span>
-                <span style="display:inline-block;padding:5px 12px;border-radius:100px;font-size:0.75rem;font-weight:600;background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE;">Qwen3-235B</span>
-                <span style="display:inline-block;padding:5px 12px;border-radius:100px;font-size:0.75rem;font-weight:600;background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE;">XGBoost</span>
-                <span style="display:inline-block;padding:5px 12px;border-radius:100px;font-size:0.75rem;font-weight:600;background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE;">SHAP</span>
-                <span style="display:inline-block;padding:5px 12px;border-radius:100px;font-size:0.75rem;font-weight:600;background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE;">GMM</span>
-                <span style="display:inline-block;padding:5px 12px;border-radius:100px;font-size:0.75rem;font-weight:600;background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE;">FastAPI</span>
-                <span style="display:inline-block;padding:5px 12px;border-radius:100px;font-size:0.75rem;font-weight:600;background:#EFF6FF;color:#2563EB;border:1px solid #BFDBFE;">Streamlit</span>
+            <div style="text-align: center;">
+                <p style="font-size: 0.8rem; color: #94A3B8; margin-bottom: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px;">Powered By</p>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;">
+                    <span style="display:inline-block;padding:6px 16px;border-radius:100px;font-size:0.8rem;font-weight:600;background:#FFFFFF;color:#2563EB;border:1px solid #BFDBFE;box-shadow:0 1px 3px rgba(0,0,0,0.04);">Qwen-Plus</span>
+                    <span style="display:inline-block;padding:6px 16px;border-radius:100px;font-size:0.8rem;font-weight:600;background:#FFFFFF;color:#2563EB;border:1px solid #BFDBFE;box-shadow:0 1px 3px rgba(0,0,0,0.04);">Qwen3-235B</span>
+                    <span style="display:inline-block;padding:6px 16px;border-radius:100px;font-size:0.8rem;font-weight:600;background:#FFFFFF;color:#2563EB;border:1px solid #BFDBFE;box-shadow:0 1px 3px rgba(0,0,0,0.04);">XGBoost</span>
+                    <span style="display:inline-block;padding:6px 16px;border-radius:100px;font-size:0.8rem;font-weight:600;background:#FFFFFF;color:#2563EB;border:1px solid #BFDBFE;box-shadow:0 1px 3px rgba(0,0,0,0.04);">SHAP</span>
+                    <span style="display:inline-block;padding:6px 16px;border-radius:100px;font-size:0.8rem;font-weight:600;background:#FFFFFF;color:#2563EB;border:1px solid #BFDBFE;box-shadow:0 1px 3px rgba(0,0,0,0.04);">GMM</span>
+                    <span style="display:inline-block;padding:6px 16px;border-radius:100px;font-size:0.8rem;font-weight:600;background:#FFFFFF;color:#2563EB;border:1px solid #BFDBFE;box-shadow:0 1px 3px rgba(0,0,0,0.04);">FastAPI</span>
+                    <span style="display:inline-block;padding:6px 16px;border-radius:100px;font-size:0.8rem;font-weight:600;background:#FFFFFF;color:#2563EB;border:1px solid #BFDBFE;box-shadow:0 1px 3px rgba(0,0,0,0.04);">Streamlit</span>
+                </div>
             </div>
         </div>
     </div>
     '''
-    st.components.v1.html(trust_html, height=400, scrolling=False)
+    st.components.v1.html(trust_html, height=420, scrolling=False)
 
-    st.markdown("<div style='margin: 2rem 0;'></div>", unsafe_allow_html=True)
+    # ========== FAQ + TESTIMONIALS (Content Wrap) ==========
+    st.markdown('<div class="content-wrap" style="padding-top: 4rem; padding-bottom: 2rem;">', unsafe_allow_html=True)
 
-    # ========== Tech Details ==========
-    with st.expander("查看核心技术细节（AI提示词与算法原理）"):
-        st.info("本展示专为评委/技术评审设计，展示系统的核心技术实现")
-
-        tab1, tab2, tab3 = st.tabs([" AI 提示词", " 算法原理", "特征体系"])
-
-        with tab1:
-            try:
-                prompt_data = make_api_request("/detection/ai-prompt")
-                if prompt_data:
-                    st.markdown(f"### {prompt_data.get('title', 'AI分析提示词')}")
-                    st.caption(f"使用模型: `{prompt_data.get('model', 'Unknown')}`")
-
-                    st.markdown("**七大风险特征维度：**")
-                    features = prompt_data.get('features', {})
-                    for i, (feature_code, feature_info) in enumerate(features.items(), 1):
-                        with st.container(border=True):
-                            col_feat, col_desc = st.columns([1, 2])
-                            with col_feat:
-                                st.markdown(f"**{i}. {feature_info.get('name', feature_code)}**")
-                                st.code(feature_code, language='text')
-                            with col_desc:
-                                st.caption(f"{feature_info.get('description', '')}")
-                                st.markdown(f"*示例: {feature_info.get('example', '')}*")
-
-                    st.markdown("**评分标准：**")
-                    scoring = prompt_data.get('scoring_criteria', {})
-                    col_s1, col_s2, col_s3 = st.columns(3)
-                    with col_s1:
-                        st.success(scoring.get('low', ''))
-                    with col_s2:
-                        st.warning(scoring.get('medium', ''))
-                    with col_s3:
-                        st.error(scoring.get('high', ''))
-
-                    st.markdown("---")
-                    st.markdown("** 完整提示词模板：**")
-                    st.code(prompt_data.get('prompt_template', ''), language='text')
-                else:
-                    st.error("提示词数据加载失败")
-            except Exception as e:
-                st.error(f"加载提示词失败: {e}")
-
-        with tab2:
-            st.markdown("###  GMM-SHAP 可解释性算法")
-            st.markdown("""
-            **算法流程：**
-            1. **多模型集成预测**：结合逻辑回归、XGBoost、神经网络预测
-            2. **动态阈值优化**：通过 Youden 指数确定最优分类阈值
-            3. **GMM 聚类解释**：使用高斯混合模型将样本聚为低/中/高风险簇
-            4. **SHAP 归因分析**：在每个簇内计算特征贡献度，生成定制化解释
-
-            **技术创新点：**
-            - 解决 AI "黑箱"问题，每个预测都有明确依据
-            - 针对不同风险等级提供差异化解释
-            - 结合 7 维文本特征 + 传统财务指标
-            """)
-
-        with tab3:
-            st.markdown("###  双模特征体系")
-            st.markdown("""
-            **维度1: 结构化财务指标**
-            - 存贷双高检测
-            - 现金流背离分析
-            - 存货异常识别
-            - ROE / 资产负债率监控
-
-            **维度2: 非结构化文本特征（AI 提取）**
-            - 语义矛盾度（CON_SEM_AI）
-            - 风险披露完整性（COV_RISK_AI）
-            - 异常乐观语调（TONE_ABN_AI）
-            - 文本-数据一致性（FIT_TD_AI）
-            - 关联隐藏指数（HIDE_REL_AI）
-            - 信息密度异常（DEN_ABN_AI）
-            - 回避表述强度（STR_EVA_AI）
-            """)
-
-    # ========== FAQ Section ==========
-    st.markdown("<div style='margin: 2.5rem 0 1.5rem 0; text-align: center;'><h2 style='font-size: 1.6rem; font-weight: 700; color: #0F172A; letter-spacing: -0.5px;'>常见问题</h2><p style='color: #64748B; font-size: 0.95rem; margin-top: 0.5rem;'>关于 Audit Mind 的使用、定价与技术的常见疑问</p></div>", unsafe_allow_html=True)
+    # FAQ
+    st.markdown("<h2 style='font-size: 2.2rem; font-weight: 700; color: #0F172A; letter-spacing: -1px; margin-bottom: 0.5rem; text-align: center;'>常见问题</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #64748B; font-size: 1.05rem; margin-bottom: 2rem; text-align: center;'>关于 Audit Mind 的使用、定价与技术的常见疑问</p>", unsafe_allow_html=True)
 
     faq_items = [
         ("Audit Mind 的舞弊检测准确率如何？", "Audit Mind 采用多模型集成架构，结合 GMM-SHAP 可解释性算法，在模拟测试环境中对已知舞弊案例的识别率达到行业领先水平。系统提供风险概率而非确定性结论，建议结合专业审计判断使用。"),
         ("免费版可以体验哪些功能？", "免费用户可体验 3 次完整的舞弊检测流程（含风险评分、SHAP 特征分析、风险标签解读），每日可使用 AI 问答 5 次，财务报表解析 1 次。体验后如需更多额度，可升级会员。"),
         ("支持哪些财务数据格式？", "目前支持手动输入财务数据、上传 Excel / CSV 文件，以及在财务助手中通过 AI 自动解析年报 PDF 生成四表一注。票据识别支持发票、银行流水、工资表等图片/PDF 上传。"),
-        ("会员版与免费版的核心区别是什么？", "会员版享受不限次数的舞弊检测、AI 财务助手解析、税务测算与票据识别，并可导出专业级 PDF / Word 检测报告。企业版额外提供 API 接口、批量检测与私有化部署选项。"),
-        ("数据安全和隐私如何保障？", "所有上传的财务数据与报告均通过加密传输与存储，分析完成后可手动删除。我们不会将用户数据用于模型训练，企业版支持本地化部署，数据完全不出域。"),
+        ("会员版与免费版的核心区别是什么？", "会员版享受不限次数的舞弊检测、AI 财务助手解析、税务测算与票据识别，并可导出专业级 PDF / Word 检测报告。"),
+        ("数据安全和隐私如何保障？", "所有上传的财务数据与报告均通过加密传输与存储，分析完成后可手动删除。我们不会将用户数据用于模型训练。"),
         ("检测结果中的 SHAP 图如何理解？", "SHAP 图展示每个财务指标或文本特征对最终风险评分的贡献度。红色条表示推高舞弊概率的特征，蓝色条表示降低概率的特征。通过 SHAP 可以定位具体风险点，指导后续审计核查方向。"),
     ]
-
     for idx, (q, a) in enumerate(faq_items):
         with st.expander(q):
-            st.markdown(f"<div style='color: #475569; line-height: 1.7; font-size: 0.92rem; padding: 0.25rem 0;'>{a}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div style='color: #475569; line-height: 1.8; font-size: 0.95rem; padding: 0.25rem 0;'>{a}</div>", unsafe_allow_html=True)
 
-    # ========== Testimonials ==========
-    st.markdown("<div style='margin: 2.5rem 0 1.5rem 0; text-align: center;'><h2 style='font-size: 1.6rem; font-weight: 700; color: #0F172A; letter-spacing: -0.5px;'>用户心声</h2><p style='color: #64748B; font-size: 0.95rem; margin-top: 0.5rem;'>来自审计师、财务从业者与企业主的真实反馈</p></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin: 3rem 0;'></div>", unsafe_allow_html=True)
+
+    # Testimonials
+    st.markdown("<h2 style='font-size: 2.2rem; font-weight: 700; color: #0F172A; letter-spacing: -1px; margin-bottom: 0.5rem; text-align: center;'>用户心声</h2>", unsafe_allow_html=True)
+    st.markdown("<p style='color: #64748B; font-size: 1.05rem; margin-bottom: 2rem; text-align: center;'>来自审计师、财务从业者与企业主的真实反馈</p>", unsafe_allow_html=True)
 
     testimonials = [
-        {
-            "name": "李经理",
-            "title": "某会计师事务所 · 审计经理",
-            "content": "过去识别财务舞弊依赖经验和抽样，Audit Mind 的 AI 文本分析帮我们发现了好几起 MD&A 语义矛盾案例，SHAP 归因也很清晰，客户报告更有说服力了。",
-            "color": "#EFF6FF",
-            "border": "#BFDBFE",
-            "accent": "#2563EB"
-        },
-        {
-            "name": "王总监",
-            "title": "某制造业集团 · 财务总监",
-            "content": "税务测算功能很实用，尤其是年终奖单独计税和合并计税的对比，直接帮团队省了几十万的个税支出。简易报税的票据 AI 识别准确率也很高。",
-            "color": "#F0FDF4",
-            "border": "#BBF7D0",
-            "accent": "#10B981"
-        },
-        {
-            "name": "张老师",
-            "title": "某财经大学 · 会计学教授",
-            "content": "在课堂演示舞弊识别时，Audit Mind 的可视化效果非常直观，学生能通过 SHAP 图理解 AI 是如何做出判断的，是教学与科研结合的好工具。",
-            "color": "#FFFBEB",
-            "border": "#FDE68A",
-            "accent": "#F59E0B"
-        },
+        {"name": "李经理", "title": "某会计师事务所 · 审计经理", "content": "过去识别财务舞弊依赖经验和抽样，Audit Mind 的 AI 文本分析帮我们发现了好几起 MD&A 语义矛盾案例，SHAP 归因也很清晰，客户报告更有说服力了。", "color": "#EFF6FF", "border": "#BFDBFE", "accent": "#2563EB"},
+        {"name": "王总监", "title": "某制造业集团 · 财务总监", "content": "税务测算功能很实用，尤其是年终奖单独计税和合并计税的对比，直接帮团队省了几十万的个税支出。简易报税的票据 AI 识别准确率也很高。", "color": "#F0FDF4", "border": "#BBF7D0", "accent": "#10B981"},
+        {"name": "张老师", "title": "某财经大学 · 会计学教授", "content": "在课堂演示舞弊识别时，Audit Mind 的可视化效果非常直观，学生能通过 SHAP 图理解 AI 是如何做出判断的，是教学与科研结合的好工具。", "color": "#FFFBEB", "border": "#FDE68A", "accent": "#F59E0B"},
     ]
-
     testimonial_cols = st.columns(len(testimonials))
     for idx, t in enumerate(testimonials):
         with testimonial_cols[idx]:
-            t_html = f"""<div style="background: {t['color']}; border: 1px solid {t['border']}; border-radius: 14px; padding: 1.5rem; height: 100%; animation: fadeInUp 0.5s ease-out {idx*0.15}s both; position: relative;">
-                <div style="font-size: 2rem; color: {t['accent']}; opacity: 0.25; position: absolute; top: 10px; left: 14px; font-family: Georgia, serif;">"</div>
-                <p style="color: #334155; font-size: 0.92rem; line-height: 1.7; margin: 1.25rem 0 1.25rem 0; position: relative; z-index: 1;">{t['content']}</p>
-                <div style="display: flex; align-items: center; gap: 10px; margin-top: auto;">
-                    <div style="width: 36px; height: 36px; border-radius: 50%; background: {t['accent']}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.85rem;">{t['name'][0]}</div>
+            t_html = f'''<div style="background: {t['color']}; border: 1px solid {t['border']}; border-radius: 16px; padding: 1.75rem; height: 100%; animation: fadeInUp 0.5s ease-out {idx*0.15}s both; position: relative;">
+                <div style="font-size: 2.5rem; color: {t['accent']}; opacity: 0.2; position: absolute; top: 12px; left: 16px; font-family: Georgia, serif;">"</div>
+                <p style="color: #334155; font-size: 0.95rem; line-height: 1.8; margin: 1.5rem 0 1.5rem 0; position: relative; z-index: 1;">{t['content']}</p>
+                <div style="display: flex; align-items: center; gap: 12px; margin-top: auto;">
+                    <div style="width: 42px; height: 42px; border-radius: 50%; background: {t['accent']}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">{t['name'][0]}</div>
                     <div>
-                        <div style="font-weight: 600; color: #0F172A; font-size: 0.9rem;">{t['name']}</div>
-                        <div style="color: #64748B; font-size: 0.8rem;">{t['title']}</div>
+                        <div style="font-weight: 700; color: #0F172A; font-size: 0.95rem;">{t['name']}</div>
+                        <div style="color: #64748B; font-size: 0.85rem;">{t['title']}</div>
                     </div>
                 </div>
-            </div>"""
-            st.components.v1.html(t_html, height=260, scrolling=False)
+            </div>'''
+            st.components.v1.html(t_html, height=280, scrolling=False)
 
-    # ========== Bottom CTA Banner ==========
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # ========== BOTTOM CTA (Full Width) ==========
     cta_html = '''
-    <div style="margin: 2.5rem -1rem 0 -1rem; padding: 3rem 2rem; background: linear-gradient(135deg, #EFF6FF, #DBEAFE); border-top: 1px solid #BFDBFE; text-align: center; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.3; background-image: radial-gradient(circle, #3B82F6 1px, transparent 1px); background-size: 40px 40px;"></div>
-        <div style="max-width: 600px; margin: 0 auto; position: relative; z-index: 1;">
-            <h2 style="font-size: 1.8rem; font-weight: 700; color: #0F172A; margin-bottom: 0.75rem; letter-spacing: -0.5px;">&#x1F680; 准备好开始了吗？</h2>
-            <p style="font-size: 1rem; color: #475569; margin-bottom: 1.5rem; line-height: 1.7;">立即体验 Audit Mind 的智能财务舞弊检测能力<br>上传第一份报告，3 分钟内获取专业级风险分析</p>
-            <a href="#" onclick="window.parent.postMessage({type: 'streamlit:setComponentValue', value: 'detect'}, '*'); return false;"
-               style="display:inline-block;padding:12px 32px;border-radius:10px;font-size:1rem;font-weight:600;color:#FFFFFF;background:linear-gradient(135deg, #2563EB, #1D4ED8);text-decoration:none;transition:all 0.2s ease;box-shadow:0 4px 16px rgba(37,99,235,0.3);"
-               onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 24px rgba(37,99,235,0.4)';"
-               onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 16px rgba(37,99,235,0.3)';">
+    <div style="width: 100%; padding: 80px 2rem; background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%); text-align: center; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.1; background-image: radial-gradient(circle, #3B82F6 1px, transparent 1px); background-size: 40px 40px;"></div>
+        <div style="position: absolute; top: 20%; left: 10%; width: 200px; height: 200px; background: radial-gradient(circle, rgba(37,99,235,0.2) 0%, transparent 70%); border-radius: 50%;"></div>
+        <div style="position: absolute; bottom: 20%; right: 10%; width: 180px; height: 180px; background: radial-gradient(circle, rgba(96,165,250,0.15) 0%, transparent 70%); border-radius: 50%;"></div>
+        <div style="max-width: 700px; margin: 0 auto; position: relative; z-index: 1;">
+            <h2 style="font-size: 2.5rem; font-weight: 800; color: #FFFFFF; margin-bottom: 1rem; letter-spacing: -1.5px;">准备好开始了吗？</h2>
+            <p style="font-size: 1.1rem; color: #94A3B8; margin-bottom: 2rem; line-height: 1.8;">立即体验 Audit Mind 的智能财务舞弊检测能力<br>上传第一份报告，3 分钟内获取专业级风险分析</p>
+            <a href="#" style="display:inline-block;padding:16px 48px;border-radius:12px;font-size:1.1rem;font-weight:600;color:#FFFFFF;background:linear-gradient(135deg, #2563EB, #1D4ED8);text-decoration:none;transition:all 0.3s ease;box-shadow:0 8px 32px rgba(37,99,235,0.4);"
+               onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 40px rgba(37,99,235,0.5)';"
+               onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 8px 32px rgba(37,99,235,0.4)';">
                 立即开始检测
             </a>
-            <p style="font-size: 0.8rem; color: #64748B; margin-top: 1.25rem;">新用户免费体验 3 次完整检测 · 无需信用卡</p>
+            <p style="font-size: 0.85rem; color: #64748B; margin-top: 1.5rem;">新用户免费体验 3 次完整检测 · 无需信用卡</p>
         </div>
     </div>
     '''
-    st.components.v1.html(cta_html, height=280, scrolling=False)
+    st.components.v1.html(cta_html, height=360, scrolling=False)
 
 
 # ================= 舞弊检测页面 =================
@@ -4830,6 +4880,13 @@ def main():
 
     # 路由分发
     page = st.session_state.current_page
+    # 非首页页面统一包裹 content-wrap 以限制内容宽度
+    non_fullwidth_pages = ["fs", "detect", "qa", "history", "reports", "membership", "settings", "pricing", "cases"]
+    needs_wrap = page in non_fullwidth_pages
+
+    if needs_wrap:
+        st.markdown('<div class="content-wrap" style="padding-top: 2rem; padding-bottom: 3rem;">', unsafe_allow_html=True)
+
     if st.session_state.logged_in:
         if page == "home":
             render_home()
@@ -4854,16 +4911,21 @@ def main():
             render_qa()
         elif page == "pricing":
             st.markdown("""
-            <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; border-radius: 20px; position: relative; overflow: hidden;">
-                <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(37,99,235,0.12); border-radius: 50%; "></div>
-                <div style="position: relative; z-index: 1;">
-                    <h2 style="color: #0F172A; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 价格中心</h2>
+            <div style="margin: -2rem -2rem 2rem -2rem; padding: 3rem 2rem; background: linear-gradient(135deg, #0F172A, #1E293B); position: relative; overflow: hidden;">
+                <div style="position: absolute; top: -60px; right: -60px; width: 240px; height: 240px; background: rgba(37,99,235,0.15); border-radius: 50%;"></div>
+                <div style="position: absolute; bottom: -40px; left: 10%; width: 180px; height: 180px; background: rgba(96,165,250,0.1); border-radius: 50%;"></div>
+                <div style="position: relative; z-index: 1; max-width: 1280px; margin: 0 auto;">
+                    <h1 style="color: #FFFFFF; font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -1.5px;">价格中心</h1>
+                    <p style="color: #94A3B8; font-size: 1.05rem;">选择适合您的方案，解锁全部智能审计能力</p>
                 </div>
             </div>
             """, unsafe_allow_html=True)
             render_membership()
         elif page == "cases":
             render_case_center()
+
+    if needs_wrap:
+        st.markdown('</div>', unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
