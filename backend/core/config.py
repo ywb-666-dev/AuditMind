@@ -30,14 +30,14 @@ class Settings(BaseSettings):
     DASHSCOPE_API_KEY: str = "sk-49dfdf1df5c245febf3254741c8aa381"  # 阿里云DashScope API Key
     DASHSCOPE_BASE_URL: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 
-    # 财务助手专用模型：qwen-max 旗舰版，效果最佳
-    MODEL_QWEN_FS: str = "qwen-max"
+    # 财务助手专用模型：qwen3.6-plus-2026-04-02，用户确认额度充足
+    MODEL_QWEN_FS: str = "qwen3.6-plus-2026-04-02"
     # 舞弊检测专用模型：qwen3-235b-a22b 旗舰推理版，深度分析能力强，适合风险判断
     MODEL_QWEN_DETECTION: str = "qwen3-235b-a22b"
     # 视觉识别专用模型：qwen-vl-max 多模态模型，支持票据/图片识别
     MODEL_QWEN_VL: str = "qwen-vl-max"
     # 兼容旧代码的通用别名（默认指向财务助手模型）
-    MODEL_QWEN: str = "qwen-max"
+    MODEL_QWEN: str = "qwen3.6-plus-2026-04-02"
 
     # 其他备选 LLM 配置
     SILICONFLOW_API_KEY: str = ""
