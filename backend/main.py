@@ -34,6 +34,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:8501",  # Streamlit 本地开发
         "http://localhost:3000",
+        "http://47.76.180.29:8501",  # 生产环境服务器
+        "http://47.76.180.29:8000",
         "https://*.streamlit.app",  # Streamlit Cloud
         "https://*.onrender.com"    # Render 部署
     ],

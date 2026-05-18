@@ -1862,13 +1862,15 @@ def render_tax_module():
                             mime = f.type if f.type else "image/jpeg"
 
                             resp = requests.post(
-                                f"{API_BASE_URL.replace('/api', '')}/qa/ask",
-                                headers={"Content-Type": "application/json"},
+                                f"{API_BASE_URL}/qa/ask",
+                                headers={
+                                    "Content-Type": "application/json",
+                                    "Authorization": f"Bearer {st.session_state.token}"
+                                },
                                 json={
                                     "question": "识别这张票据/单据，提取以下信息并以JSON格式返回：{\"票据类型\":\"...\",\"金额\":数字,\"税率\":\"百分比或-\",\"税额\":数字,\"开票日期\":\"YYYY-MM-DD或-\",\"分类\":\"收入/成本/费用\"}",
                                     "image_base64": b64_image,
-                                    "image_mime": mime,
-                                    "model": "qwen-vl-max"
+                                    "image_mime": mime
                                 },
                                 timeout=60
                             )
