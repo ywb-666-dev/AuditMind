@@ -31,186 +31,152 @@ st.set_page_config(
 # 仅注入轻量增强样式，不强制主题色，跟随浏览器/系统 light/dark 偏好
 st.markdown("""
 <style>
-/* ===== Design Tokens - Blue Theme ===== */
+/* ===== Design Tokens - Minimal Professional ===== */
 :root {
-    --bg-primary: #F8FAFC;
-    --bg-secondary: #F1F5F9;
-    --bg-card: #FFFFFF;
-    --bg-elevated: #FFFFFF;
-    --text-primary: #0F172A;
-    --text-secondary: #475569;
-    --text-muted: #94A3B8;
+    --bg: #FFFFFF;
+    --bg-soft: #F8F9FA;
+    --bg-muted: #F1F3F5;
+    --text: #111827;
+    --text-secondary: #4B5563;
+    --text-muted: #9CA3AF;
     --accent: #2563EB;
     --accent-hover: #1D4ED8;
-    --accent-light: rgba(37,99,235,0.08);
-    --border: #E2E8F0;
-    --border-light: #F1F5F9;
+    --accent-light: #EFF6FF;
+    --border: #E5E7EB;
+    --border-light: #F3F4F6;
     --success: #10B981;
     --warning: #F59E0B;
     --danger: #EF4444;
-    --info: #3B82F6;
-    --shadow-sm: 0 1px 2px rgba(15,23,42,0.04);
-    --shadow-md: 0 4px 12px rgba(15,23,42,0.06);
-    --shadow-lg: 0 8px 24px rgba(15,23,42,0.08);
-    --shadow-glow: 0 0 20px rgba(37,99,235,0.12);
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 14px;
-    --radius-xl: 20px;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.05);
+    --shadow-lg: 0 12px 32px rgba(0,0,0,0.08);
+    --shadow-glow: 0 0 24px rgba(37,99,235,0.12);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
 }
+
+/* ===== Hide Sidebar ===== */
+[data-testid="stSidebar"] { display: none !important; }
+[data-testid="stSidebarNav"] { display: none !important; }
 
 /* ===== Reset & Base ===== */
 .main .block-container {
-    padding-top: 1.5rem;
-    padding-bottom: 2rem;
-    max-width: 1200px;
+    padding-top: 5rem;
+    padding-bottom: 3rem;
+    max-width: 1100px;
 }
 .stApp, .stApp * {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "SF Pro Display", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif !important;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
-h1 { font-weight: 700 !important; letter-spacing: -0.03em !important; font-size: 2.2rem !important; color: var(--text-primary) !important; }
-h2 { font-weight: 600 !important; letter-spacing: -0.02em !important; font-size: 1.7rem !important; color: var(--text-primary) !important; }
-h3 { font-weight: 600 !important; font-size: 1.25rem !important; color: var(--text-primary) !important; }
-p, li, td, th, label, .stMarkdown { font-size: 0.95rem !important; line-height: 1.65 !important; color: var(--text-secondary) !important; }
+h1 { font-weight: 800 !important; letter-spacing: -0.04em !important; font-size: 2.5rem !important; color: var(--text) !important; line-height: 1.15 !important; }
+h2 { font-weight: 700 !important; letter-spacing: -0.03em !important; font-size: 1.75rem !important; color: var(--text) !important; }
+h3 { font-weight: 600 !important; font-size: 1.2rem !important; color: var(--text) !important; }
+p, li, td, th, label, .stMarkdown { font-size: 0.95rem !important; line-height: 1.7 !important; color: var(--text-secondary) !important; }
 
 /* ===== Buttons ===== */
 .stButton > button {
     border-radius: var(--radius-sm) !important;
     font-weight: 500 !important;
-    padding: 0.5rem 1.25rem !important;
-    transition: all 0.15s ease !important;
+    padding: 0.6rem 1.5rem !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
     letter-spacing: 0.01em;
     border: 1px solid transparent !important;
     font-size: 0.9rem !important;
 }
-.stButton > button:hover { transform: translateY(-1px); }
-.stButton > button:active { transform: translateY(0); }
+.stButton > button:hover { transform: translateY(-2px); }
+.stButton > button:active { transform: translateY(0) scale(0.98); }
 .stButton > button[kind="primary"] {
     background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
     color: #FFFFFF !important;
-    border-color: transparent !important;
-    box-shadow: 0 2px 8px rgba(37,99,235,0.25) !important;
+    box-shadow: 0 4px 12px rgba(37,99,235,0.25) !important;
 }
-.stButton > button[kind="primary"] p,
-.stButton > button[kind="primary"] div {
-    color: #FFFFFF !important;
-}
+.stButton > button[kind="primary"] p, .stButton > button[kind="primary"] div { color: #FFFFFF !important; }
 .stButton > button[kind="primary"]:hover {
     background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%) !important;
-    box-shadow: 0 4px 16px rgba(37,99,235,0.35) !important;
-    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(37,99,235,0.35) !important;
 }
 .stButton > button[kind="secondary"] {
-    background: var(--bg-card) !important;
-    color: var(--text-primary) !important;
+    background: #FFFFFF !important;
+    color: var(--text) !important;
     border-color: var(--border) !important;
 }
 .stButton > button[kind="secondary"]:hover {
-    background: var(--bg-secondary) !important;
     border-color: var(--accent) !important;
     color: var(--accent) !important;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.08) !important;
 }
 
 /* ===== Inputs ===== */
-.stTextInput > div > div > input,
-.stTextArea > div > div > textarea,
-.stNumberInput > div > div > input,
-.stSelectbox > div > div > div {
+.stTextInput > div > div > input, .stTextArea > div > div > textarea,
+.stNumberInput > div > div > input, .stSelectbox > div > div > div {
     border-radius: var(--radius-sm) !important;
     border: 1px solid var(--border) !important;
-    background: var(--bg-card) !important;
-    color: var(--text-primary) !important;
-    padding: 0.6rem 0.875rem !important;
+    background: #FFFFFF !important;
+    color: var(--text) !important;
+    padding: 0.65rem 1rem !important;
     font-size: 0.9rem !important;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
 }
-.stTextInput > div > div > input:focus,
-.stTextArea > div > div > textarea:focus,
-.stNumberInput > div > div > input:focus,
-.stSelectbox > div > div > div:focus {
+.stTextInput > div > div > input:focus, .stTextArea > div > div > textarea:focus,
+.stNumberInput > div > div > input:focus, .stSelectbox > div > div > div:focus {
     border-color: var(--accent) !important;
-    box-shadow: 0 0 0 3px rgba(37,99,235,0.12) !important;
+    box-shadow: 0 0 0 4px rgba(37,99,235,0.08) !important;
 }
 
 /* ===== Cards ===== */
 .glass-card, .feature-card, .stat-card, .pricing-card {
-    background: var(--bg-card) !important;
+    background: #FFFFFF !important;
     border: 1px solid var(--border) !important;
-    border-radius: var(--radius-md) !important;
-    padding: 1.5rem !important;
-    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    border-radius: var(--radius-lg) !important;
+    padding: 1.75rem !important;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease !important;
 }
-.glass-card:hover, .feature-card:hover, .stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md) !important;
+.glass-card:hover, .feature-card:hover, .stat-card:hover, .pricing-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg) !important;
+    border-color: #BFDBFE !important;
 }
 
 /* ===== Badge System ===== */
 .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 12px;
-    border-radius: 100px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 0.3px;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px; border-radius: 100px;
+    font-size: 0.8rem; font-weight: 600; letter-spacing: 0.3px;
 }
-.badge-primary { background: rgba(37,99,235,0.08); color: var(--accent); border: 1px solid rgba(37,99,235,0.12); }
-.badge-success { background: rgba(16,185,129,0.08); color: var(--success); border: 1px solid rgba(16,185,129,0.12); }
-.badge-warning { background: rgba(245,158,11,0.08); color: var(--warning); border: 1px solid rgba(245,158,11,0.12); }
-.badge-danger { background: rgba(239,68,68,0.08); color: var(--danger); border: 1px solid rgba(239,68,68,0.12); }
-
-/* ===== Sidebar ===== */
-[data-testid="stSidebar"] { background: var(--bg-secondary) !important; border-right: 1px solid var(--border) !important; }
-[data-testid="stSidebar"] .stButton > button { width: 100% !important; text-align: left !important; justify-content: flex-start !important; border-radius: var(--radius-sm) !important; border: none !important; background: transparent !important; color: var(--text-secondary) !important; font-weight: 500 !important; padding: 0.6rem 0.875rem !important; }
-[data-testid="stSidebar"] .stButton > button:hover { background: var(--accent-light) !important; color: var(--accent) !important; }
-[data-testid="stSidebar"] .stButton > button[kind="primary"] { background: linear-gradient(135deg, #2563EB, #1D4ED8) !important; color: #FFFFFF !important; border-left: 3px solid #1E40AF !important; box-shadow: 0 2px 8px rgba(37,99,235,0.2) !important; }
-[data-testid="stSidebar"] .stButton > button[kind="primary"] p,
-[data-testid="stSidebar"] .stButton > button[kind="primary"] div { color: #FFFFFF !important; }
-[data-testid="stSidebar"] hr { border-color: var(--border) !important; margin: 0.75rem 0 !important; }
+.badge-primary { background: var(--accent-light); color: var(--accent); border: 1px solid #BFDBFE; }
+.badge-success { background: #F0FDF4; color: var(--success); border: 1px solid #BBF7D0; }
+.badge-warning { background: #FFFBEB; color: var(--warning); border: 1px solid #FDE68A; }
+.badge-danger { background: #FEF2F2; color: var(--danger); border: 1px solid #FECACA; }
 
 /* ===== Tables ===== */
-[data-testid="stDataFrame"] th { background: var(--bg-secondary) !important; color: var(--text-primary) !important; font-weight: 600 !important; border-bottom: 1px solid var(--border) !important; }
+[data-testid="stDataFrame"] th { background: var(--bg-soft) !important; color: var(--text) !important; font-weight: 600 !important; border-bottom: 1px solid var(--border) !important; }
 [data-testid="stDataFrame"] td { border-bottom: 1px solid var(--border-light) !important; }
-[data-testid="stDataFrame"] tr:hover { background: var(--bg-secondary) !important; }
+[data-testid="stDataFrame"] tr:hover { background: var(--bg-soft) !important; }
 
 /* ===== Tabs ===== */
-.stTabs [data-baseweb="tab-list"] { border-bottom: 1px solid var(--border) !important; gap: 4px !important; }
-.stTabs [data-baseweb="tab"] { color: var(--text-muted) !important; font-weight: 500 !important; padding: 0.6rem 1rem !important; border-radius: var(--radius-sm) var(--radius-sm) 0 0 !important; }
-.stTabs [data-baseweb="tab-highlight"] { background: var(--accent) !important; }
+.stTabs [data-baseweb="tab-list"] { border-bottom: 1px solid var(--border) !important; gap: 8px !important; }
+.stTabs [data-baseweb="tab"] { color: var(--text-muted) !important; font-weight: 500 !important; padding: 0.7rem 1.25rem !important; border-radius: var(--radius-sm) var(--radius-sm) 0 0 !important; }
+.stTabs [data-baseweb="tab-highlight"] { background: var(--accent) !important; height: 2px !important; }
 .stTabs [aria-selected="true"] { color: var(--accent) !important; }
 
 /* ===== Expanders ===== */
-.streamlit-expanderHeader { background: var(--bg-secondary) !important; border: 1px solid var(--border) !important; border-radius: var(--radius-sm) !important; font-weight: 500 !important; }
+.streamlit-expanderHeader { background: var(--bg-soft) !important; border: 1px solid var(--border) !important; border-radius: var(--radius-sm) !important; font-weight: 500 !important; }
 .streamlit-expanderHeader:hover { border-color: var(--accent) !important; }
 
 /* ===== Alerts ===== */
 .stAlert { border-radius: var(--radius-sm) !important; border: 1px solid !important; }
-.stAlert[data-baseweb="notification"] { box-shadow: none !important; }
-
-/* ===== Progress & Slider ===== */
-.stProgress > div > div { background: linear-gradient(90deg, #3B82F6, #2563EB) !important; border-radius: 8px !important; }
-.stSlider > div > div > div > div { background: var(--accent) !important; border-radius: 4px !important; }
-
-/* ===== Radio ===== */
-.stRadio > div { display: flex; flex-direction: column; gap: 6px; }
-.stRadio label { padding: 10px 14px !important; border-radius: var(--radius-sm) !important; transition: all 0.2s ease !important; border: 1.5px solid transparent !important; font-weight: 500 !important; }
-.stRadio label:hover { background: var(--bg-secondary) !important; border-color: var(--border) !important; }
-
-/* ===== Checkbox ===== */
-.stCheckbox > label { padding: 8px 12px !important; border-radius: var(--radius-sm) !important; transition: all 0.2s ease !important; }
-.stCheckbox > label:hover { background: var(--bg-secondary) !important; }
 
 /* ===== Markdown Code ===== */
-.stMarkdown code { background: var(--bg-secondary) !important; color: var(--text-primary) !important; padding: 2px 6px !important; border-radius: 4px !important; font-size: 0.85em !important; }
-.stMarkdown pre { background: var(--bg-secondary) !important; border-radius: var(--radius-md) !important; padding: 1rem !important; border: 1px solid var(--border) !important; }
+.stMarkdown code { background: var(--bg-soft) !important; color: var(--text) !important; padding: 2px 6px !important; border-radius: 4px !important; font-size: 0.85em !important; }
+.stMarkdown pre { background: var(--bg-soft) !important; border-radius: var(--radius-md) !important; padding: 1rem !important; border: 1px solid var(--border) !important; }
 
 /* ===== Animations ===== */
 @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(24px); }
     to { opacity: 1; transform: translateY(0); }
 }
 @keyframes fadeIn {
@@ -223,7 +189,7 @@ p, li, td, th, label, .stMarkdown { font-size: 0.95rem !important; line-height: 
 }
 @keyframes pulse {
     0%, 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0.15); }
-    50% { box-shadow: 0 0 0 8px rgba(37,99,235,0); }
+    50% { box-shadow: 0 0 0 10px rgba(37,99,235,0); }
 }
 @keyframes float {
     0%, 100% { transform: translateY(0); }
@@ -233,10 +199,10 @@ p, li, td, th, label, .stMarkdown { font-size: 0.95rem !important; line-height: 
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
 }
-.animate-fadeInUp { animation: fadeInUp 0.5s ease-out both; }
+.animate-fadeInUp { animation: fadeInUp 0.6s ease-out both; }
 .animate-fadeIn { animation: fadeIn 0.4s ease-out both; }
 .animate-slideInLeft { animation: slideInLeft 0.5s ease-out both; }
-.animate-pulse { animation: pulse 2s infinite; }
+.animate-pulse { animation: pulse 2.5s infinite; }
 .animate-float { animation: float 3s ease-in-out infinite; }
 
 /* Thinking dots animation */
@@ -246,27 +212,8 @@ p, li, td, th, label, .stMarkdown { font-size: 0.95rem !important; line-height: 
 }
 
 /* ===== Enhanced Interactions ===== */
-.hover-lift { transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease; }
-.hover-lift:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(15,23,42,0.1); }
-
-.glow-btn {
-    position: relative;
-    overflow: hidden;
-    transition: all 0.25s ease;
-}
-.glow-btn::after {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    width: 0; height: 0;
-    background: rgba(255,255,255,0.15);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.4s ease, height 0.4s ease;
-}
-.glow-btn:hover::after {
-    width: 200px; height: 200px;
-}
+.hover-lift { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease; }
+.hover-lift:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.1); }
 
 /* Gradient text for hero */
 .gradient-text {
@@ -275,6 +222,21 @@ p, li, td, th, label, .stMarkdown { font-size: 0.95rem !important; line-height: 
     -webkit-text-fill-color: transparent;
     background-clip: text;
 }
+
+/* ===== Top Header Bar ===== */
+.top-nav-bar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+    background: rgba(255,255,255,0.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-light);
+    padding: 0 2rem;
+    height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+}
+.top-nav-logo { font-size: 1.25rem; font-weight: 800; color: var(--text); letter-spacing: -0.5px; text-decoration: none; }
+.top-nav-link { font-size: 0.9rem; font-weight: 500; color: var(--text-secondary); text-decoration: none; padding: 6px 12px; border-radius: 6px; transition: all 0.2s ease; }
+.top-nav-link:hover { color: var(--accent); background: var(--accent-light); }
+.top-nav-link.active { color: var(--accent); font-weight: 600; }
+.top-nav-link.active::after { content: ''; display: block; width: 100%; height: 2px; background: var(--accent); border-radius: 2px; margin-top: 2px; }
 
 /* ===== Spacing Utilities ===== */
 .gap-1 { gap: 0.25rem; }
@@ -584,6 +546,15 @@ def make_api_request(endpoint, method="GET", data=None, headers=None, timeout=60
         return None
 
 
+def _render_page_header(title: str, subtitle: str = ""):
+    """渲染简洁统一的页面标题区"""
+    subtitle_html = f'<p style="color: #6B7280; font-size: 0.95rem; margin: 0;">{subtitle}</p>' if subtitle else ""
+    st.markdown(f"""
+    <div style="margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid #F3F4F6;">
+        <h1 style="font-size: 1.75rem; font-weight: 700; color: #111827; margin-bottom: 0.25rem; letter-spacing: -0.5px;">{title}</h1>
+        {subtitle_html}
+    </div>
+    """, unsafe_allow_html=True)
 
 
 def run_detection_with_progress(detection_data, timeout=120):
@@ -812,48 +783,70 @@ def create_ai_radar_chart(ai_scores):
 
 
 # ================= 顶部导航栏 =================
-def render_top_navigation():
-    """渲染顶部导航栏 - 包含登录/注册按钮"""
-    # 使用 columns 创建顶部栏布局
-    col1, col2, col3, col4 = st.columns([5, 2, 1.5, 1.5])
+def render_header():
+    """渲染顶部水平导航栏 - 替代侧边栏"""
+    if "current_page" not in st.session_state:
+        st.session_state.current_page = "home"
 
-    with col1:
-        st.markdown("###  Audit Mind")
+    # 品牌 + 导航 + 用户操作
+    col_logo, col_nav, col_user = st.columns([1.5, 5, 1.5])
 
-    with col2:
+    with col_logo:
+        st.markdown("""
+        <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#2563EB,#1D4ED8);display:flex;align-items:center;justify-content:center;color:#FFFFFF;font-weight:700;font-size:0.9rem;">A</div>
+            <span style="font-size:1.15rem;font-weight:800;color:#111827;letter-spacing:-0.5px;">Audit Mind</span>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_nav:
         if st.session_state.logged_in:
-            username = st.session_state.user_info.get('username', '用户')
-            membership = st.session_state.user_info.get('membership_level', 'free')
-            membership_label = {"free": "免费版", "pro": "专业版", "enterprise": "企业版"}
-            st.caption(f"{username} | {membership_label.get(membership, '免费版')}")
+            pages = [
+                ("首页", "home"),
+                ("财务助手", "fs"),
+                ("舞弊检测", "detect"),
+                ("AI 问答", "qa"),
+                ("我的检测", "history"),
+                ("报告", "reports"),
+                ("会员", "membership"),
+            ]
         else:
-            st.caption("未登录")
+            pages = [
+                ("首页", "home"),
+                ("AI 问答", "qa"),
+                ("价格", "pricing"),
+                ("案例", "cases"),
+            ]
 
-    with col3:
+        current = st.session_state.current_page
+        nav_cols = st.columns(len(pages))
+        for i, (label, key) in enumerate(pages):
+            with nav_cols[i]:
+                active = current == key
+                btn_type = "primary" if active else "secondary"
+                if st.button(label, key=f"nav_{key}", use_container_width=True, type=btn_type):
+                    st.session_state.current_page = key
+                    st.rerun()
+
+    with col_user:
         if st.session_state.logged_in:
-            # 显示剩余检测次数
-            remaining = st.session_state.user_info.get('free_detections_remaining')
-            if remaining and remaining > 0:
-                st.caption(f"剩余 {remaining} 次检测")
-            elif remaining == -1 or remaining is None:
-                st.caption("无限次检测")
-
-    with col4:
-        if st.session_state.logged_in:
-            if st.button("退出", use_container_width=True, key="top_logout"):
-                # 清除持久化登录信息
-                AuthManager.clear_auth()
-
-                st.session_state.logged_in = False
-                st.session_state.token = None
-                st.session_state.user_info = None
-                st.rerun()
+            user_cols = st.columns([3, 1])
+            with user_cols[0]:
+                username = st.session_state.user_info.get('username', '用户')
+                st.caption(f"{username}")
+            with user_cols[1]:
+                if st.button("退出", key="header_logout", use_container_width=True):
+                    AuthManager.clear_auth()
+                    st.session_state.logged_in = False
+                    st.session_state.token = None
+                    st.session_state.user_info = None
+                    st.rerun()
         else:
-            if st.button("登录 / 注册", use_container_width=True, type="primary", key="top_login"):
+            if st.button("登录 / 注册", key="header_login", use_container_width=True, type="primary"):
                 st.session_state.show_login_modal = True
                 st.rerun()
 
-    st.divider()
+    st.markdown("<hr style='border: none; border-top: 1px solid #F3F4F6; margin: 0.5rem 0 1.5rem 0;'/>", unsafe_allow_html=True)
 
 
 # ================= 登录弹窗 =================
@@ -957,91 +950,29 @@ def render_login_modal():
 
 
 
-# ================= 侧边栏导航 =================
-def render_sidebar():
-    """渲染侧边栏导航 - Premium Design (Button-based, no widget state conflicts)"""
-    with st.sidebar:
-        # 品牌区域
-        st.markdown("""
-        <div style="text-align: center; padding: 1rem 0 0.5rem;">
-            <div style="font-size: 2.2rem; margin-bottom: 0.25rem;">&#x1F4C8;</div>
-            <div style="font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; color: #0F172A;">Audit Mind</div>
-            <div style="font-size: 0.75rem; color: #64748B; margin-top: 2px;">AI 财务舞弊识别</div>
-        </div>
-        """, unsafe_allow_html=True)
-        st.divider()
-
-        # 初始化当前页面
-        if "current_page" not in st.session_state:
-            st.session_state.current_page = "home"
-
-        # 主导航 - 根据登录状态显示不同选项
-        if st.session_state.logged_in:
-            pages = [
-                ("🏠 首页", "home"),
-                ("📄 财务助手", "fs"),
-                ("🔍 舞弊检测", "detect"),
-                ("💬 AI 问答", "qa"),
-                ("📜 我的检测", "history"),
-                ("📁 报告管理", "reports"),
-                ("💎 会员中心", "membership"),
-                ("⚙️ 账号设置", "settings"),
-            ]
-        else:
-            pages = [
-                ("🏠 首页", "home"),
-                ("💬 AI 问答(预览)", "qa"),
-                ("💳 价格中心", "pricing"),
-                ("📖 案例中心", "cases"),
-            ]
-
-        current = st.session_state.current_page
-        for label, key in pages:
-            active = current == key
-            btn_type = "primary" if active else "secondary"
-            if st.button(label, key=f"nav_{key}", use_container_width=True, type=btn_type):
-                st.session_state.current_page = key
-                st.rerun()
-
-        st.divider()
-
-        # 快捷帮助
-        with st.expander("📚 帮助中心"):
-            st.markdown("""
-            - 📖 [如何使用](#)
-            - ❓ [常见问题](#)
-            - 💬 [联系客服](#)
-            """)
-
-        return current
-
-
 # ================= 首页 =================
 def render_home():
     """渲染首页 - Premium Design"""
     # ========== Hero Section ==========
     hero_html = '''
-    <div style="margin: -1.5rem -1rem 2rem; padding: 80px 24px 72px; background: linear-gradient(180deg, #F8FAFC 0%, #EFF6FF 50%, #F8FAFC 100%); text-align: center; border-bottom: 1px solid #E2E8F0; position: relative; overflow: hidden;">
-        <!-- Animated background dots -->
-        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.4; background-image: radial-gradient(circle, #BFDBFE 1px, transparent 1px); background-size: 32px 32px;"></div>
+    <div style="margin: -1.5rem -1rem 2rem; padding: 80px 24px 64px; text-align: center; position: relative; overflow: hidden;">
         <div style="max-width: 800px; margin: 0 auto; position: relative; z-index: 1;">
             <div style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; border-radius: 100px; font-size: 0.85rem; font-weight: 600; background: linear-gradient(135deg, #EFF6FF, #DBEAFE); border: 1px solid #BFDBFE; color: #2563EB; margin-bottom: 1.5rem; letter-spacing: 0.02em; animation: fadeInUp 0.6s ease-out both;">
-                &#x2728; AI-Powered Financial Audit Intelligence
+                AI-Powered Financial Audit Intelligence
             </div>
-            <h1 style="font-size: 3.2rem; font-weight: 700; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 1rem; color: #0F172A; animation: fadeInUp 0.7s ease-out 0.1s both;">
-                Audit Mind
+            <h1 style="font-size: 3.2rem; font-weight: 800; letter-spacing: -2px; line-height: 1.1; margin-bottom: 1rem; color: #111827; animation: fadeInUp 0.7s ease-out 0.1s both;">
+                智能识别财务舞弊<br><span style="font-size: 2rem; font-weight: 600; color: #4B5563; letter-spacing: -1px;">守护每一笔资金的安全</span>
             </h1>
-            <p style="font-size: 1.15rem; color: #475569; line-height: 1.7; max-width: 560px; margin: 0 auto 2rem; font-weight: 400; animation: fadeInUp 0.7s ease-out 0.2s both;">
-                基于生成式 AI 的上市公司财务舞弊智能识别系统<br>
-                <span style="font-size: 1rem; color: #64748B;">&#x1F680; 双模分析 · &#x1F4CA; SHAP 可解释 · &#x1F6A8; 风险标签可视化</span>
+            <p style="font-size: 1.1rem; color: #6B7280; line-height: 1.7; max-width: 520px; margin: 0 auto 2rem; font-weight: 400; animation: fadeInUp 0.7s ease-out 0.2s both;">
+                基于生成式 AI 的上市公司财务舞弊识别系统，双模分析 + SHAP 可解释 + 风险标签可视化
             </p>
         </div>
     </div>
     '''
-    st.components.v1.html(hero_html, height=440, scrolling=False)
+    st.components.v1.html(hero_html, height=380, scrolling=False)
 
     # CTA Buttons row
-    c1, c2, c3, c4 = st.columns([1, 1, 1, 3])
+    c1, c2, c3 = st.columns([1, 1, 2])
     with c1:
         if st.button("开始检测", type="primary", use_container_width=True, key="hero_cta_detect"):
             if st.session_state.logged_in:
@@ -1051,16 +982,8 @@ def render_home():
                 st.session_state.show_login_modal = True
                 st.rerun()
     with c2:
-        if st.button("财务助手", use_container_width=True, key="hero_cta_fs"):
-            if st.session_state.logged_in:
-                st.session_state.current_page = "fs"
-                st.rerun()
-            else:
-                st.session_state.show_login_modal = True
-                st.rerun()
-    with c3:
-        if st.button("AI 问答", use_container_width=True, key="hero_cta_qa"):
-            st.session_state.current_page = "qa"
+        if st.button("了解更多", use_container_width=True, key="hero_cta_more"):
+            st.session_state.current_page = "pricing"
             st.rerun()
 
     # Demo hint
@@ -1426,15 +1349,7 @@ def render_home():
 # ================= 财务助手页面 (v2 - AI自动生成) =================
 def render_financial_assistant():
     """渲染财务助手页面 - 支持财务报表与税务中心双模块"""
-    st.markdown("""
-    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; border-radius: 20px; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(37,99,235,0.08); border-radius: 50%; "></div>
-        <div style="position: relative; z-index: 1;">
-            <h2 style="color: #0F172A; font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem;"> 财务助手</h2>
-            <p style="color: #475569; font-size: 1rem; margin: 0;">智能财务与税务助手：财务报表 · 税务测算 · 报税辅助 · 财税咨询</p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    _render_page_header("财务助手", "智能财务与税务助手：财务报表 · 税务测算 · 报税辅助 · 财税咨询")
 
     # ========== 财务助手会员定价（折叠面板，不占用主空间）==========
     with st.expander("查看 AI 财务助手会员方案"):
@@ -4032,15 +3947,7 @@ def render_detection_result(result, show_divider=True):
 # ================= AI 问答页面 =================
 def render_qa():
     """渲染 AI 问答页面 - 支持流式输出"""
-    st.markdown("""
-    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; border-radius: 20px; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(139,126,116,0.15); border-radius: 50%; "></div>
-        <div style="position: relative; z-index: 1;">
-            <h2 style="color: #0F172A; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> AI 智能问答</h2>
-            <p style="color: #475569; font-size: 1rem; margin: 0;">财务舞弊领域专业问答助手，7×24 随时解答</p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    _render_page_header("AI 智能问答", "财务舞弊领域专业问答助手，7×24 随时解答")
 
     # 检查登录状态
     if not st.session_state.logged_in:
@@ -4165,15 +4072,7 @@ def render_qa():
 # ================= 我的检测页面 =================
 def render_my_detections():
     """渲染「我的检测」页面"""
-    st.markdown("""
-    <div style="margin: -1rem -1rem 1.5rem -1rem; padding: 2rem 1.5rem; background: #F8FAFC; border-bottom: 1px solid #E2E8F0; border-radius: 20px; position: relative; overflow: hidden;">
-        <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: rgba(37,99,235,0.12); border-radius: 50%; "></div>
-        <div style="position: relative; z-index: 1;">
-            <h2 style="color: #0F172A; font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;"> 我的检测</h2>
-            <p style="color: #475569; font-size: 1rem; margin: 0;">历史检测记录与报告管理</p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    _render_page_header("我的检测", "历史检测记录与报告管理")
 
     if not st.session_state.logged_in:
         st.warning("请先登录")
@@ -4922,18 +4821,15 @@ def main():
         AuthManager.try_auto_login()
         st.session_state.auth_initialized = True
 
-    # 显示顶部导航栏
-    render_top_navigation()
+    # 显示顶部水平导航栏
+    render_header()
 
     # 显示登录弹窗(如果需要)
     if st.session_state.get('show_login_modal', False) and not st.session_state.logged_in:
         render_login_modal()
 
-    # 显示侧边栏导航
-    menu = render_sidebar()
-
     # 路由分发
-    page = menu
+    page = st.session_state.current_page
     if st.session_state.logged_in:
         if page == "home":
             render_home()
