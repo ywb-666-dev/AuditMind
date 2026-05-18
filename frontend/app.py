@@ -88,8 +88,30 @@ h3 { font-weight: 600 !important; font-size: 1.4rem !important; color: var(--tex
 p, li, td, th, label, .stMarkdown { font-size: 1rem !important; line-height: 1.7 !important; color: var(--text-secondary) !important; }
 
 /* Content width constraints inside full-width sections */
-.content-wrap { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
-.content-wrap-wide { max-width: 1400px; margin: 0 auto; padding: 0 2rem; }
+.content-wrap { max-width: 1280px; margin: 0 auto; padding: 0 3rem; }
+.content-wrap-wide { max-width: 1400px; margin: 0 auto; padding: 0 3rem; }
+
+/* Side decoration for full-width sections */
+.side-glow-left {
+    position: absolute; left: 0; top: 20%; bottom: 20%; width: 3px;
+    background: linear-gradient(180deg, transparent, rgba(37,99,235,0.15), transparent);
+}
+.side-glow-right {
+    position: absolute; right: 0; top: 20%; bottom: 20%; width: 3px;
+    background: linear-gradient(180deg, transparent, rgba(37,99,235,0.15), transparent);
+}
+.corner-accent-tl {
+    position: absolute; top: 24px; left: 24px; width: 40px; height: 40px;
+    border-top: 2px solid rgba(96,165,250,0.25);
+    border-left: 2px solid rgba(96,165,250,0.25);
+    border-radius: 4px 0 0 0;
+}
+.corner-accent-br {
+    position: absolute; bottom: 24px; right: 24px; width: 40px; height: 40px;
+    border-bottom: 2px solid rgba(96,165,250,0.25);
+    border-right: 2px solid rgba(96,165,250,0.25);
+    border-radius: 0 0 4px 0;
+}
 
 /* ===== Buttons ===== */
 .stButton > button {
@@ -1025,8 +1047,14 @@ def render_home():
         <div style="position: absolute; top: 10%; left: 15%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(37,99,235,0.25) 0%, transparent 70%); border-radius: 50%; animation: float 6s ease-in-out infinite;"></div>
         <div style="position: absolute; bottom: 15%; right: 10%; width: 250px; height: 250px; background: radial-gradient(circle, rgba(96,165,250,0.2) 0%, transparent 70%); border-radius: 50%; animation: float 8s ease-in-out infinite 2s;"></div>
         <div style="position: absolute; top: 40%; right: 25%; width: 150px; height: 150px; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%); border-radius: 50%; animation: float 5s ease-in-out infinite 1s;"></div>
+        <!-- Side glow lines -->
+        <div class="side-glow-left" style="left: 3rem;"></div>
+        <div class="side-glow-right" style="right: 3rem;"></div>
+        <!-- Corner accents -->
+        <div class="corner-accent-tl" style="top: 2rem; left: 2rem;"></div>
+        <div class="corner-accent-br" style="bottom: 2rem; right: 2rem;"></div>
 
-        <div style="position: relative; z-index: 2; text-align: center; max-width: 900px; padding: 0 2rem;">
+        <div style="position: relative; z-index: 2; text-align: center; max-width: 900px; padding: 0 4rem;">
             <div style="display: inline-flex; align-items: center; gap: 10px; padding: 10px 24px; border-radius: 100px; font-size: 0.9rem; font-weight: 600; background: rgba(37,99,235,0.15); border: 1px solid rgba(96,165,250,0.3); color: #60A5FA; margin-bottom: 2rem; letter-spacing: 0.03em; animation: fadeInUp 0.8s ease-out both;">
                 <span style="width: 8px; height: 8px; background: #3B82F6; border-radius: 50%; display: inline-block; animation: pulse 2s infinite;"></span>
                 AI-Powered Financial Audit Intelligence
@@ -1061,7 +1089,7 @@ def render_home():
     stats_html = '''
     <div id="stats" style="width: 100%; padding: 48px 0; background: linear-gradient(90deg, #2563EB, #3B82F6, #1D4ED8); position: relative; overflow: hidden;">
         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.1; background-image: radial-gradient(circle, #FFFFFF 1px, transparent 1px); background-size: 30px 30px;"></div>
-        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; position: relative; z-index: 1;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 4rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; position: relative; z-index: 1;">
             <div style="text-align: center;">
                 <div class="count-up" data-target="92" style="font-size: 3rem; font-weight: 800; color: #FFFFFF; line-height: 1;">0</div>
                 <div style="font-size: 1.1rem; color: #FFFFFF; font-weight: 700; margin-top: 4px;">%</div>
@@ -1158,7 +1186,7 @@ def render_home():
     features_section_html = '''
     <div id="features" style="width: 100%; padding: 80px 0; background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 50%, #EFF6FF 100%); position: relative;">
         <div style="position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, #BFDBFE, transparent);"></div>
-        <div class="content-wrap" style="max-width: 1280px; margin: 0 auto; padding: 0 2rem;">
+        <div class="content-wrap" style="max-width: 1280px; margin: 0 auto; padding: 0 4rem;">
             <div style="text-align: center; margin-bottom: 3rem;">
                 <h2 style="font-size: 2.2rem; font-weight: 700; color: #0F172A; letter-spacing: -1px; margin-bottom: 0.5rem;">核心能力</h2>
                 <p style="color: #64748B; font-size: 1.05rem;">四大核心模块，覆盖财务舞弊识别全链路</p>
@@ -1194,7 +1222,7 @@ def render_home():
     how_it_works_html = '''
     <div style="width: 100%; padding: 80px 0; background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); position: relative; overflow: hidden;">
         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.08; background-image: radial-gradient(circle, #3B82F6 1px, transparent 1px); background-size: 48px 48px;"></div>
-        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 4rem; position: relative; z-index: 1;">
             <div style="text-align: center; margin-bottom: 3rem;">
                 <h2 style="font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #FFFFFF; letter-spacing: -1px;">三步完成智能检测</h2>
                 <p style="color: #94A3B8; font-size: 1.05rem;">上传财务报告 → AI 深度解析 → 获取风险报告</p>
@@ -1280,7 +1308,7 @@ def render_home():
     trust_html = '''
     <div style="width: 100%; padding: 64px 0; background: linear-gradient(180deg, #F8FAFC 0%, #EFF6FF 100%); position: relative;">
         <div style="position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, #BFDBFE, transparent);"></div>
-        <div style="max-width: 1200px; margin: 0 auto; padding: 0 2rem;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 4rem;">
             <div style="text-align: center; margin-bottom: 2.5rem;">
                 <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0F172A; letter-spacing: -0.5px;">技术信任背书</h2>
                 <p style="color: #64748B; font-size: 1rem;">源自顶尖学术成果，服务专业审计场景</p>
@@ -1374,7 +1402,7 @@ def render_home():
 
     # ========== BOTTOM CTA (Full Width) ==========
     cta_html = '''
-    <div style="width: 100%; padding: 80px 2rem; background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%); text-align: center; position: relative; overflow: hidden;">
+    <div style="width: 100%; padding: 80px 4rem; background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%); text-align: center; position: relative; overflow: hidden;">
         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.1; background-image: radial-gradient(circle, #3B82F6 1px, transparent 1px); background-size: 40px 40px;"></div>
         <div style="position: absolute; top: 20%; left: 10%; width: 200px; height: 200px; background: radial-gradient(circle, rgba(37,99,235,0.2) 0%, transparent 70%); border-radius: 50%;"></div>
         <div style="position: absolute; bottom: 20%; right: 10%; width: 180px; height: 180px; background: radial-gradient(circle, rgba(96,165,250,0.15) 0%, transparent 70%); border-radius: 50%;"></div>
