@@ -1082,17 +1082,8 @@ def render_home():
             <p style="font-size: 1.25rem; color: #94A3B8; line-height: 1.8; max-width: 620px; margin: 0 auto 2.5rem; font-weight: 400; animation: fadeInUp 0.8s ease-out 0.45s both;">
                 基于生成式 AI 的上市公司财务舞弊识别系统<br>双模分析 · SHAP 可解释 · 风险标签可视化
             </p>
-            <div style="animation: fadeInUp 0.8s ease-out 0.6s both;">
-                <a href="#stats" style="display:inline-block;padding:14px 40px;border-radius:12px;font-size:1.05rem;font-weight:600;color:#FFFFFF;background:linear-gradient(135deg, #2563EB, #1D4ED8);text-decoration:none;transition:all 0.3s ease;box-shadow:0 8px 32px rgba(37,99,235,0.35);margin-right:12px;"
-                   onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 40px rgba(37,99,235,0.5)';"
-                   onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 8px 32px rgba(37,99,235,0.35)';">
-                    立即开始检测
-                </a>
-                <a href="#features" style="display:inline-block;padding:14px 40px;border-radius:12px;font-size:1.05rem;font-weight:600;color:#94A3B8;background:transparent;border:1.5px solid #334155;text-decoration:none;transition:all 0.3s ease;"
-                   onmouseover="this.style.borderColor='#3B82F6';this.style.color='#3B82F6';"
-                   onmouseout="this.style.borderColor='#334155';this.style.color='#94A3B8';">
-                    了解更多
-                </a>
+            <div style="animation: fadeInUp 0.8s ease-out 0.6s both; color: #64748B; font-size: 0.95rem; margin-top: 1rem;">
+                向下滚动探索更多 ↓
             </div>
         </div>
     </div>
@@ -1423,11 +1414,6 @@ def render_home():
         <div style="max-width: 700px; margin: 0 auto; position: relative; z-index: 1;">
             <h2 style="font-size: 2.5rem; font-weight: 800; color: #FFFFFF; margin-bottom: 1rem; letter-spacing: -1.5px;">准备好开始了吗？</h2>
             <p style="font-size: 1.1rem; color: #94A3B8; margin-bottom: 2rem; line-height: 1.8;">立即体验 Audit Mind 的智能财务舞弊检测能力<br>上传第一份报告，3 分钟内获取专业级风险分析</p>
-            <a href="#" style="display:inline-block;padding:16px 48px;border-radius:12px;font-size:1.1rem;font-weight:600;color:#FFFFFF;background:linear-gradient(135deg, #2563EB, #1D4ED8);text-decoration:none;transition:all 0.3s ease;box-shadow:0 8px 32px rgba(37,99,235,0.4);"
-               onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 40px rgba(37,99,235,0.5)';"
-               onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 8px 32px rgba(37,99,235,0.4)';">
-                立即开始检测
-            </a>
             <p style="font-size: 0.85rem; color: #64748B; margin-top: 1.5rem;">新用户免费体验 3 次完整检测 · 无需信用卡</p>
         </div>
     </div>
