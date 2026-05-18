@@ -82,10 +82,10 @@ st.markdown("""
 }
 
 /* ===== Typography Scale - Larger & Bolder ===== */
-h1 { font-weight: 800 !important; letter-spacing: -0.03em !important; font-size: 3rem !important; color: var(--text) !important; line-height: 1.1 !important; }
-h2 { font-weight: 700 !important; letter-spacing: -0.02em !important; font-size: 2.2rem !important; color: var(--text) !important; }
-h3 { font-weight: 600 !important; font-size: 1.4rem !important; color: var(--text) !important; }
-p, li, td, th, label, .stMarkdown { font-size: 1rem !important; line-height: 1.7 !important; color: var(--text-secondary) !important; }
+h1 { font-weight: 800 !important; letter-spacing: -0.03em !important; font-size: 3.5rem !important; color: var(--text) !important; line-height: 1.05 !important; }
+h2 { font-weight: 700 !important; letter-spacing: -0.02em !important; font-size: 2.6rem !important; color: var(--text) !important; }
+h3 { font-weight: 600 !important; font-size: 1.6rem !important; color: var(--text) !important; }
+p, li, td, th, label, .stMarkdown { font-size: 1.05rem !important; line-height: 1.7 !important; color: var(--text-secondary) !important; }
 
 /* Content width constraints inside full-width sections */
 .content-wrap { max-width: 1280px; margin: 0 auto; padding: 0 3rem; }
@@ -1059,13 +1059,13 @@ def render_home():
                 <span style="width: 8px; height: 8px; background: #3B82F6; border-radius: 50%; display: inline-block; animation: pulse 2s infinite;"></span>
                 AI-Powered Financial Audit Intelligence
             </div>
-            <h1 style="font-size: 4rem; font-weight: 800; letter-spacing: -3px; line-height: 1.05; margin-bottom: 1.25rem; color: #FFFFFF; animation: fadeInUp 0.8s ease-out 0.15s both;">
+            <h1 style="font-size: 4.5rem; font-weight: 800; letter-spacing: -3px; line-height: 1.05; margin-bottom: 1.25rem; color: #FFFFFF; animation: fadeInUp 0.8s ease-out 0.15s both;">
                 智能识别财务舞弊
             </h1>
-            <h2 style="font-size: 2.2rem; font-weight: 500; color: #94A3B8; letter-spacing: -1px; margin-bottom: 1.5rem; animation: fadeInUp 0.8s ease-out 0.3s both;">
+            <h2 style="font-size: 2.4rem; font-weight: 500; color: #94A3B8; letter-spacing: -1px; margin-bottom: 1.5rem; animation: fadeInUp 0.8s ease-out 0.3s both;">
                 守护每一笔资金的安全
             </h2>
-            <p style="font-size: 1.15rem; color: #64748B; line-height: 1.8; max-width: 560px; margin: 0 auto 2.5rem; font-weight: 400; animation: fadeInUp 0.8s ease-out 0.45s both;">
+            <p style="font-size: 1.25rem; color: #94A3B8; line-height: 1.8; max-width: 620px; margin: 0 auto 2.5rem; font-weight: 400; animation: fadeInUp 0.8s ease-out 0.45s both;">
                 基于生成式 AI 的上市公司财务舞弊识别系统<br>双模分析 · SHAP 可解释 · 风险标签可视化
             </p>
             <div style="animation: fadeInUp 0.8s ease-out 0.6s both;">
@@ -1087,25 +1087,25 @@ def render_home():
 
     # ========== ANIMATED STATS BAR (Full Width Blue Gradient) ==========
     stats_html = '''
-    <div id="stats" style="width: 100%; padding: 48px 0; background: linear-gradient(90deg, #2563EB, #3B82F6, #1D4ED8); position: relative; overflow: hidden;">
+    <div id="stats" style="width: 100%; padding: 64px 0; background: linear-gradient(90deg, #2563EB, #3B82F6, #1D4ED8); position: relative; overflow: hidden;">
         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.1; background-image: radial-gradient(circle, #FFFFFF 1px, transparent 1px); background-size: 30px 30px;"></div>
         <div style="max-width: 1200px; margin: 0 auto; padding: 0 4rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; position: relative; z-index: 1;">
             <div style="text-align: center;">
-                <div class="count-up" data-target="92" style="font-size: 3rem; font-weight: 800; color: #FFFFFF; line-height: 1;">0</div>
-                <div style="font-size: 1.1rem; color: #FFFFFF; font-weight: 700; margin-top: 4px;">%</div>
-                <div style="font-size: 0.95rem; color: rgba(255,255,255,0.75); margin-top: 8px; font-weight: 500;">AI 识别准确率</div>
+                <div class="count-up" data-target="92" style="font-size: 3.5rem; font-weight: 800; color: #FFFFFF; line-height: 1;">0</div>
+                <div style="font-size: 1.2rem; color: #FFFFFF; font-weight: 700; margin-top: 4px;">%</div>
+                <div style="font-size: 1.05rem; color: rgba(255,255,255,0.85); margin-top: 8px; font-weight: 500;">AI 识别准确率</div>
             </div>
             <div style="text-align: center;">
-                <div class="count-up" data-target="12847" style="font-size: 3rem; font-weight: 800; color: #FFFFFF; line-height: 1;">0</div>
-                <div style="font-size: 0.95rem; color: rgba(255,255,255,0.75); margin-top: 8px; font-weight: 500;">已分析财报</div>
+                <div class="count-up" data-target="12847" style="font-size: 3.5rem; font-weight: 800; color: #FFFFFF; line-height: 1;">0</div>
+                <div style="font-size: 1.05rem; color: rgba(255,255,255,0.85); margin-top: 8px; font-weight: 500;">已分析财报</div>
             </div>
             <div style="text-align: center;">
-                <div class="count-up" data-target="4562" style="font-size: 3rem; font-weight: 800; color: #FFFFFF; line-height: 1;">0</div>
-                <div style="font-size: 0.95rem; color: rgba(255,255,255,0.75); margin-top: 8px; font-weight: 500;">覆盖 A 股企业</div>
+                <div class="count-up" data-target="4562" style="font-size: 3.5rem; font-weight: 800; color: #FFFFFF; line-height: 1;">0</div>
+                <div style="font-size: 1.05rem; color: rgba(255,255,255,0.85); margin-top: 8px; font-weight: 500;">覆盖 A 股企业</div>
             </div>
             <div style="text-align: center;">
-                <div class="count-up" data-target="7" style="font-size: 3rem; font-weight: 800; color: #FFFFFF; line-height: 1;">0</div>
-                <div style="font-size: 0.95rem; color: rgba(255,255,255,0.75); margin-top: 8px; font-weight: 500;">风险分析维度</div>
+                <div class="count-up" data-target="7" style="font-size: 3.5rem; font-weight: 800; color: #FFFFFF; line-height: 1;">0</div>
+                <div style="font-size: 1.05rem; color: rgba(255,255,255,0.85); margin-top: 8px; font-weight: 500;">风险分析维度</div>
             </div>
         </div>
     </div>
@@ -1184,69 +1184,69 @@ def render_home():
 
     # ========== FEATURES SECTION (With Blue Gradient Background) ==========
     features_section_html = '''
-    <div id="features" style="width: 100%; padding: 80px 0; background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 50%, #EFF6FF 100%); position: relative;">
+    <div id="features" style="width: 100%; padding: 100px 0; background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 50%, #EFF6FF 100%); position: relative;">
         <div style="position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, #BFDBFE, transparent);"></div>
         <div class="content-wrap" style="max-width: 1280px; margin: 0 auto; padding: 0 4rem;">
-            <div style="text-align: center; margin-bottom: 3rem;">
-                <h2 style="font-size: 2.2rem; font-weight: 700; color: #0F172A; letter-spacing: -1px; margin-bottom: 0.5rem;">核心能力</h2>
-                <p style="color: #64748B; font-size: 1.05rem;">四大核心模块，覆盖财务舞弊识别全链路</p>
+            <div style="text-align: center; margin-bottom: 3.5rem;">
+                <h2 style="font-size: 2.6rem; font-weight: 700; color: #0F172A; letter-spacing: -1px; margin-bottom: 0.75rem;">核心能力</h2>
+                <p style="color: #64748B; font-size: 1.15rem;">四大核心模块，覆盖财务舞弊识别全链路</p>
             </div>
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
-                <div class="feature-card" style="padding: 2rem; animation: fadeInUp 0.6s ease-out 0.1s both;">
-                    <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #EFF6FF, #DBEAFE); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1rem;">📈</div>
-                    <h4 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0F172A;">双模输入分析</h4>
-                    <p style="font-size: 0.95rem; color: #475569; line-height: 1.7;">结构化财务数据 + MD&A 非结构化文本，全方位透视企业风险，不留死角。</p>
+                <div class="feature-card" style="padding: 2.25rem; animation: fadeInUp 0.6s ease-out 0.1s both;">
+                    <div style="width: 52px; height: 52px; border-radius: 12px; background: linear-gradient(135deg, #EFF6FF, #DBEAFE); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin-bottom: 1.25rem;">📈</div>
+                    <h4 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.6rem; color: #0F172A;">双模输入分析</h4>
+                    <p style="font-size: 1rem; color: #475569; line-height: 1.7;">结构化财务数据 + MD&A 非结构化文本，全方位透视企业风险，不留死角。</p>
                 </div>
-                <div class="feature-card" style="padding: 2rem; animation: fadeInUp 0.6s ease-out 0.2s both;">
-                    <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #F0FDF4, #DCFCE7); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1rem;">🔍</div>
-                    <h4 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0F172A;">AI 可解释性</h4>
-                    <p style="font-size: 0.95rem; color: #475569; line-height: 1.7;">SHAP 特征重要性分析，每个预测都有明确依据，告别黑箱，审计师也能看懂 AI。</p>
+                <div class="feature-card" style="padding: 2.25rem; animation: fadeInUp 0.6s ease-out 0.2s both;">
+                    <div style="width: 52px; height: 52px; border-radius: 12px; background: linear-gradient(135deg, #F0FDF4, #DCFCE7); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin-bottom: 1.25rem;">🔍</div>
+                    <h4 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.6rem; color: #0F172A;">AI 可解释性</h4>
+                    <p style="font-size: 1rem; color: #475569; line-height: 1.7;">SHAP 特征重要性分析，每个预测都有明确依据，告别黑箱，审计师也能看懂 AI。</p>
                 </div>
-                <div class="feature-card" style="padding: 2rem; animation: fadeInUp 0.6s ease-out 0.3s both;">
-                    <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #FFFBEB, #FEF3C7); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1rem;">🚨</div>
-                    <h4 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0F172A;">风险标签可视化</h4>
-                    <p style="font-size: 0.95rem; color: #475569; line-height: 1.7;">自动生成「存贷双高」「现金流背离」等可读性强的风险标签，一目了然。</p>
+                <div class="feature-card" style="padding: 2.25rem; animation: fadeInUp 0.6s ease-out 0.3s both;">
+                    <div style="width: 52px; height: 52px; border-radius: 12px; background: linear-gradient(135deg, #FFFBEB, #FEF3C7); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin-bottom: 1.25rem;">🚨</div>
+                    <h4 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.6rem; color: #0F172A;">风险标签可视化</h4>
+                    <p style="font-size: 1rem; color: #475569; line-height: 1.7;">自动生成「存贷双高」「现金流背离」等可读性强的风险标签，一目了然。</p>
                 </div>
-                <div class="feature-card" style="padding: 2rem; animation: fadeInUp 0.6s ease-out 0.4s both;">
-                    <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #F3E8FF, #E9D5FF); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1rem;">🤖</div>
-                    <h4 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #0F172A;">AI 智能问答</h4>
-                    <p style="font-size: 0.95rem; color: #475569; line-height: 1.7;">财务舞弊理论、案例解析、实操指导、税务咨询，7×24 随时解答。</p>
+                <div class="feature-card" style="padding: 2.25rem; animation: fadeInUp 0.6s ease-out 0.4s both;">
+                    <div style="width: 52px; height: 52px; border-radius: 12px; background: linear-gradient(135deg, #F3E8FF, #E9D5FF); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin-bottom: 1.25rem;">🤖</div>
+                    <h4 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.6rem; color: #0F172A;">AI 智能问答</h4>
+                    <p style="font-size: 1rem; color: #475569; line-height: 1.7;">财务舞弊理论、案例解析、实操指导、税务咨询，7×24 随时解答。</p>
                 </div>
             </div>
         </div>
     </div>
     '''
-    st.components.v1.html(features_section_html, height=700, scrolling=False)
+    st.components.v1.html(features_section_html, height=780, scrolling=False)
 
     # ========== HOW IT WORKS (Dark Section for Contrast) ==========
     how_it_works_html = '''
-    <div style="width: 100%; padding: 80px 0; background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); position: relative; overflow: hidden;">
+    <div style="width: 100%; padding: 100px 0; background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); position: relative; overflow: hidden;">
         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.08; background-image: radial-gradient(circle, #3B82F6 1px, transparent 1px); background-size: 48px 48px;"></div>
         <div style="max-width: 1200px; margin: 0 auto; padding: 0 4rem; position: relative; z-index: 1;">
-            <div style="text-align: center; margin-bottom: 3rem;">
-                <h2 style="font-size: 2.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #FFFFFF; letter-spacing: -1px;">三步完成智能检测</h2>
-                <p style="color: #94A3B8; font-size: 1.05rem;">上传财务报告 → AI 深度解析 → 获取风险报告</p>
+            <div style="text-align: center; margin-bottom: 3.5rem;">
+                <h2 style="font-size: 2.6rem; font-weight: 700; margin-bottom: 0.75rem; color: #FFFFFF; letter-spacing: -1px;">三步完成智能检测</h2>
+                <p style="color: #94A3B8; font-size: 1.15rem;">上传财务报告 → AI 深度解析 → 获取风险报告</p>
             </div>
             <div style="display: flex; align-items: flex-start; justify-content: center; gap: 0;">
                 <div style="flex: 1; text-align: center; position: relative; animation: fadeInUp 0.6s ease-out 0.1s both;">
-                    <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #2563EB, #1D4ED8); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; box-shadow: 0 0 30px rgba(37,99,235,0.4);">
-                        <span style="font-size: 1.25rem; font-weight: 700; color: #FFFFFF;">1</span>
+                    <div style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #2563EB, #1D4ED8); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; box-shadow: 0 0 30px rgba(37,99,235,0.4);">
+                        <span style="font-size: 1.4rem; font-weight: 700; color: #FFFFFF;">1</span>
                     </div>
-                    <h4 style="font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem; color: #FFFFFF;">📄 上传报告</h4>
-                    <p style="font-size: 0.9rem; color: #94A3B8; line-height: 1.6; padding: 0 1rem;">支持 PDF 年报、Excel 财务表、Word 文档等多格式上传</p>
+                    <h4 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.6rem; color: #FFFFFF;">📄 上传报告</h4>
+                    <p style="font-size: 1rem; color: #94A3B8; line-height: 1.6; padding: 0 1rem;">支持 PDF 年报、Excel 财务表、Word 文档等多格式上传</p>
                 </div>
-                <div style="flex: 0.5; height: 2px; background: linear-gradient(90deg, #2563EB, #3B82F6); margin-top: 32px; opacity: 0.5;"></div>
+                <div style="flex: 0.5; height: 2px; background: linear-gradient(90deg, #2563EB, #3B82F6); margin-top: 36px; opacity: 0.5;"></div>
                 <div style="flex: 1; text-align: center; position: relative; animation: fadeInUp 0.6s ease-out 0.25s both;">
-                    <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #2563EB, #1D4ED8); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; box-shadow: 0 0 30px rgba(37,99,235,0.4);">
-                        <span style="font-size: 1.25rem; font-weight: 700; color: #FFFFFF;">2</span>
+                    <div style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #2563EB, #1D4ED8); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; box-shadow: 0 0 30px rgba(37,99,235,0.4);">
+                        <span style="font-size: 1.4rem; font-weight: 700; color: #FFFFFF;">2</span>
                     </div>
-                    <h4 style="font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem; color: #FFFFFF;">🤖 AI 深度解析</h4>
-                    <p style="font-size: 0.9rem; color: #94A3B8; line-height: 1.6; padding: 0 1rem;">7 维风险特征提取 + SHAP 可解释性分析 + IPO 对标</p>
+                    <h4 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.6rem; color: #FFFFFF;">🤖 AI 深度解析</h4>
+                    <p style="font-size: 1rem; color: #94A3B8; line-height: 1.6; padding: 0 1rem;">7 维风险特征提取 + SHAP 可解释性分析 + IPO 对标</p>
                 </div>
-                <div style="flex: 0.5; height: 2px; background: linear-gradient(90deg, #3B82F6, #2563EB); margin-top: 32px; opacity: 0.5;"></div>
+                <div style="flex: 0.5; height: 2px; background: linear-gradient(90deg, #3B82F6, #2563EB); margin-top: 36px; opacity: 0.5;"></div>
                 <div style="flex: 1; text-align: center; position: relative; animation: fadeInUp 0.6s ease-out 0.4s both;">
-                    <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #2563EB, #1D4ED8); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; box-shadow: 0 0 30px rgba(37,99,235,0.4);">
-                        <span style="font-size: 1.25rem; font-weight: 700; color: #FFFFFF;">3</span>
+                    <div style="width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(135deg, #2563EB, #1D4ED8); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.25rem; box-shadow: 0 0 30px rgba(37,99,235,0.4);">
+                        <span style="font-size: 1.4rem; font-weight: 700; color: #FFFFFF;">3</span>
                     </div>
                     <h4 style="font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem; color: #FFFFFF;">📊 获取报告</h4>
                     <p style="font-size: 0.9rem; color: #94A3B8; line-height: 1.6; padding: 0 1rem;">可视化风险标签、整改建议、完整证据链下载</p>
