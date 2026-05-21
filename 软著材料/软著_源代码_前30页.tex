@@ -14,12 +14,12 @@
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0pt}
 
-% 代码样式设置
+% 代码样式设置：纯黑白，无任何彩色
 \lstset{
     language=Python,
     basicstyle=\ttfamily\footnotesize,
     numbers=left,
-    numberstyle=\tiny\color{gray},
+    numberstyle=\tiny,
     numbersep=8pt,
     frame=none,
     breaklines=true,
@@ -29,9 +29,6 @@
     aboveskip=0pt,
     belowskip=0pt,
     lineskip=1pt,
-    keywordstyle=\color{blue},
-    commentstyle=\color{gray}\itshape,
-    stringstyle=\color{orange},
     morekeywords={async,await,True,False,None},
     literate={_}{\_}1
 }

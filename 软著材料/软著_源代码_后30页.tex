@@ -12,16 +12,15 @@
 \fancyfoot[C]{\thepage/60}
 \renewcommand{\headrulewidth}{0.4pt}
 
+% 代码样式设置：纯黑白，无任何彩色
 \lstset{
     language=Python,
     basicstyle=\ttfamily\footnotesize,
-    numbers=left, numberstyle=\tiny\color{gray},
+    numbers=left, numberstyle=\tiny,
     numbersep=8pt, frame=none, breaklines=true,
     breakatwhitespace=true, showstringspaces=false,
     tabsize=4, aboveskip=0pt, belowskip=0pt,
-    lineskip=1pt, keywordstyle=\color{blue},
-    commentstyle=\color{gray}\itshape,
-    stringstyle=\color{orange},
+    lineskip=1pt,
     morekeywords={async,await,True,False,None},
     literate={_}{\_}1
 }
