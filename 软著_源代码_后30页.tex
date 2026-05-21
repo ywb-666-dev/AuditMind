@@ -1,0 +1,793 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{ctex}
+\usepackage{DejaVuSansMono}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[C]{\small 审计智鉴流式数据处理系统 V1.0}
+\fancyfoot[C]{\thepage/60}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\footnotesize,
+    numbers=left, numberstyle=\tiny\color{gray},
+    numbersep=8pt, frame=none, breaklines=true,
+    breakatwhitespace=true, showstringspaces=false,
+    tabsize=4, aboveskip=0pt, belowskip=0pt,
+    lineskip=1pt, keywordstyle=\color{blue},
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{orange},
+    morekeywords={async,await,True,False,None},
+    literate={_}{\_}1
+}
+
+\begin{document}
+\setcounter{page}{31}
+
+% ==================== frontend/app.py: render_header() ====================
+\begin{lstlisting}
+def render_header():
+    """渲染顶部水平导航栏 - 替代侧边栏"""
+    if "current_page" not in st.session_state:
+        st.session_state.current_page = "home"
+    st.markdown("""
+    <div style="position:fixed;top:0;left:0;right:0;
+        z-index:10000;height:3px;background:linear-gradient(
+        90deg,#2563EB,#3B82F6,#60A5FA,#3B82F6,#2563EB);">
+    </div>
+    """, unsafe_allow_html=True)
+    col_logo, col_nav, col_user = st.columns([1.2, 5, 1.3])
+    with col_logo:
+        st.markdown("""
+        <div style="display:flex;align-items:center;
+            gap:10px;cursor:pointer;">
+            <div style="width:36px;height:36px;
+                border-radius:10px;background:linear-gradient(
+                135deg,#2563EB,#1D4ED8);display:flex;
+                align-items:center;justify-content:center;
+                color:#FFFFFF;font-weight:800;font-size:1rem;">
+                A</div>
+            <span style="font-size:1.25rem;font-weight:800;
+                color:#0F172A;letter-spacing:-0.5px;">
+                Audit Mind</span>
+        </div>
+        """, unsafe_allow_html=True)
+    with col_nav:
+        if st.session_state.logged_in:
+            pages = [
+                ("首页", "home"), ("财务助手", "fs"),
+                ("舞弊检测", "detect"), ("AI 问答", "qa"),
+                ("我的检测", "history"), ("报告", "reports"),
+                ("会员", "membership"),
+            ]
+        else:
+            pages = [
+                ("首页", "home"), ("AI 问答", "qa"),
+                ("价格", "pricing"), ("案例", "cases"),
+            ]
+        current = st.session_state.current_page
+        nav_cols = st.columns(len(pages))
+        for i, (label, key) in enumerate(pages):
+            with nav_cols[i]:
+                active = current == key
+                if active:
+                    st.markdown(f"""
+                    <div style="text-align:center;padding:6px 2px;">
+                        <span style="font-size:0.95rem;
+                            font-weight:700;color:#2563EB;">
+                            {label}</span>
+                        <div style="width:20px;height:3px;
+                            background:linear-gradient(90deg,
+                            #2563EB,#3B82F6);border-radius:2px;
+                            margin:4px auto 0;"></div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                else:
+                    if st.button(label, key=f"nav_{key}",
+                            use_container_width=True):
+                        st.session_state.current_page = key
+                        st.rerun()
+    with col_user:
+        if st.session_state.logged_in:
+            user_cols = st.columns([2, 1])
+            with user_cols[0]:
+                username = st.session_state.user_info.get(
+                    'username', '用户')
+                st.markdown(f"""
+                <div style="display:flex;align-items:center;
+                    justify-content:flex-end;gap:8px;
+                    padding-top:4px;">
+                    <div style="width:32px;height:32px;
+                        border-radius:50%;background:linear-gradient(
+                        135deg,#2563EB,#3B82F6);display:flex;
+                        align-items:center;justify-content:center;
+                        color:#FFFFFF;font-weight:700;
+                        font-size:0.85rem;">
+                        {username[0].upper()}</div>
+                    <span style="font-size:0.9rem;font-weight:600;
+                        color:#0F172A;">{username}</span>
+                </div>
+                """, unsafe_allow_html=True)
+            with user_cols[1]:
+                if st.button("退出", key="header_logout",
+                        use_container_width=True):
+                    AuthManager.clear_auth()
+                    st.session_state.logged_in = False
+                    st.session_state.token = None
+                    st.session_state.user_info = None
+                    st.rerun()
+        else:
+            if st.button("登录 / 注册", key="header_login",
+                    use_container_width=True, type="primary"):
+                st.session_state.show_login_modal = True
+                st.rerun()
+\end{lstlisting}
+
+% ==================== frontend/app.py: render_home() ====================
+\begin{lstlisting}
+def render_home():
+    """渲染首页 - Cinematic Full-Width Design"""
+    hero_html = '''
+    <div style="width:100%;min-height:580px;position:relative;
+        overflow:hidden;background:linear-gradient(135deg,
+        #0F172A 0%,#1E293B 40%,#0F172A 100%);
+        display:flex;align-items:center;justify-content:center;">
+        <div style="position:absolute;top:0;left:0;right:0;
+            bottom:0;opacity:0.15;background-image:linear-gradient(
+            rgba(59,130,246,0.3) 1px,transparent 1px),
+            linear-gradient(90deg,rgba(59,130,246,0.3) 1px,
+            transparent 1px);background-size:60px 60px;"></div>
+        <div style="position:relative;z-index:2;text-align:center;
+            max-width:900px;padding:0 4rem;">
+            <div style="display:inline-flex;align-items:center;
+                gap:10px;padding:10px 24px;border-radius:100px;
+                font-size:0.9rem;font-weight:600;background:
+                rgba(37,99,235,0.15);border:1px solid
+                rgba(96,165,250,0.3);color:#60A5FA;
+                margin-bottom:2rem;">
+                <span style="width:8px;height:8px;background:#3B82F6;
+                    border-radius:50%;display:inline-block;
+                    animation:pulse 2s infinite;"></span>
+                AI-Powered Financial Audit Intelligence
+            </div>
+            <h1 style="font-size:4.5rem;font-weight:800;
+                letter-spacing:-3px;line-height:1.05;
+                margin-bottom:1.25rem;color:#FFFFFF;">
+                智能识别财务舞弊
+            </h1>
+            <h2 style="font-size:2.4rem;font-weight:500;
+                color:#94A3B8;letter-spacing:-1px;
+                margin-bottom:1.5rem;">
+                守护每一笔资金的安全
+            </h2>
+            <p style="font-size:1.25rem;color:#94A3B8;
+                line-height:1.8;max-width:620px;
+                margin:0 auto 2.5rem;">
+                基于生成式 AI 的上市公司财务舞弊识别系统
+                <br>双模分析 · SHAP 可解释 · 风险标签可视化
+            </p>
+        </div>
+    </div>
+    '''
+    st.components.v1.html(hero_html, height=580, scrolling=False)
+    stats_html = '''
+    <div style="width:100%;padding:64px 0;background:
+        linear-gradient(90deg,#2563EB,#3B82F6,#1D4ED8);">
+        <div style="max-width:1200px;margin:0 auto;
+            padding:0 4rem;display:grid;
+            grid-template-columns:repeat(4,1fr);gap:2rem;">
+            <div style="text-align:center;">
+                <div style="font-size:3.5rem;font-weight:800;
+                    color:#FFFFFF;">92%</div>
+                <div style="font-size:1.05rem;
+                    color:rgba(255,255,255,0.85);">
+                    AI 识别准确率</div>
+            </div>
+            <div style="text-align:center;">
+                <div style="font-size:3.5rem;font-weight:800;
+                    color:#FFFFFF;">12,847</div>
+                <div style="font-size:1.05rem;
+                    color:rgba(255,255,255,0.85);">
+                    已分析财报</div>
+            </div>
+            <div style="text-align:center;">
+                <div style="font-size:3.5rem;font-weight:800;
+                    color:#FFFFFF;">4,562</div>
+                <div style="font-size:1.05rem;
+                    color:rgba(255,255,255,0.85);">
+                    覆盖 A 股企业</div>
+            </div>
+            <div style="text-align:center;">
+                <div style="font-size:3.5rem;font-weight:800;
+                    color:#FFFFFF;">7</div>
+                <div style="font-size:1.05rem;
+                    color:rgba(255,255,255,0.85);">
+                    风险分析维度</div>
+            </div>
+        </div>
+    </div>
+    '''
+    st.components.v1.html(stats_html, height=200, scrolling=False)
+    c1, c2, c3 = st.columns([1, 1, 4])
+    with c1:
+        if st.button("开始检测", type="primary",
+                use_container_width=True, key="hero_cta_detect"):
+            if st.session_state.logged_in:
+                st.session_state.current_page = "detect"
+                st.rerun()
+            else:
+                st.session_state.show_login_modal = True
+                st.rerun()
+    with c2:
+        if st.button("查看价格", use_container_width=True,
+                key="hero_cta_more"):
+            st.session_state.current_page = "pricing"
+            st.rerun()
+\end{lstlisting}
+
+% ==================== frontend/app.py: render_detection() ====================
+\begin{lstlisting}
+def render_detection():
+    """渲染舞弊检测页面 - Premium Design"""
+    st.markdown("""
+    <div style="margin:-1rem -1rem 2rem -1rem;
+        padding:2rem 1.5rem;background:#F8FAFC;
+        border-bottom:1px solid #E2E8F0;
+        border-radius:20px;position:relative;
+        overflow:hidden;">
+        <div style="position:absolute;top:-50px;right:-50px;
+            width:200px;height:200px;background:
+            rgba(37,99,235,0.08);border-radius:50%;"></div>
+        <div style="position:relative;z-index:1;">
+            <h2 style="color:#0F172A;font-size:1.8rem;
+                font-weight:700;margin-bottom:0.5rem;">
+                舞弊检测</h2>
+            <p style="color:#475569;font-size:1rem;margin:0;">
+                上传财务数据，AI 智能识别潜在舞弊风险</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    if not st.session_state.logged_in:
+        st.warning("请先登录以使用检测功能")
+        return
+    if 'upload_years' not in st.session_state:
+        st.session_state.upload_years = [2023]
+    if 'uploaded_files_data' not in st.session_state:
+        st.session_state.uploaded_files_data = {}
+    if 'parsed_results' not in st.session_state:
+        st.session_state.parsed_results = None
+    tab1, tab2, tab3 = st.tabs(
+        [" 文件上传", " 内置案例库", "手动录入"])
+    with tab1:
+        st.subheader("上传财务文件进行检测")
+        st.info("**上传说明**：您可以将多年度财务数据整理在
+            一个Excel/CSV文件中上传")
+        col1, col2 = st.columns(2)
+        with col1:
+            company_name = st.text_input("企业名称*",
+                key="upload_company_name",
+                placeholder="例如：贵州茅台")
+        with col2:
+            stock_code = st.text_input("证券代码",
+                key="upload_stock_code",
+                placeholder="例如：600519")
+        st.subheader("设置数据年份区间")
+        col_start, col_end = st.columns(2)
+        with col_start:
+            start_year = st.number_input("起始年份",
+                min_value=2000, max_value=2025,
+                value=2020, key="start_year")
+        with col_end:
+            end_year = st.number_input("结束年份",
+                min_value=2000, max_value=2025,
+                value=2023, key="end_year")
+        if start_year > end_year:
+            st.error("起始年份不能大于结束年份")
+        uploaded_file = st.file_uploader(
+            "上传财务数据文件",
+            type=['xlsx', 'xls', 'csv', 'txt'],
+            key="financial_file_uploader")
+        mdna_files = st.file_uploader(
+            "上传MD&A文本文件（可选，可多选）",
+            type=['txt', 'docx', 'doc', 'pdf'],
+            key="mdna_file_uploader",
+            accept_multiple_files=True)
+        if uploaded_file:
+            if st.button("解析文件内容", type="secondary",
+                    use_container_width=True):
+                with st.spinner("正在解析文件，请稍候..."):
+                    try:
+                        file_content = uploaded_file.getvalue()
+                        if uploaded_file.name.endswith(
+                                ('.xlsx', '.xls')):
+                            import pandas as pd
+                            df = pd.read_excel(
+                                io.BytesIO(file_content))
+                        elif uploaded_file.name.endswith('.csv'):
+                            import pandas as pd
+                            df = pd.read_csv(
+                                io.BytesIO(file_content))
+                        year_col = None
+                        for col in df.columns:
+                            if str(col).lower() in \
+                                    ['year', '年份', '年度']:
+                                year_col = col
+                                break
+                        results = []
+                        if year_col:
+                            for year_val, year_df in \
+                                    df.groupby(year_col):
+                                if start_year <= int(year_val) \
+                                        <= end_year:
+                                    financial_data = {}
+                                    for col in year_df.columns:
+                                        if col != year_col:
+                                            val = year_df[col].iloc[0]
+                                            try:
+                                                financial_data[
+                                                    str(col)] = float(val)
+                                            except:
+                                                pass
+                                    results.append({
+                                        "year": int(year_val),
+                                        "financial_data": financial_data,
+                                        "parsed_success": True
+                                    })
+                        else:
+                            financial_data = {}
+                            for col in df.columns:
+                                try:
+                                    val = df[col].iloc[0]
+                                    financial_data[str(col)] = float(val)
+                                except:
+                                    pass
+                            results.append({
+                                "year": start_year,
+                                "financial_data": financial_data,
+                                "parsed_success": True
+                            })
+                        mdna_text = ""
+                        if mdna_files:
+                            mdna_parts = []
+                            for i, mdna_f in enumerate(mdna_files):
+                                content = mdna_f.getvalue().decode(
+                                    'utf-8', errors='ignore')
+                                if content.strip():
+                                    mdna_parts.append(
+                                        f"【MD&A文件{i+1}: {mdna_f.name}】\n{content}")
+                            mdna_text = "\n\n---\n\n".join(mdna_parts)
+                        st.session_state.parsed_results = {
+                            "type": "multi_year",
+                            "results": results,
+                            "year_range": f"{start_year}-{end_year}",
+                            "mdna_text": mdna_text
+                        }
+                        st.success(f"成功解析 {len(results)} 个年份的数据")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"解析失败：{str(e)}")
+\end{lstlisting}
+
+% ==================== frontend/app.py: render_detection_result() ====================
+\begin{lstlisting}
+def render_detection_result(result, show_divider=True):
+    """渲染检测结果 - Premium Design"""
+    year = result.get('year', '')
+    fraud_prob = result.get("fraud_probability", 0)
+    risk_level = result.get("risk_level", "low")
+    risk_score = result.get("risk_score", 0)
+    risk_colors = {"high": "#EF4444", "medium": "#F59E0B",
+        "low": "#10B981"}
+    risk_bg = {"high": "rgba(239,68,68,0.1)",
+        "medium": "rgba(245,158,11,0.1)",
+        "low": "rgba(16,185,129,0.1)"}
+    rc = risk_colors.get(risk_level, "#6B8294")
+    rbg = risk_bg.get(risk_level, "rgba(107,130,148,0.1)")
+    st.markdown(f"""
+    <div style="margin:0 0 2rem 0;padding:2rem;
+        border-radius:24px;background:linear-gradient(
+        135deg,#F8FAFC,#EFF6FF);border:1px solid {rc}33;">
+        <div style="display:flex;align-items:center;
+            gap:12px;margin-bottom:1rem;">
+            <span style="display:inline-flex;padding:6px 16px;
+                border-radius:100px;font-size:0.85rem;
+                font-weight:700;background:{rbg};
+                color:{rc};border:1px solid {rc}44;">
+                {show_risk_level_badge(risk_level)}</span>
+            <span style="font-size:1.5rem;font-weight:700;">
+                {year}年度 智能检测报告</span>
+        </div>
+        <div style="display:grid;
+            grid-template-columns:repeat(4,1fr);gap:1rem;">
+            <div style="text-align:center;padding:1rem;
+                border-radius:16px;">
+                <div style="font-size:0.8rem;opacity:0.6;
+                    margin-bottom:4px;">舞弊概率</div>
+                <div style="font-size:1.8rem;font-weight:800;
+                    color:{rc};">{fraud_prob:.1%}</div>
+            </div>
+            <div style="text-align:center;padding:1rem;
+                border-radius:16px;">
+                <div style="font-size:0.8rem;opacity:0.6;
+                    margin-bottom:4px;">风险评分</div>
+                <div style="font-size:1.8rem;font-weight:800;">
+                    {risk_score:.1f}</div>
+            </div>
+            <div style="text-align:center;padding:1rem;
+                border-radius:16px;">
+                <div style="font-size:0.8rem;opacity:0.6;
+                    margin-bottom:4px;">风险标签</div>
+                <div style="font-size:1.8rem;font-weight:800;">
+                    {len(result.get('risk_labels', []))}</div>
+            </div>
+            <div style="text-align:center;padding:1rem;
+                border-radius:16px;">
+                <div style="font-size:0.8rem;opacity:0.6;
+                    margin-bottom:4px;">置信度</div>
+                <div style="font-size:1.8rem;font-weight:800;">
+                    {(1-fraud_prob)*100:.0f}%</div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        fig = create_fraud_probability_gauge(fraud_prob)
+        st.plotly_chart(fig, use_container_width=True)
+    with col2:
+        st.metric("风险标签数",
+            f"{len(result.get('risk_labels', []))}个")
+    st.divider()
+    col_chart1, col_chart2 = st.columns([2, 1])
+    with col_chart1:
+        st.subheader("AI风险特征雷达图")
+        ai_scores = result.get("ai_feature_scores", {})
+        if ai_scores:
+            fig = create_ai_radar_chart(ai_scores)
+            if fig:
+                st.plotly_chart(fig, use_container_width=True)
+    with col_chart2:
+        st.subheader("SHAP特征重要性")
+        shap_features = result.get("shap_features", {})
+        if shap_features:
+            sorted_features = sorted(shap_features.items(),
+                key=lambda x: abs(x[1]), reverse=True)[:5]
+            for feature, importance in sorted_features:
+                abs_importance = abs(importance)
+                display_value = min(abs_importance * 2, 1.0)
+                feature_names = {
+                    "CON_SEM_AI": "语义矛盾度",
+                    "COV_RISK_AI": "风险披露完整性",
+                    "TONE_ABN_AI": "异常乐观语调",
+                    "FIT_TD_AI": "文本-数据一致性",
+                    "HIDE_REL_AI": "关联隐藏指数",
+                    "DEN_ABN_AI": "信息密度异常",
+                    "STR_EVA_AI": "回避表述强度"
+                }
+                feature_name = feature_names.get(feature, feature)
+                st.progress(display_value,
+                    text=f"{feature_name}: {importance:+.4f}")
+\end{lstlisting}
+
+% ==================== frontend/app.py: render_qa() ====================
+\begin{lstlisting}
+def render_qa():
+    """渲染 AI 问答页面 - 支持流式输出"""
+    _render_page_header("AI 智能问答",
+        "财务舞弊领域专业问答助手，7x24 随时解答")
+    if not st.session_state.logged_in:
+        st.info("AI 问答功能仅对登录用户开放")
+        st.divider()
+        render_login_register()
+        return
+    if not st.session_state.chat_history:
+        st.markdown('''
+        <div class="glass-card" style="text-align:center;
+            padding:3rem 2rem;margin-bottom:1.5rem;">
+            <h3 style="font-size:1.25rem;font-weight:700;
+                margin-bottom:0.5rem;">
+                财务舞弊智能问答助手</h3>
+            <p style="font-size:0.95rem;opacity:0.7;
+                line-height:1.6;max-width:500px;margin:0 auto;">
+                我可以帮您解答财务舞弊识别、审计方法、
+                案例分析等专业问题。
+                <br>支持流式输出，即问即答。
+            </p>
+        </div>
+        ''', unsafe_allow_html=True)
+    if 'streaming_answer' not in st.session_state:
+        st.session_state.streaming_answer = ""
+    if 'is_streaming' not in st.session_state:
+        st.session_state.is_streaming = False
+    suggestions = make_api_request("/qa/suggestions")
+    with st.sidebar:
+        st.subheader("推荐问题")
+        if suggestions:
+            for cat in suggestions:
+                with st.expander(cat["category"]):
+                    for q in cat["questions"]:
+                        if st.button(q, key=f"sug_{q[:20]}"):
+                            st.session_state.selected_question = q
+    for msg in st.session_state.chat_history:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
+    if prompt := st.chat_input("请输入您的问题..."):
+        st.session_state.chat_history.append(
+            {"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        with st.chat_message("assistant"):
+            thinking_placeholder = st.empty()
+            thinking_placeholder.markdown("""
+            <div style="display:flex;align-items:center;
+                gap:10px;padding:4px 0;">
+                <div style="display:flex;gap:4px;
+                    align-items:center;">
+                    <span style="display:inline-block;
+                        width:7px;height:7px;border-radius:50%;
+                        background:#3B82F6;
+                        animation:thinkingBounce 1.4s infinite
+                        ease-in-out both;"></span>
+                    <span style="display:inline-block;
+                        width:7px;height:7px;border-radius:50%;
+                        background:#3B82F6;
+                        animation:thinkingBounce 1.4s infinite
+                        ease-in-out both;
+                        animation-delay:0.16s;"></span>
+                    <span style="display:inline-block;
+                        width:7px;height:7px;border-radius:50%;
+                        background:#3B82F6;
+                        animation:thinkingBounce 1.4s infinite
+                        ease-in-out both;
+                        animation-delay:0.32s;"></span>
+                </div>
+                <span style="font-size:0.85rem;color:#64748B;">
+                    AI 正在思考中...</span>
+            </div>
+            """, unsafe_allow_html=True)
+            try:
+                import requests
+                url = f"{API_BASE_URL}/qa/ask-stream"
+                req_headers = {
+                    "Authorization": f"Bearer {st.session_state.token}",
+                    "Content-Type": "application/json"
+                }
+                req_data = {"question": prompt}
+                response = requests.post(url, json=req_data,
+                    headers=req_headers, stream=True, timeout=120)
+                if response.status_code == 200:
+                    def _stream_generator():
+                        for line in response.iter_lines(
+                                decode_unicode=True):
+                            if not line:
+                                continue
+                            if line.startswith("data: "):
+                                data_str = line[6:]
+                                if data_str == "[DONE]":
+                                    break
+                                try:
+                                    event_data = json.loads(data_str)
+                                    content = event_data.get("content")
+                                    if content and \
+                                            isinstance(content, str):
+                                        yield content
+                                    if event_data.get("error"):
+                                        break
+                                except json.JSONDecodeError:
+                                    continue
+                    full_answer = st.write_stream(_stream_generator)
+                    thinking_placeholder.empty()
+                    st.session_state.chat_history.append(
+                        {"role": "assistant", "content": full_answer})
+                else:
+                    thinking_placeholder.empty()
+                    result = make_api_request("/qa/ask",
+                        method="POST", data={"question": prompt})
+                    if result and "answer" in result:
+                        answer = result["answer"]
+                        st.markdown(answer)
+                        st.session_state.chat_history.append(
+                            {"role": "assistant", "content": answer})
+                    else:
+                        st.error("回答失败，请稍后重试")
+            except Exception as e:
+                thinking_placeholder.empty()
+                result = make_api_request("/qa/ask",
+                    method="POST", data={"question": prompt})
+                if result and "answer" in result:
+                    answer = result["answer"]
+                    st.markdown(answer)
+                    st.session_state.chat_history.append(
+                        {"role": "assistant", "content": answer})
+                else:
+                    st.error(f"回答失败: {str(e)}")
+\end{lstlisting}
+
+% ==================== frontend/app.py: render_tax_module() ====================
+\begin{lstlisting}
+def render_tax_module():
+    """渲染税务中心模块 - 包含税务测算、简易报税、财税咨询"""
+    sub_tab1, sub_tab2, sub_tab3 = st.tabs(
+        ["税务测算", "简易报税", "财税咨询"])
+    with sub_tab1:
+        st.markdown("""
+        <div style="text-align:center;padding:12px 0 16px 0;">
+            <h3 style="font-size:1.2rem;font-weight:700;
+                margin-bottom:4px;color:#0F172A;">
+                智能税务测算</h3>
+            <p style="color:#64748B;font-size:0.85rem;margin:0;">
+                按最新税法计算个税、企业税，对比最优纳税方案</p>
+        </div>
+        """, unsafe_allow_html=True)
+        calc_tab1, calc_tab2 = st.tabs(["个税测算", "企业税测算"])
+        with calc_tab1:
+            st.markdown("**基本信息**")
+            col1, col2 = st.columns(2)
+            with col1:
+                monthly_salary = st.number_input("税前月薪（元）",
+                    min_value=0, value=15000, step=500,
+                    key="tax_salary")
+                annual_bonus = st.number_input("年终奖（元）",
+                    min_value=0, value=30000, step=1000,
+                    key="tax_bonus")
+            with col2:
+                social_insurance = st.number_input(
+                    "五险一金/月（元）", min_value=0,
+                    value=3000, step=100, key="tax_si")
+                special_deduction = st.number_input(
+                    "专项附加扣除/月（元）", min_value=0,
+                    value=2000, step=100, key="tax_sd")
+            if st.button("计算个税", type="primary",
+                    use_container_width=True, key="calc_pit"):
+                annual_income = monthly_salary * 12
+                annual_deduction = (
+                    60000 + social_insurance * 12
+                    + special_deduction * 12
+                )
+                taxable_income = max(0,
+                    annual_income - annual_deduction)
+                brackets = [
+                    (0, 36000, 0.03, 0),
+                    (36000, 144000, 0.10, 2520),
+                    (144000, 300000, 0.20, 16920),
+                    (300000, 420000, 0.25, 31920),
+                    (420000, 660000, 0.30, 52920),
+                    (660000, 960000, 0.35, 85920),
+                    (960000, float('inf'), 0.45, 181920),
+                ]
+                tax = 0
+                rate = 0
+                quick_deduction = 0
+                for low, high, r, qd in brackets:
+                    if taxable_income > low:
+                        rate = r
+                        quick_deduction = qd
+                if taxable_income > 0:
+                    tax = taxable_income * rate - quick_deduction
+                after_tax = annual_income - tax
+                st.metric("年收入", f"¥{annual_income:,.0f}")
+                st.metric("年扣除额", f"¥{annual_deduction:,.0f}")
+                st.metric("适用税率", f"{rate*100:.0f}%")
+                st.metric("年个税", f"¥{tax:,.0f}")
+                st.metric("税后年收入", f"¥{after_tax:,.0f}")
+        with calc_tab2:
+            col1, col2 = st.columns(2)
+            with col1:
+                revenue = st.number_input("营业收入（元/年）",
+                    min_value=0, value=500000,
+                    step=10000, key="biz_revenue")
+                cost = st.number_input("营业成本（元/年）",
+                    min_value=0, value=300000,
+                    step=10000, key="biz_cost")
+            with col2:
+                taxpayer_type = st.selectbox("纳税人类型",
+                    ["小规模纳税人", "一般纳税人"],
+                    key="biz_type")
+                industry = st.selectbox("行业类型",
+                    ["服务业（6%）", "交通运输/建筑（9%）",
+                    "货物销售（13%）"], key="biz_industry")
+            if st.button("计算企业税", type="primary",
+                    use_container_width=True, key="calc_biz"):
+                profit = revenue - cost
+                if taxpayer_type == "小规模纳税人":
+                    vat_rate = 0.03
+                    vat = revenue * vat_rate
+                else:
+                    vat_rates = {
+                        "服务业（6%）": 0.06,
+                        "交通运输/建筑（9%）": 0.09,
+                        "货物销售（13%）": 0.13
+                    }
+                    vat_rate = vat_rates.get(industry, 0.06)
+                    vat = revenue * vat_rate
+                if profit <= 0:
+                    income_tax = 0
+                elif profit <= 3000000:
+                    income_tax = profit * 0.05
+                else:
+                    income_tax = profit * 0.25
+                surcharge = vat * 0.12
+                if taxpayer_type == "小规模纳税人":
+                    surcharge = vat * 0.06
+                total_tax = vat + income_tax + surcharge
+                net_profit = profit - total_tax
+                st.metric("增值税", f"¥{vat:,.0f}")
+                st.metric("企业所得税", f"¥{income_tax:,.0f}")
+                st.metric("附加税", f"¥{surcharge:,.0f}")
+                st.metric("合计应缴税额", f"¥{total_tax:,.0f}")
+                st.metric("税后净利润", f"¥{net_profit:,.0f}")
+\end{lstlisting}
+
+% ==================== frontend/app.py: main() ====================
+\begin{lstlisting}
+def main():
+    """主程序"""
+    cookie_manager = AuthManager.get_cookie_manager_instance()
+    if not st.session_state.auth_initialized:
+        AuthManager.try_auto_login()
+        st.session_state.auth_initialized = True
+    render_header()
+    if st.session_state.get('show_login_modal', False) \
+            and not st.session_state.logged_in:
+        render_login_modal()
+    page = st.session_state.current_page
+    non_fullwidth_pages = ["fs", "detect", "qa", "history",
+        "reports", "membership", "settings", "pricing", "cases"]
+    needs_wrap = page in non_fullwidth_pages
+    if needs_wrap:
+        st.markdown('<div class="content-wrap" style="
+            padding-top:2rem;padding-bottom:3rem;">',
+            unsafe_allow_html=True)
+    if st.session_state.logged_in:
+        if page == "home":
+            render_home()
+        elif page == "fs":
+            render_financial_assistant()
+        elif page == "detect":
+            render_detection()
+        elif page == "qa":
+            render_qa()
+        elif page == "history":
+            render_my_detections()
+        elif page == "reports":
+            render_report_management()
+        elif page == "membership":
+            render_membership()
+        elif page == "settings":
+            render_account_settings()
+    else:
+        if page == "home":
+            render_home()
+        elif page == "qa":
+            render_qa()
+        elif page == "pricing":
+            st.markdown("""
+            <div style="margin:-2rem -2rem 2rem -2rem;
+                padding:3rem 2rem;background:linear-gradient(
+                135deg,#0F172A,#1E293B);">
+                <div style="position:relative;z-index:1;
+                    max-width:1280px;margin:0 auto;">
+                    <h1 style="color:#FFFFFF;font-size:2.5rem;
+                        font-weight:800;margin-bottom:0.5rem;">
+                        价格中心</h1>
+                    <p style="color:#94A3B8;font-size:1.05rem;">
+                        选择适合您的方案，解锁全部智能审计能力</p>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            render_membership()
+        elif page == "cases":
+            render_case_center()
+    if needs_wrap:
+        st.markdown('</div>', unsafe_allow_html=True)
+
+if __name__ == "__main__":
+    main()
+\end{lstlisting}
+
+\end{document}

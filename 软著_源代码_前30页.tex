@@ -1,0 +1,1269 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{ctex}
+\usepackage{DejaVuSansMono}
+
+% 页眉页脚设置
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[C]{\small 审计智鉴流式数据处理系统 V1.0}
+\fancyfoot[C]{\thepage/60}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% 代码样式设置
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\footnotesize,
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    numbersep=8pt,
+    frame=none,
+    breaklines=true,
+    breakatwhitespace=true,
+    showstringspaces=false,
+    tabsize=4,
+    aboveskip=0pt,
+    belowskip=0pt,
+    lineskip=1pt,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray}\itshape,
+    stringstyle=\color{orange},
+    morekeywords={async,await,True,False,None},
+    literate={_}{\_}1
+}
+
+\begin{document}
+\setcounter{page}{1}
+
+% ==================== backend/main.py ====================
+\begin{lstlisting}
+"""
+FastAPI 主应用入口
+财务舞弊识别 SaaS 平台 - Backend API
+"""
+import sys
+import os
+# 添加项目根目录到Python路径
+sys.path.insert(0, os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__))))
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.staticfiles import StaticFiles
+import os
+
+from core.config import settings
+from core.database import init_db
+
+# 导入路由
+from routers import (user, detection, qa, payment,
+    report, user_account, payment_system, membership,
+    upload, report_export, financial_statement)
+
+# 创建 FastAPI 应用
+app = FastAPI(
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION,
+    description="基于生成式 AI 的上市公司财务舞弊智能识别系统",
+    docs_url="/docs",
+    redoc_url="/redoc"
+)
+
+# 配置 CORS（允许前端访问）
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:8501",
+        "http://localhost:3000",
+        "http://47.76.180.29:8501",
+        "http://47.76.180.29:8000",
+        "https://*.streamlit.app",
+        "https://*.onrender.com"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# GZip 压缩中间件
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+# 挂载静态文件目录
+os.makedirs(settings.UPLOAD_FOLDER, exist_ok=True)
+os.makedirs("result/reports", exist_ok=True)
+os.makedirs("backend/templates/reports", exist_ok=True)
+app.mount("/uploads", StaticFiles(
+    directory=settings.UPLOAD_FOLDER), name="uploads")
+app.mount("/reports", StaticFiles(
+    directory="result/reports"), name="reports")
+
+# 包含路由
+app.include_router(user.router, prefix=settings.API_PREFIX)
+app.include_router(user_account.router, prefix=settings.API_PREFIX)
+app.include_router(detection.router, prefix=settings.API_PREFIX)
+app.include_router(qa.router, prefix=settings.API_PREFIX)
+app.include_router(payment.router, prefix=settings.API_PREFIX)
+app.include_router(payment_system.router, prefix=settings.API_PREFIX)
+app.include_router(membership.router, prefix=settings.API_PREFIX)
+app.include_router(report_export.router, prefix=settings.API_PREFIX)
+app.include_router(report.router, prefix=settings.API_PREFIX)
+app.include_router(upload.router, prefix=settings.API_PREFIX)
+app.include_router(financial_statement.router,
+    prefix=settings.API_PREFIX)
+
+# 健康检查
+@app.get("/")
+def root():
+    return {
+        "name": settings.APP_NAME,
+        "version": settings.APP_VERSION,
+        "status": "running"
+    }
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy"}
+
+# 数据库初始化
+@app.on_event("startup")
+def startup_event():
+    print("=" * 60)
+    print(f"{settings.APP_NAME} v{settings.APP_VERSION}")
+    print("=" * 60)
+    try:
+        init_db()
+        print("数据库初始化成功")
+    except Exception as e:
+        print(f"数据库初始化失败：{e}")
+    try:
+        from services.detection_service import detection_engine
+        print("检测引擎初始化成功")
+    except Exception as e:
+        print(f"检测引擎初始化失败：{e}")
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0",
+        port=8000, reload=settings.DEBUG)
+\end{lstlisting}
+
+% ==================== backend/core/security.py ====================
+\begin{lstlisting}
+"""
+用户认证和安全工具
+"""
+from datetime import datetime, timedelta
+from typing import Optional
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from sqlalchemy.orm import Session
+from backend.core.config import settings
+from backend.core.database import get_db
+from backend.models.database import User
+
+pwd_context = CryptContext(schemes=["pbkdf2_sha256"],
+    deprecated="auto")
+security = HTTPBearer()
+
+def verify_password(plain_password: str,
+    hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
+
+def get_password_hash(password: str) -> str:
+    return pwd_context.hash(password)
+
+def create_access_token(data: dict,
+    expires_delta: Optional[timedelta] = None) -> str:
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(
+            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode,
+        settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    return encoded_jwt
+
+def decode_access_token(token: str) -> Optional[dict]:
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM])
+        return payload
+    except JWTError:
+        return None
+
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+    db: Session = Depends(get_db)
+) -> User:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="无法验证凭证",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    token = credentials.credentials
+    payload = decode_access_token(token)
+    if payload is None:
+        raise credentials_exception
+    user_id: str = payload.get("sub")
+    if user_id is None:
+        raise credentials_exception
+    user = db.query(User).filter(User.id == int(user_id)).first()
+    if user is None:
+        raise credentials_exception
+    return user
+
+def get_user_membership_level(user: User) -> str:
+    if user.membership_level != "free":
+        if user.membership_expire_at and \
+                user.membership_expire_at < datetime.utcnow():
+            user.membership_level = "free"
+            user.membership_expire_at = None
+            return "free"
+    return user.membership_level
+
+def check_detection_quota(user: User) -> bool:
+    membership_level = get_user_membership_level(user)
+    if membership_level == "free":
+        if user.free_detections_remaining is None or \
+                user.free_detections_remaining <= 0:
+            return False
+        if user.detection_reset_date and \
+                user.detection_reset_date < datetime.utcnow().date():
+            user.free_detections_remaining = \
+                settings.FREE_USER_MONTHLY_DETECTIONS
+            user.detection_reset_date = \
+                datetime.utcnow().date() + timedelta(days=30)
+        return user.free_detections_remaining > 0
+    else:
+        return True
+
+def consume_detection_quota(user: User) -> int:
+    membership_level = get_user_membership_level(user)
+    if membership_level == "free":
+        if user.free_detections_remaining and \
+                user.free_detections_remaining > 0:
+            user.free_detections_remaining -= 1
+            return user.free_detections_remaining
+    return -1
+
+def check_ai_question_quota(user: User) -> bool:
+    membership_level = get_user_membership_level(user)
+    quotas = {
+        "free": settings.FREE_USER_DAILY_AI_QUESTIONS,
+        "pro": settings.PRO_USER_DAILY_AI_QUESTIONS,
+        "enterprise": settings.ENTERPRISE_USER_DAILY_AI_QUESTIONS,
+    }
+    quota = quotas.get(membership_level, 0)
+    return quota <= 0 or (
+        user.free_detections_remaining is None or
+        user.free_detections_remaining < quota
+    )
+\end{lstlisting}
+
+% ==================== backend/models/database.py (部分) ====================
+\begin{lstlisting}
+"""
+数据库模型定义
+财务舞弊识别 SaaS 平台 - 核心数据表结构
+"""
+from sqlalchemy import (Column, Integer, String, Float,
+    DateTime, Boolean, Text, ForeignKey, JSON, Date)
+from sqlalchemy.dialects.mysql import LONGTEXT
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
+from datetime import datetime
+
+Base = declarative_base()
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String(50), unique=True,
+        index=True, nullable=False)
+    email = Column(String(100), unique=True, index=True)
+    phone = Column(String(20), unique=True, index=True)
+    password_hash = Column(String(255), nullable=False)
+    user_type = Column(String(20), default="individual")
+    membership_level = Column(String(20), default="free")
+    membership_expire_at = Column(DateTime)
+    balance = Column(Float, default=0.0)
+    free_detections_remaining = Column(Integer, default=3)
+    detection_reset_date = Column(Date)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow,
+        onupdate=datetime.utcnow)
+    profile = relationship("UserProfile",
+        back_populates="user", uselist=False)
+    detections = relationship("DetectionRecord",
+        back_populates="user")
+    orders = relationship("Order", back_populates="user")
+    subscription = relationship("Subscription",
+        back_populates="user", uselist=False)
+    qa_history = relationship("QAHistory",
+        back_populates="user")
+
+class UserProfile(Base):
+    __tablename__ = "user_profiles"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"),
+        unique=True)
+    real_name = Column(String(50))
+    id_card = Column(String(18))
+    id_card_verified = Column(Boolean, default=False)
+    company_name = Column(String(200))
+    credit_code = Column(String(18))
+    company_verified = Column(Boolean, default=False)
+    certified = Column(Boolean, default=False)
+    certified_at = Column(DateTime)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow,
+        onupdate=datetime.utcnow)
+    user = relationship("User", back_populates="profile")
+
+class DetectionRecord(Base):
+    __tablename__ = "detection_records"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    company_name = Column(String(200), nullable=False)
+    stock_code = Column(String(10), index=True)
+    year = Column(Integer)
+    fraud_probability = Column(Float)
+    risk_level = Column(String(20))
+    risk_score = Column(Float)
+    shap_features = Column(JSON)
+    ai_feature_scores = Column(JSON)
+    risk_labels = Column(JSON)
+    risk_evidence_locations = Column(JSON)
+    suspicious_segments = Column(JSON)
+    ipo_comparison_results = Column(JSON)
+    remediation_suggestions = Column(JSON)
+    financial_data = Column(JSON)
+    mdna_text = Column(LONGTEXT)
+    cost = Column(Float, default=0.0)
+    detection_type = Column(String(20), default="single")
+    status = Column(String(20), default="completed")
+    created_at = Column(DateTime, default=datetime.utcnow,
+        index=True)
+    updated_at = Column(DateTime, default=datetime.utcnow,
+        onupdate=datetime.utcnow)
+    user = relationship("User", back_populates="detections")
+    reports = relationship("Report",
+        back_populates="detection")
+
+class Report(Base):
+    __tablename__ = "reports"
+    id = Column(Integer, primary_key=True, index=True)
+    record_id = Column(Integer,
+        ForeignKey("detection_records.id"))
+    report_type = Column(String(20), default="basic")
+    file_path = Column(String(500))
+    file_url = Column(String(500))
+    is_public = Column(Boolean, default=False)
+    share_token = Column(String(64), unique=True)
+    share_expire_at = Column(DateTime)
+    download_count = Column(Integer, default=0)
+    view_count = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow,
+        onupdate=datetime.utcnow)
+    detection = relationship("DetectionRecord",
+        back_populates="reports")
+\end{lstlisting}
+
+% ==================== backend/routers/user.py ====================
+\begin{lstlisting}
+"""
+用户认证路由
+"""
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import HTTPBearer
+from sqlalchemy.orm import Session
+from datetime import datetime, timedelta
+
+from backend.core.database import get_db
+from backend.core.security import (
+    verify_password, get_password_hash,
+    create_access_token, get_current_user
+)
+from backend.core.config import settings
+from backend.models.database import User, UserProfile
+from backend.schemas.schemas import (
+    UserCreate, UserLogin, UserResponse, TokenResponse,
+    UserUpdate, UserProfileCreate, UserProfileResponse,
+    MembershipLevelEnum
+)
+
+router = APIRouter(prefix="/user", tags=["用户认证"])
+security = HTTPBearer()
+
+@router.post("/register", response_model=UserResponse)
+def register(user_data: UserCreate,
+    db: Session = Depends(get_db)):
+    existing_user = db.query(User).filter(
+        User.username == user_data.username).first()
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="用户名已存在"
+        )
+    if user_data.email:
+        existing_email = db.query(User).filter(
+            User.email == user_data.email).first()
+        if existing_email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="邮箱已被注册"
+            )
+    if user_data.phone:
+        existing_phone = db.query(User).filter(
+            User.phone == user_data.phone).first()
+        if existing_phone:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="手机号已被注册"
+            )
+    db_user = User(
+        username=user_data.username,
+        email=user_data.email,
+        phone=user_data.phone,
+        password_hash=get_password_hash(user_data.password),
+        user_type=user_data.user_type.value,
+        membership_level="free",
+        free_detections_remaining=
+            settings.FREE_USER_MONTHLY_DETECTIONS,
+        detection_reset_date=datetime.utcnow().date() +
+            timedelta(days=30)
+    )
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    db_profile = UserProfile(user_id=db_user.id)
+    db.add(db_profile)
+    db.commit()
+    return db_user
+
+@router.post("/login", response_model=TokenResponse)
+def login(login_data: UserLogin,
+    db: Session = Depends(get_db)):
+    user = db.query(User).filter(
+        (User.username == login_data.username) |
+        (User.email == login_data.username) |
+        (User.phone == login_data.username)
+    ).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="用户名或密码错误"
+        )
+    if not verify_password(login_data.password,
+            user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="用户名或密码错误"
+        )
+    access_token = create_access_token(
+        data={"sub": str(user.id)}
+    )
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": user
+    }
+
+@router.get("/profile", response_model=UserResponse)
+def get_profile(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    return current_user
+
+@router.put("/profile", response_model=UserResponse)
+def update_profile(
+    user_data: UserUpdate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    update_data = user_data.model_dump(exclude_unset=True)
+    if user_data.email and user_data.email != \
+            current_user.email:
+        existing = db.query(User).filter(
+            User.email == user_data.email,
+            User.id != current_user.id
+        ).first()
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="邮箱已被其他用户使用"
+            )
+    if user_data.phone and user_data.phone != \
+            current_user.phone:
+        existing = db.query(User).filter(
+            User.phone == user_data.phone,
+            User.id != current_user.id
+        ).first()
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="手机号已被其他用户使用"
+            )
+    for field, value in update_data.items():
+        setattr(current_user, field, value)
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+@router.post("/logout")
+def logout(current_user: User = Depends(get_current_user)):
+    return {"message": "登出成功"}
+\end{lstlisting}
+
+% ==================== backend/routers/detection.py (核心函数) ====================
+\begin{lstlisting}
+"""
+舞弊检测核心路由
+"""
+from fastapi import (APIRouter, Depends, HTTPException,
+    status, UploadFile, File)
+from sqlalchemy.orm import Session
+from typing import Optional, List, Dict, Any, Tuple
+from functools import lru_cache
+import json
+import re
+
+from backend.core.database import get_db
+from backend.core.security import get_current_user
+from backend.core.config import settings
+from backend.models.database import (User, DetectionRecord,
+    DemoCase, Report)
+from backend.schemas.schemas import (
+    DetectionCreate, DetectionResponse,
+    DetectionDetailResponse, RiskLevelEnum
+)
+
+_cases_cache = {}
+_cases_cache_time = 0
+import time
+
+def get_cached_cases(db: Session, featured_only: bool = False):
+    global _cases_cache, _cases_cache_time
+    cache_key = f"featured_{featured_only}"
+    current_time = time.time()
+    if cache_key in _cases_cache and \
+            (current_time - _cases_cache_time) < 300:
+        return _cases_cache[cache_key]
+    query = db.query(DemoCase)
+    if featured_only:
+        query = query.filter(DemoCase.is_featured == True)
+    cases = query.order_by(DemoCase.sort_order,
+        DemoCase.id).all()
+    _cases_cache[cache_key] = cases
+    _cases_cache_time = current_time
+    return cases
+
+router = APIRouter(prefix="/detection", tags=["舞弊检测"])
+
+def compute_shap_features(ai_scores: dict,
+    financial_data: dict) -> dict:
+    shap_values = {}
+    for feature, score in ai_scores.items():
+        if isinstance(score, (list, tuple)):
+            score = score[0]
+        if isinstance(score, str):
+            safe_score = 0.0
+        else:
+            try:
+                safe_score = float(score)
+            except:
+                safe_score = 0.0
+        shap_values[feature] = round(safe_score * 0.3, 4)
+    if financial_data:
+        cash = float(financial_data.get("货币资金", 0) or 0)
+        short_loan = float(
+            financial_data.get("短期借款", 0) or 0)
+        if cash > 50 and short_loan > 20:
+            shap_values["存贷双高指标"] = 0.25
+        net_cash = float(financial_data.get(
+            "经营活动现金流净额", 0) or 0)
+        net_profit = float(financial_data.get(
+            "净利润", 0) or 0)
+        if net_profit > 0 and net_cash < 0:
+            shap_values["现金流背离指标"] = 0.22
+        inventory = float(financial_data.get("存货", 0) or 0)
+        total_assets = float(financial_data.get(
+            "总资产", 1) or 1)
+        if total_assets > 0 and inventory / total_assets > 0.15:
+            shap_values["存货占比指标"] = 0.18
+    total = sum(shap_values.values())
+    if total > 0:
+        shap_values = {k: round(v / total, 4)
+            for k, v in shap_values.items()}
+    return shap_values
+
+async def extract_ai_features_from_text(
+    mdna_text: str, financial_data: dict) -> dict:
+    from backend.services.detection_service import \
+        detection_engine
+    if not mdna_text:
+        return detection_engine._get_default_ai_features()
+    try:
+        ai_features = await detection_engine.extract_ai_features(
+            mdna_text, financial_data)
+        return ai_features
+    except Exception as e:
+        print(f"LLM特征提取失败: {e}")
+        return _fallback_ai_feature_extraction(
+            mdna_text, financial_data)
+
+def _fallback_ai_feature_extraction(
+    mdna_text: str, financial_data: dict) -> dict:
+    ai_scores = {
+        "CON_SEM_AI": 0.35,
+        "COV_RISK_AI": 0.35,
+        "TONE_ABN_AI": 0.35,
+        "FIT_TD_AI": 0.35,
+        "HIDE_REL_AI": 0.35,
+        "DEN_ABN_AI": 0.35,
+        "STR_EVA_AI": 0.35
+    }
+    text_lower = mdna_text.lower()
+    contradiction_keywords = ["但是", "然而", "尽管",
+        "虽然", "不过", "却", "反之"]
+    contra_count = sum(1 for kw in contradiction_keywords
+        if kw in text_lower)
+    if contra_count >= 2:
+        ai_scores["CON_SEM_AI"] = min(
+            0.4 + contra_count * 0.08, 0.9)
+    risk_keywords = ["风险", "不确定性", "挑战",
+        "困难", "压力", "波动", "下滑"]
+    risk_count = sum(1 for kw in risk_keywords
+        if kw in text_lower)
+    if risk_count < 3:
+        ai_scores["COV_RISK_AI"] = 0.65
+    elif risk_count > 8:
+        ai_scores["COV_RISK_AI"] = 0.55
+    positive_keywords = ["大幅增长", "突破", "领先",
+        "优异", "显著", "持续向好", "创新高"]
+    positive_count = sum(1 for kw in positive_keywords
+        if kw in text_lower)
+    if positive_count > 3:
+        ai_scores["TONE_ABN_AI"] = min(
+            0.45 + positive_count * 0.1, 0.95)
+    if financial_data:
+        revenue_growth = float(financial_data.get(
+            "营业收入增长率", 0) or 0)
+        net_profit = float(financial_data.get(
+            "净利润", 0) or 0)
+        cash_flow = float(financial_data.get(
+            "经营活动现金流净额", 0) or 0)
+        if ("增长" in text_lower or "提升" in text_lower) \
+                and revenue_growth < -0.1:
+            ai_scores["FIT_TD_AI"] = 0.85
+        if net_profit > 0 and cash_flow < 0:
+            ai_scores["FIT_TD_AI"] = min(
+                ai_scores["FIT_TD_AI"] + 0.25, 0.9)
+    related_keywords = ["关联方", "关联交易", "关联关系",
+        "少数股东", "实际控制人", "控股股东"]
+    related_count = sum(1 for kw in related_keywords
+        if kw in text_lower)
+    if related_count == 0:
+        ai_scores["HIDE_REL_AI"] = 0.55
+    elif related_count > 5:
+        ai_scores["HIDE_REL_AI"] = min(
+            0.45 + related_count * 0.06, 0.8)
+    text_length = len(mdna_text)
+    if text_length < 300:
+        ai_scores["DEN_ABN_AI"] = 0.6
+    elif text_length > 3000:
+        ai_scores["DEN_ABN_AI"] = 0.5
+    evade_keywords = ["可能", "或许", "大概", "预计",
+        "计划", "拟", "将", "有望"]
+    evade_count = sum(1 for kw in evade_keywords
+        if kw in text_lower)
+    if evade_count > 8:
+        ai_scores["STR_EVA_AI"] = min(
+            0.4 + evade_count * 0.05, 0.85)
+    return ai_scores
+
+@router.get("/cases", response_model=List[DemoCaseResponse])
+def get_demo_cases(
+    featured_only: bool = False,
+    db: Session = Depends(get_db)
+):
+    return get_cached_cases(db, featured_only)
+
+@router.get("/cases/{case_id}",
+    response_model=DemoCaseDetailResponse)
+def get_demo_case(case_id: int,
+    db: Session = Depends(get_db)):
+    case = db.query(DemoCase).filter(
+        DemoCase.id == case_id).first()
+    if not case:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="案例不存在"
+        )
+    return case
+\end{lstlisting}
+
+% ==================== backend/services/detection_service.py (核心类) ====================
+\begin{lstlisting}
+"""
+舞弊检测核心功能实现
+包含 AI 特征提取、风险评分计算、SHAP 分析等
+"""
+import asyncio
+import json
+import re
+import os
+import hashlib
+from typing import Dict, List, Optional, Tuple, Any
+from functools import lru_cache
+import numpy as np
+import shap
+import xgboost as xgb
+import joblib
+from sqlalchemy.orm import Session
+from cachetools import TTLCache
+
+from backend.core.config import settings
+from backend.models.database import DetectionRecord, DemoCase
+from backend.core.cache_manager import (get_llm_cache,
+    get_shap_cache, cached)
+
+ai_result_cache = get_llm_cache()
+shap_cache = get_shap_cache()
+from backend.schemas.schemas import DetectionCreate, RiskLevelEnum
+from backend.services.analysis_service import analysis_service
+from backend.services.detailed_shap_analysis import \
+    get_detailed_shap_analysis
+
+PROJECT_ROOT = os.path.dirname(os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__))))
+MODEL_DIR = os.path.join(PROJECT_ROOT, "result", "models")
+
+if not os.path.exists(MODEL_DIR):
+    alt_model_dir = os.path.join(PROJECT_ROOT, "..", "models")
+    if os.path.exists(alt_model_dir):
+        MODEL_DIR = os.path.abspath(alt_model_dir)
+
+class FraudDetectionEngine:
+    def __init__(self):
+        self.ai_model = None
+        self.traditional_model = None
+        self.feature_names = []
+        self.scaler = None
+        self.selected_features = None
+        self.numeric_columns = None
+        self._load_models()
+
+    def _load_models(self):
+        try:
+            ai_model_path = os.path.join(MODEL_DIR,
+                "model_ai_XGBoost.pkl")
+            trad_model_path = os.path.join(MODEL_DIR,
+                "model_trad_XGBoost.pkl")
+            scaler_path = os.path.join(MODEL_DIR, "scaler.pkl")
+            features_path = os.path.join(MODEL_DIR,
+                "selected_features.pkl")
+            numeric_path = os.path.join(MODEL_DIR,
+                "numeric_columns.pkl")
+            if os.path.exists(ai_model_path):
+                self.ai_model = joblib.load(ai_model_path)
+            if os.path.exists(trad_model_path):
+                self.traditional_model = joblib.load(
+                    trad_model_path)
+            if os.path.exists(scaler_path):
+                self.scaler = joblib.load(scaler_path)
+            if os.path.exists(features_path):
+                self.selected_features = joblib.load(
+                    features_path)
+            if os.path.exists(numeric_path):
+                self.numeric_columns = joblib.load(
+                    numeric_path)
+            if self.ai_model:
+                try:
+                    self.feature_names = \
+                        self.ai_model.get_booster().feature_names
+                except Exception:
+                    try:
+                        self.feature_names = \
+                            self.ai_model.feature_names_in_
+                    except:
+                        self.feature_names = []
+        except Exception as e:
+            self.ai_model = xgb.XGBClassifier()
+            self.traditional_model = xgb.XGBClassifier()
+
+    @cached(cache_name="llm_results", maxsize=200,
+            ttl=86400)
+    async def extract_ai_features(self, mdna_text: str,
+        financial_data: Dict[str, Any]) -> Dict[str, float]:
+        if not mdna_text:
+            return self._get_default_ai_features()
+        cache_key = self._generate_cache_key(
+            mdna_text, financial_data)
+        if cache_key in ai_result_cache:
+            return ai_result_cache[cache_key]
+        prompt = settings.OPTIMIZED_PROMPT_TEMPLATE.format(
+            mdna_text=mdna_text[:1000],
+            financial_data=json.dumps(financial_data,
+                ensure_ascii=False)
+        )
+        try:
+            response = await self._call_llm_api(prompt)
+            features = self._parse_llm_response(response)
+            ai_result_cache[cache_key] = features
+            return features
+        except Exception as e:
+            return self._get_default_ai_features()
+
+    def _generate_cache_key(self, mdna_text: str,
+        financial_data: Dict[str, Any]) -> str:
+        text_prefix = mdna_text[:200].strip()
+        key_data = f"{text_prefix}_{json.dumps(
+            financial_data, sort_keys=True,
+            ensure_ascii=False)}"
+        return hashlib.md5(key_data.encode()).hexdigest()
+
+    async def _call_llm_api(self, prompt: str) -> str:
+        import httpx
+        try:
+            async with httpx.AsyncClient(
+                    timeout=60.0) as client:
+                response = await client.post(
+                    f"{settings.DASHSCOPE_BASE_URL}/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {settings.DASHSCOPE_API_KEY}",
+                        "Content-Type": "application/json"
+                    },
+                    json={
+                        "model": settings.MODEL_QWEN_DETECTION,
+                        "messages": [
+                            {"role": "system", "content":
+                                "你是财务舞弊识别领域的专家，擅长通过文本分析识别财务风险信号。"},
+                            {"role": "user", "content": prompt}
+                        ],
+                        "temperature": 0.3,
+                        "max_tokens": 800
+                    }
+                )
+                if response.status_code == 200:
+                    result = response.json()
+                    return result["choices"][0]["message"]["content"]
+                else:
+                    return self._get_fallback_ai_response()
+        except Exception as e:
+            return self._get_fallback_ai_response()
+
+    def _get_fallback_ai_response(self) -> str:
+        return json.dumps({
+            "CON_SEM_AI": 0.45,
+            "COV_RISK_AI": 0.42,
+            "TONE_ABN_AI": 0.40,
+            "FIT_TD_AI": 0.44,
+            "HIDE_REL_AI": 0.41,
+            "DEN_ABN_AI": 0.43,
+            "STR_EVA_AI": 0.42,
+            "analysis_notes": "API调用失败，使用默认评估值"
+        })
+
+    def _parse_llm_response(self, response: str) -> Dict[str, float]:
+        cleaned_response = re.sub(r'^```json\n|\n```$',
+            '', response.strip())
+        features = json.loads(cleaned_response)
+        standardized = {}
+        for feature in settings.WEIGHTED_FEATURES.keys():
+            score = features.get(feature, 0.3)
+            standardized[feature] = min(max(
+                float(score), 0.0), 1.0)
+        if 'key_risks' in features:
+            standardized['_key_risks'] = features['key_risks']
+        if 'text_evidence' in features:
+            standardized['_text_evidence'] = \
+                features['text_evidence']
+        return standardized
+
+    def _get_default_ai_features(self) -> Dict[str, float]:
+        return {feature: 0.3
+            for feature in settings.WEIGHTED_FEATURES.keys()}
+
+    def calculate_fraud_probability(self,
+        financial_data: Dict[str, Any],
+        ai_features: Dict[str, float]
+    ) -> Tuple[float, RiskLevelEnum, List[Dict[str, Any]], float]:
+        trad_score = self._calculate_traditional_risk(
+            financial_data)
+        ai_score = 0.0
+        for feature, score in ai_features.items():
+            weight = settings.WEIGHTED_FEATURES.get(feature, 1.0)
+            ai_score += score * weight
+        ai_score = ai_score / sum(
+            settings.WEIGHTED_FEATURES.values()) * 65
+        base_risk = 35
+        total_score = base_risk + trad_score + ai_score
+        total_score = min(total_score, 100)
+        normalized_score = total_score / 100
+        fraud_probability = min(max(
+            0.50 + normalized_score * 0.5, 0), 0.95)
+        if fraud_probability >= 0.55:
+            risk_level = RiskLevelEnum.HIGH
+        elif fraud_probability >= 0.30:
+            risk_level = RiskLevelEnum.MEDIUM
+        else:
+            risk_level = RiskLevelEnum.LOW
+        risk_labels = self._generate_risk_labels(
+            financial_data, ai_features, fraud_probability)
+        return (fraud_probability, risk_level,
+            risk_labels, total_score)
+
+    def _calculate_traditional_risk(self,
+        financial_data: Dict[str, Any]) -> float:
+        score = 0.0
+        cash = float(financial_data.get("货币资金", 0) or 0)
+        short_loan = float(financial_data.get(
+            "短期借款", 0) or 0)
+        if cash > 50 and short_loan > 20:
+            score += 20
+        net_cash = float(financial_data.get(
+            "经营活动现金流净额", 0) or 0)
+        net_profit = float(financial_data.get(
+            "净利润", 0) or 0)
+        if net_profit > 0 and net_cash < 0:
+            score += 15
+        inventory = float(financial_data.get("存货", 0) or 0)
+        total_assets = float(financial_data.get(
+            "总资产", 1) or 1)
+        if total_assets > 0 and inventory / total_assets > 0.15:
+            score += 10
+        return min(score, 40)
+
+    def _generate_risk_labels(self, financial_data, ai_features,
+        fraud_probability):
+        risk_labels = []
+        cash = float(financial_data.get("货币资金", 0) or 0)
+        short_loan = float(financial_data.get(
+            "短期借款", 0) or 0)
+        net_cash = float(financial_data.get(
+            "经营活动现金流净额", 0) or 0)
+        net_profit = float(financial_data.get(
+            "净利润", 0) or 0)
+        if cash > 50 and short_loan > 20:
+            risk_labels.append({
+                "label": "存贷双高",
+                "score": 0.85,
+                "description": "货币资金和短期借款同时处于高位"
+            })
+        if net_profit > 0 and net_cash < 0:
+            risk_labels.append({
+                "label": "现金流背离",
+                "score": 0.90,
+                "description": "净利润为正但经营现金流为负"
+            })
+        label_map = {
+            "CON_SEM_AI": ("文本语义矛盾",
+                "MD&A 文本中存在前后矛盾的表述"),
+            "FIT_TD_AI": ("文本-数据不一致",
+                "文本描述与财务数据不匹配"),
+            "COV_RISK_AI": ("风险披露不足",
+                "未充分披露重大风险因素"),
+            "HIDE_REL_AI": ("关联交易隐藏",
+                "关联交易披露不充分或存在隐藏"),
+            "TONE_ABN_AI": ("语调异常乐观",
+                "管理层语调过于乐观"),
+            "DEN_ABN_AI": ("信息密度异常",
+                "信息披露过于简略或冗长"),
+            "STR_EVA_AI": ("回避表述",
+                "对关键问题使用模糊、回避性表述")
+        }
+        thresholds = {
+            "CON_SEM_AI": 0.6, "COV_RISK_AI": 0.6,
+            "TONE_ABN_AI": 0.55, "FIT_TD_AI": 0.6,
+            "HIDE_REL_AI": 0.55, "DEN_ABN_AI": 0.65,
+            "STR_EVA_AI": 0.6
+        }
+        for feature, score in ai_features.items():
+            if feature.startswith('_') or \
+                    feature not in label_map:
+                continue
+            try:
+                score_val = float(score) if score is not None \
+                    else 0.0
+            except:
+                score_val = 0.0
+            if score_val >= thresholds.get(feature, 0.6):
+                label, desc = label_map[feature]
+                risk_labels.append({
+                    "label": label, "score": round(score_val, 2),
+                    "description": desc
+                })
+        return risk_labels[:10]
+\end{lstlisting}
+
+% ==================== backend/routers/qa.py ====================
+\begin{lstlisting}
+"""
+AI 智能问答路由 - 支持流式输出
+"""
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import StreamingResponse
+from sqlalchemy.orm import Session
+from typing import List, Optional, AsyncGenerator
+import httpx
+import json
+
+from backend.core.database import get_db
+from backend.core.security import get_current_user
+from backend.core.config import settings
+from backend.models.database import User, QAHistory
+from backend.schemas.schemas import (QAAskRequest, QAResponse,
+    QASuggestionResponse)
+
+router = APIRouter(prefix="/qa", tags=["AI 问答"])
+
+PRESET_QUESTIONS = {
+    "theory": [
+        "什么是财务舞弊的信号传递理论？",
+        "信息不对称如何导致财务舞弊？",
+        "舞弊三角理论的核心要素是什么？",
+        "GONE 理论如何解释财务舞弊？"
+    ],
+    "practice": [
+        "什么是存贷双高？如何识别？",
+        "如何识别 MD&A 中的语义矛盾？",
+        "审计中如何使用 AI 工具辅助？",
+        "如何通过现金流分析识别舞弊？"
+    ],
+    "policy": [
+        "A 股信息披露规则有哪些核心要求？",
+        "证监会财务舞弊处罚标准是什么？",
+        "新证券法对舞弊的处罚力度如何？",
+        "会计师事务所的审计责任有哪些？"
+    ],
+    "case": [
+        "康美药业舞弊案的关键识别点是什么？",
+        "瑞幸咖啡虚增收入的手法是什么？",
+        "獐子岛扇贝跑路事件如何识别？",
+        "贵州茅台为什么是健康企业典型？"
+    ],
+    "platform": [
+        "如何解读舞弊概率？",
+        "SHAP 分析的原理是什么？",
+        "如何导出检测报告？",
+        "会员版和免费版有什么区别？"
+    ]
+}
+
+SYSTEM_PROMPT = """你是一位财务舞弊识别领域的专家助手。
+请用专业、准确但通俗易懂的语言回答用户问题。"""
+
+async def call_llm_api(question: str, context: str = "",
+    image_base64: str = None, image_mime: str = None) -> str:
+    user_prompt = f"{context}\n\n问题：{question}" \
+        if context else question
+    is_multimodal = image_base64 is not None and \
+        image_mime is not None
+    model = settings.MODEL_QWEN_VL if is_multimodal \
+        else settings.MODEL_QWEN_FS
+    if is_multimodal:
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": [
+                {"type": "text", "text": user_prompt},
+                {"type": "image_url", "image_url": {
+                    "url": f"data:{image_mime};base64,{image_base64}"
+                }}
+            ]}
+        ]
+    else:
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_prompt}
+        ]
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.post(
+                f"{settings.DASHSCOPE_BASE_URL}/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {settings.DASHSCOPE_API_KEY}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": model,
+                    "messages": messages,
+                    "temperature": 0.7,
+                    "max_tokens": 1500
+                }
+            )
+            if response.status_code == 200:
+                result = response.json()
+                return result["choices"][0]["message"]["content"]
+            else:
+                return "抱歉，暂时无法回答该问题。"
+    except Exception as e:
+        return f"抱歉，回答失败：{str(e)[:100]}"
+
+async def call_llm_api_streaming(question: str,
+    context: str = "") -> AsyncGenerator[str, None]:
+    user_prompt = f"{context}\n\n问题：{question}" \
+        if context else question
+    try:
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            async with client.stream("POST",
+                f"{settings.DASHSCOPE_BASE_URL}/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {settings.DASHSCOPE_API_KEY}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "model": settings.MODEL_QWEN_FS,
+                    "messages": [
+                        {"role": "system",
+                            "content": SYSTEM_PROMPT},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    "temperature": 0.7,
+                    "max_tokens": 1500,
+                    "stream": True
+                }
+            ) as response:
+                if response.status_code != 200:
+                    yield f"data: {json.dumps({'error':
+                        'API调用失败'})}\n\n"
+                    return
+                async for line in response.aiter_lines():
+                    if not line or line.strip() == "":
+                        continue
+                    if line.startswith("data: "):
+                        data_str = line[6:]
+                        if data_str == "[DONE]":
+                            yield f"data: {json.dumps(
+                                {'done': True})}\n\n"
+                            break
+                        try:
+                            data = json.loads(data_str)
+                            if "choices" in data and \
+                                    len(data["choices"]) > 0:
+                                delta = data["choices"][0].get(
+                                    "delta", {})
+                                content = delta.get("content")
+                                if content and \
+                                        isinstance(content, str):
+                                    yield f"data: {json.dumps(
+                                        {'content': content})}\n\n"
+                        except json.JSONDecodeError:
+                            continue
+    except Exception as e:
+        yield f"data: {json.dumps({'error': str(e)})}\n\n"
+
+@router.post("/ask", response_model=QAResponse)
+async def ask_question(
+    question_data: QAAskRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    if question_data.category and question_data.category in \
+            ["theory", "practice", "policy", "case", "platform"]:
+        context = f"问题类别：{question_data.category}"
+    else:
+        context = ""
+    answer = await call_llm_api(
+        question_data.question, context,
+        image_base64=question_data.image_base64,
+        image_mime=question_data.image_mime
+    )
+    db_qa = QAHistory(
+        user_id=current_user.id,
+        question=question_data.question,
+        answer=answer,
+        category=question_data.category
+    )
+    db.add(db_qa)
+    db.commit()
+    db.refresh(db_qa)
+    return db_qa
+
+@router.post("/ask-stream")
+async def ask_question_stream(
+    question_data: QAAskRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    if question_data.category and question_data.category in \
+            ["theory", "practice", "policy", "case", "platform"]:
+        context = f"问题类别：{question_data.category}"
+    else:
+        context = ""
+    async def event_generator() -> AsyncGenerator[str, None]:
+        full_answer = ""
+        yield f"data: {json.dumps({'start': True})}\n\n"
+        async for chunk in call_llm_api_streaming(
+                question_data.question, context):
+            yield chunk
+            try:
+                if chunk.startswith("data: "):
+                    data = json.loads(chunk[6:])
+                    content = data.get("content")
+                    if content and isinstance(content, str):
+                        full_answer += content
+            except:
+                pass
+        yield f"data: {json.dumps({'done': True})}\n\n"
+        try:
+            db_qa = QAHistory(
+                user_id=current_user.id,
+                question=question_data.question,
+                answer=full_answer or "（流式输出内容）",
+                category=question_data.category
+            )
+            db.add(db_qa)
+            db.commit()
+        except Exception as e:
+            print(f"保存问答历史失败: {e}")
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no"
+        }
+    )
+
+@router.get("/history", response_model=List[QAResponse])
+def get_qa_history(
+    page: int = 1, page_size: int = 20,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    query = db.query(QAHistory).filter(
+        QAHistory.user_id == current_user.id
+    ).order_by(QAHistory.created_at.desc())
+    offset = (page - 1) * page_size
+    return query.offset(offset).limit(page_size).all()
+
+@router.get("/suggestions",
+    response_model=List[QASuggestionResponse])
+def get_suggestions(
+    category: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    if category and category in PRESET_QUESTIONS:
+        return [QASuggestionResponse(
+            category=category,
+            questions=PRESET_QUESTIONS[category]
+        )]
+    return [QASuggestionResponse(category=cat,
+        questions=questions)
+        for cat, questions in PRESET_QUESTIONS.items()]
+\end{lstlisting}
+
+\end{document}
